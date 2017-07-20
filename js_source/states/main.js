@@ -11,6 +11,6 @@ Game.mainState = {
 
         // Wait for user input
         var key = Engine.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        key.onDown.addOnce(function() { music.stop();Engine.state.start("play") }, this);
+        key.onDown.addOnce(function() { Engine.state.start("play") }, this);
     }
 }

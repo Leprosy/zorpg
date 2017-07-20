@@ -2,12 +2,13 @@
  * Super fun gamez engine
  */
 // Engine namespaces and definitions
-var Engine = Engine || {};
-var Game = Game || {};
+var Engine = {};
+var Game = {};
+
 Game.name = "_zorpg";
 Game.version = "0.1";
-Game.width = 960;
-Game.height = 960;
+Game.width = 640;
+Game.height = 640;
 
-// Game specific vars
-Game.tileSize = 64; // tilebased games tile size
+Game.tileSize = 32;
+Game.taldo = "oaw";
