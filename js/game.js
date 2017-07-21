@@ -70,41 +70,17 @@ Game.playState = {
     create: function() {
         console.info(Game.name + " play state", Game);
         var _this = this;
-        // ESC: go back to menu
-        var key = Engine.input.keyboard.addKey(Phaser.Keyboard.ESC);
-        key.onDown.addOnce(function() {
-            Engine.state.start("main");
-        });
-        /*
-         * Debug code
-         */
-        /*var I = new Game.Interpreter();
-        I.run(); */
-        //create map. Dont store on Game in prod!
-        this.map = Engine.add.tilemap("map", Game.tileSize, Game.tileSize);
-        this.map.addTilesetImage("floor", "floorTileset");
-        this.map.addTilesetImage("object", "objectTileset");
-        this.map.createLayer("floor");
-        this.map.createLayer("object");
-        /**
-         * End
-         */
-        // Party
-        this.party = new Game.Party();
-        // Input
-        Engine.input.keyboard.onDownCallback = function(ev) {
-            _this._inputHandler(ev);
-        };
+        // Create basic entities
+        this.map = new Game.Map();
+        console.log(this.map);
     },
-    update: function() {
-        // check input
-        document.getElementById("debug").value = this.party.x + " - " + this.party.y;
-    },
+    update: function() {},
     render: function() {},
     _inputHandler: function(ev) {
         console.log("keypressed", ev);
         switch (ev.code) {
-          case "ArrowUp":
+          // Party movement
+            case "ArrowUp":
             this.party.moveForward();
             break;
 
@@ -119,18 +95,30 @@ Game.playState = {
           case "ArrowRight":
             this.party.rotateRight();
             break;
+
+          // Fire map tile action
+            case "Space":
+            console.log("Action");
+            break;
+
+          // Exit
+            case "Escape":
+            Engine.state.start("main");
+            break;
         }
     }
 };
 
+/**
+ * Party class. This represents the player party in the game.
+ */
 Game.Party = function() {
     this.obj = Engine.add.sprite(0, 0, "objectTileset", 10);
     this.obj.anchor.setTo(.5, .5);
     this.x = 0;
     this.y = 0;
-    this.d_angle = .1;
-    // Math.PI / 2
-    this.d_dist = 5;
+    this.d_angle = Math.PI / 2;
+    this.d_dist = Game.tileSize;
 };
 
 Game.Party.prototype.moveForward = function() {
@@ -156,6 +144,21 @@ Game.Party.prototype.rotateRight = function() {
 Game.Party.prototype._calculatePos = function() {
     this.x = Math.round(this.obj.x / Game.tileSize);
     this.y = Math.round(this.obj.y / Game.tileSize);
+};
+
+/**
+ * Map class. Methods to interact with the tile based game maps.
+ */
+Game.Map = function() {
+    this.obj = Engine.add.tilemap("map", Game.tileSize, Game.tileSize);
+    this.obj.addTilesetImage("floor", "floorTileset");
+    this.obj.addTilesetImage("object", "objectTileset");
+    this.obj.createLayer("floor");
+    this.obj.createLayer("object");
+};
+
+Game.Map.prototype.getTile = function(x, y) {
+    return "x" + x + "-y" + y;
 };
 
 // Setting up main states
@@ -212,9 +215,3 @@ Game.Interpreter.prototype.run = function() {
 };
 
 Game.Interpreter.prototype.print = function(args) {};
-
-Game.Map = function(name) {
-    this.name = name;
-};
-
-Game.Map.prototype.taldo = function() {};
