@@ -24,6 +24,14 @@
         }],
  "nextobjectid":5,
  "orientation":"orthogonal",
+ "properties":
+    {
+     "script":"{\"5x5\": \"script_content\", \"10x10\": \"another_content\"}"
+    },
+ "propertytypes":
+    {
+     "script":"string"
+    },
  "renderorder":"right-down",
  "tileheight":32,
  "tilesets":[
@@ -38,6 +46,28 @@
          "spacing":0,
          "tilecount":100,
          "tileheight":32,
+         "tileproperties":
+            {
+             "10":
+                {
+                 "damage":"2d6"
+                },
+             "3":
+                {
+                 "block":true
+                }
+            },
+         "tilepropertytypes":
+            {
+             "10":
+                {
+                 "damage":"string"
+                },
+             "3":
+                {
+                 "block":"bool"
+                }
+            },
          "tilewidth":32
         }, 
         {
@@ -51,6 +81,28 @@
          "spacing":0,
          "tilecount":100,
          "tileheight":32,
+         "tileproperties":
+            {
+             "3":
+                {
+                 "block":true
+                },
+             "5":
+                {
+                 "damage":"1d6"
+                }
+            },
+         "tilepropertytypes":
+            {
+             "3":
+                {
+                 "block":"bool"
+                },
+             "5":
+                {
+                 "damage":"string"
+                }
+            },
          "tilewidth":32
         }],
  "tilewidth":32,

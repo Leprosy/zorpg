@@ -1,4 +1,6 @@
-// Play loop state
+/**
+ *  Play loop state
+ */
 Game.playState = {
     map: null,
     party: null,
@@ -7,7 +9,6 @@ Game.playState = {
     preload: function() {
         Engine.load.tilemap("map", "maps/map1.json", null, Phaser.Tilemap.TILED_JSON);
     },
-
     create: function() {
         console.info(Game.name + " play state", Game);
         var _this = this;
@@ -15,20 +16,14 @@ Game.playState = {
         // Create basic entities
         this.map = new Game.Map();
         this.party = new Game.Party();
-        //this.party.setPosition(5, 5);
 
         // Input
         Engine.input.keyboard.onDownCallback = function(ev) { _this._inputHandler(ev) };
 
         //Game.layer.resizeWorld();
     },
-
     update: function() {
         document.getElementById("debug").value = this.party.x + " - " + this.party.y;
-    },
-
-    render: function() {
-
     },
 
 
@@ -39,10 +34,21 @@ Game.playState = {
         switch(ev.code) {
             // Party movement
             case "ArrowUp":
-                this.party.moveForward();
+                var pos = this.party.getForward();
+                var tileInfo = this.map.getTile(pos.x, pos.y);
+                console.log("checking", tileInfo);
+
+                if (this.party.canPass(tileInfo)) {
+                    this.party.setPosition(pos.x, pos.y);
+                    //Trigger tile effects(ie. damage, heal, teleport, script)
+                } else {
+                    console.log("can't pass");
+                }
+
                 break;
             case "ArrowDown":
-                this.party.moveBack();
+                this.party.getBack();
+                //Copy logic from forward case
                 break;
             case "ArrowLeft":
                 this.party.rotateLeft();
@@ -89,16 +95,21 @@ Game.Party.prototype.setPosition = function(x, y) {
     this.obj.x = x * Game.tileSize + Game.tileSize / 2;
     this.obj.y = y * Game.tileSize + Game.tileSize / 2;
 }
-
-Game.Party.prototype.moveForward = function() {
-    this.obj.x = this.obj.x + this.d_dist * Math.cos(this.obj.rotation);
-    this.obj.y = this.obj.y + this.d_dist * Math.sin(this.obj.rotation);
-    this._calculatePos();
+Game.Party.prototype.getForward = function() {
+    var x = this.obj.x + this.d_dist * Math.cos(this.obj.rotation);
+    var y = this.obj.y + this.d_dist * Math.sin(this.obj.rotation);
+    return {
+        x: Math.round((x - Game.tileSize / 2) / Game.tileSize),
+        y: Math.round((y - Game.tileSize / 2) / Game.tileSize)
+    };
 }
-Game.Party.prototype.moveBack = function() {
-    this.obj.x = this.obj.x - this.d_dist * Math.cos(this.obj.rotation);
-    this.obj.y = this.obj.y - this.d_dist * Math.sin(this.obj.rotation);
-    this._calculatePos();
+Game.Party.prototype.getBack = function() {
+    var x = this.obj.x - this.d_dist * Math.cos(this.obj.rotation);
+    var y = this.obj.y - this.d_dist * Math.sin(this.obj.rotation);
+    return {
+        x: Math.round((x - Game.tileSize / 2) / Game.tileSize),
+        y: Math.round((y - Game.tileSize / 2) / Game.tileSize)
+    };
 }
 Game.Party.prototype.rotateLeft = function() {
     this.obj.rotation = (this.obj.rotation - this.d_angle) % (Math.PI * 2);
@@ -106,9 +117,8 @@ Game.Party.prototype.rotateLeft = function() {
 Game.Party.prototype.rotateRight = function() {
     this.obj.rotation = (this.obj.rotation + this.d_angle) % (Math.PI * 2);
 }
-Game.Party.prototype._calculatePos = function() {
-    this.x = Math.round((this.obj.x - Game.tileSize / 2) / Game.tileSize);
-    this.y = Math.round((this.obj.y - Game.tileSize / 2) / Game.tileSize);
+Game.Party.prototype.canPass = function(tile) { // Meant to be used with Game.Map.getTile() method
+    return !tile.floor.properties.block && (!tile.object || !tile.object.properties.block);
 }
 
 
@@ -116,6 +126,11 @@ Game.Party.prototype._calculatePos = function() {
 
 /**
  * Map class. Methods to interact with the tile based game maps.
+ * 
+ * Tile properties:
+ * 
+ * block: the tile blocks the player
+ * damage: the tile damages the player(using a die string)
  */
 Game.Map = function() {
     this.obj = Engine.add.tilemap("map", Game.tileSize, Game.tileSize);
@@ -124,8 +139,14 @@ Game.Map = function() {
     this.obj.addTilesetImage("object", "objectTileset")
     this.obj.createLayer("floor");
     this.obj.createLayer("object");
+
+    this.script = JSON.parse(this.obj.properties.script);
 }
 
 Game.Map.prototype.getTile = function(x, y) {
-    return "x" + x + "-y" + y;
+    return {
+        x: x, y: y,
+        floor: this.obj.getTile(x, y, "floor"),
+        object: this.obj.getTile(x, y, "object")
+    };
 }
