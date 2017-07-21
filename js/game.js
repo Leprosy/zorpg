@@ -111,9 +111,12 @@ Game.playState = {
             this.party.rotateRight();
             break;
 
-          // Fire map tile action
+          // Fire map tile action script
             case "Space":
-            console.log("Action");
+            var script = this.map.getScript(this.party.x, this.party.y);
+            if (script) {
+                console.log("action", script);
+            }
             break;
 
           // Exit
@@ -200,6 +203,14 @@ Game.Map.prototype.getTile = function(x, y) {
         floor: this.obj.getTile(x, y, "floor"),
         object: this.obj.getTile(x, y, "object")
     };
+};
+
+Game.Map.prototype.getScript = function(x, y) {
+    if (typeof this.script[x + "x" + y] !== "undefined") {
+        return this.script[x + "x" + y];
+    } else {
+        return false;
+    }
 };
 
 // Setting up main states
