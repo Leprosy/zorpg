@@ -15,6 +15,7 @@ Game.playState = {
         // Create basic entities
         this.map = new Game.Map();
         this.party = new Game.Party();
+        //this.party.setPosition(5, 5);
 
         // Input
         Engine.input.keyboard.onDownCallback = function(ev) { _this._inputHandler(ev) };
@@ -72,12 +73,21 @@ Game.playState = {
 Game.Party = function() {
     this.obj = Engine.add.sprite(0, 0, "objectTileset", 10);
     this.obj.anchor.setTo(0.5, 0.5);
-
     this.x = 0;
     this.y = 0;
-
     this.d_angle = Math.PI / 2
     this.d_dist = Game.tileSize;
+
+    this.setPosition(0, 0);
+}
+
+Game.Party.prototype.setPosition = function(x, y) {
+    this.x = x;
+    this.y = y;
+
+    // Do the math
+    this.obj.x = x * Game.tileSize + Game.tileSize / 2;
+    this.obj.y = y * Game.tileSize + Game.tileSize / 2;
 }
 
 Game.Party.prototype.moveForward = function() {
@@ -97,8 +107,8 @@ Game.Party.prototype.rotateRight = function() {
     this.obj.rotation = (this.obj.rotation + this.d_angle) % (Math.PI * 2);
 }
 Game.Party.prototype._calculatePos = function() {
-    this.x = Math.round(this.obj.x / Game.tileSize);
-    this.y = Math.round(this.obj.y / Game.tileSize);
+    this.x = Math.round((this.obj.x - Game.tileSize / 2) / Game.tileSize);
+    this.y = Math.round((this.obj.y - Game.tileSize / 2) / Game.tileSize);
 }
 
 
