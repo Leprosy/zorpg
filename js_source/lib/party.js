@@ -56,5 +56,7 @@ Game.Party.prototype.rotateRight = function() {
     this.obj.rotation = (this.obj.rotation + this.d_angle) % (Math.PI * 2);
 }
 Game.Party.prototype.canPass = function(tile) { // Meant to be used with Game.Map.getTile() method
+    if (!tile.floor) return false;
+
     return !tile.floor.properties.block && (!tile.object || !tile.object.properties.block);
 }
