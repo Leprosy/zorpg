@@ -13,10 +13,11 @@ Game.playState = {
         console.info(Game.name + " play state", Game);
         var _this = this;
 
-        // Create basic entities
+        // Create gameplay objects
         this.map = new Game.Map();
         this.party = new Game.Party();
         this.inter = new Game.Interpreter();
+        this.currentScript = null;
 
         // Input
         Engine.input.keyboard.onDownCallback = function(ev) { _this._inputHandler(ev) };
@@ -35,6 +36,13 @@ Game.playState = {
             // Party movement
             case "ArrowUp":
                 this.party.moveForward(this.map)
+                this.currentScript = this.map.getScript(this.party.x, this.party.y);
+
+                // immediate scripts
+                if (this.currentScript && this.currentScript.properties.startOnEnter) {
+                    this.inter.run(this.currentScript);
+                }
+
                 break;
             case "ArrowDown":
                 this.party.getBack();
@@ -49,9 +57,8 @@ Game.playState = {
 
             // Fire map tile action script
             case "Space":
-                var script = this.map.getScript(this.party.x, this.party.y);
-                if (script) {
-                    console.log("action", script);
+                if (this.currentScript) { // TODO: should run startOnEnter scripts?
+                    this.inter.run(this.currentScript);
                 }
                 break;
 

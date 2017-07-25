@@ -1,8 +1,8 @@
 /**
  * Map class. Methods to interact with the tile based game maps.
- * 
+ *
  * Tile properties:
- * 
+ *
  * block: the tile blocks the player
  * damage: the tile damages the player(using a die string)
  */

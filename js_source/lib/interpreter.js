@@ -1,6 +1,6 @@
 /**
  * Interpreter class. This execute map scripting.
- * 
+ *
  */
 
 Game.Interpreter = function() {

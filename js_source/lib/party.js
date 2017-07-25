@@ -1,6 +1,6 @@
 /**
  * Party class. This represents the player party in the game.
- * 
+ *
  */
 Game.Party = function() {
     this.obj = Engine.add.sprite(0, 0, "objectTileset", 10);

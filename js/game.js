@@ -72,9 +72,11 @@ Game.playState = {
     create: function() {
         console.info(Game.name + " play state", Game);
         var _this = this;
-        // Create basic entities
+        // Create gameplay objects
         this.map = new Game.Map();
         this.party = new Game.Party();
+        this.inter = new Game.Interpreter();
+        this.currentScript = null;
         // Input
         Engine.input.keyboard.onDownCallback = function(ev) {
             _this._inputHandler(ev);
@@ -89,6 +91,11 @@ Game.playState = {
           // Party movement
             case "ArrowUp":
             this.party.moveForward(this.map);
+            this.currentScript = this.map.getScript(this.party.x, this.party.y);
+            // immediate scripts
+            if (this.currentScript && this.currentScript.properties.startOnEnter) {
+                this.inter.run(this.currentScript);
+            }
             break;
 
           case "ArrowDown":
@@ -106,9 +113,9 @@ Game.playState = {
 
           // Fire map tile action script
             case "Space":
-            var script = this.map.getScript(this.party.x, this.party.y);
-            if (script) {
-                console.log("action", script);
+            if (this.currentScript) {
+                // TODO: should run startOnEnter scripts?
+                this.inter.run(this.currentScript);
             }
             break;
 
@@ -120,8 +127,97 @@ Game.playState = {
     }
 };
 
+// Setting up main states
+Engine = new Phaser.Game({
+    //enableDebug: false,
+    width: Game.width,
+    height: Game.height,
+    renderer: Phaser.AUTO,
+    antialias: false,
+    //transparent: true,
+    parent: "game"
+});
+
+// States defined
+Engine.state.add("load", Game.loadState);
+
+Engine.state.add("main", Game.mainState);
+
+Engine.state.add("play", Game.playState);
+
+// Let's roll
+window.onload = function() {
+    console.info(Game.name + " init");
+    Engine.state.start("load");
+};
+
+/**
+ * Interpreter class. This execute map scripting.
+ *
+ */
+Game.Interpreter = function() {
+    this.script = [];
+};
+
+Game.Interpreter.prototype.run = function(script) {
+    var linePointer = 0;
+    /*var script = [{action: "print", args: "hello"},
+                  {action: "print", args: "world"},
+                  {action: "confirm", args: "Do you like to restart?"}]*/
+    console.log("Game.Interpreter: running", script, this);
+    while (linePointer < script.length) {
+        console.log("Game.Interpreter: line", linePointer);
+        var line = script[linePointer];
+        if (!this.__proto__.hasOwnProperty(line.action)) {
+            console.error("Game.Interpreter: invalid action", line.action, "line", linePointer, line);
+            return;
+        }
+        this[line.action](line.args);
+        linePointer++;
+    }
+};
+
+Game.Interpreter.prototype.print = function(args) {
+    alert(args);
+};
+
+/**
+ * Map class. Methods to interact with the tile based game maps.
+ *
+ * Tile properties:
+ *
+ * block: the tile blocks the player
+ * damage: the tile damages the player(using a die string)
+ */
+Game.Map = function() {
+    this.obj = Engine.add.tilemap("map", Game.tileSize, Game.tileSize);
+    this.obj.addTilesetImage("floor", "floorTileset");
+    this.obj.addTilesetImage("object", "objectTileset");
+    this.obj.createLayer("floor");
+    this.obj.createLayer("object");
+    this.script = JSON.parse(this.obj.properties.script);
+};
+
+Game.Map.prototype.getTile = function(x, y) {
+    return {
+        x: x,
+        y: y,
+        floor: this.obj.getTile(x, y, "floor"),
+        object: this.obj.getTile(x, y, "object")
+    };
+};
+
+Game.Map.prototype.getScript = function(x, y) {
+    if (typeof this.script[x + "x" + y] !== "undefined") {
+        return this.script[x + "x" + y];
+    } else {
+        return false;
+    }
+};
+
 /**
  * Party class. This represents the player party in the game.
+ *
  */
 Game.Party = function() {
     this.obj = Engine.add.sprite(0, 0, "objectTileset", 10);
@@ -180,89 +276,6 @@ Game.Party.prototype.rotateRight = function() {
 
 Game.Party.prototype.canPass = function(tile) {
     // Meant to be used with Game.Map.getTile() method
+    if (!tile.floor) return false;
     return !tile.floor.properties.block && (!tile.object || !tile.object.properties.block);
-};
-
-/**
- * Map class. Methods to interact with the tile based game maps.
- * 
- * Tile properties:
- * 
- * block: the tile blocks the player
- * damage: the tile damages the player(using a die string)
- */
-Game.Map = function() {
-    this.obj = Engine.add.tilemap("map", Game.tileSize, Game.tileSize);
-    this.obj.addTilesetImage("floor", "floorTileset");
-    this.obj.addTilesetImage("object", "objectTileset");
-    this.obj.createLayer("floor");
-    this.obj.createLayer("object");
-    this.script = JSON.parse(this.obj.properties.script);
-};
-
-Game.Map.prototype.getTile = function(x, y) {
-    return {
-        x: x,
-        y: y,
-        floor: this.obj.getTile(x, y, "floor"),
-        object: this.obj.getTile(x, y, "object")
-    };
-};
-
-Game.Map.prototype.getScript = function(x, y) {
-    if (typeof this.script[x + "x" + y] !== "undefined") {
-        return this.script[x + "x" + y];
-    } else {
-        return false;
-    }
-};
-
-// Setting up main states
-Engine = new Phaser.Game({
-    //enableDebug: false,
-    width: Game.width,
-    height: Game.height,
-    renderer: Phaser.AUTO,
-    antialias: false,
-    //transparent: true,
-    parent: "game"
-});
-
-// States defined
-Engine.state.add("load", Game.loadState);
-
-Engine.state.add("main", Game.mainState);
-
-Engine.state.add("play", Game.playState);
-
-// Let's roll
-window.onload = function() {
-    console.info(Game.name + " init");
-    Engine.state.start("load");
-};
-
-Game.Interpreter = function() {
-    this.script = [];
-};
-
-Game.Interpreter.prototype.run = function(script) {
-    var linePointer = 0;
-    /*var script = [{action: "print", args: "hello"},
-                  {action: "print", args: "world"},
-                  {action: "confirm", args: "Do you like to restart?"}]*/
-    console.log("Game.Interpreter: running", script, this);
-    while (linePointer < script.length) {
-        console.log("Game.Interpreter: line", linePointer);
-        var line = script[linePointer];
-        if (!this.__proto__.hasOwnProperty(line.action)) {
-            console.error("Game.Interpreter: invalid action", line.action, "line", linePointer, line);
-            return;
-        }
-        this[line.action](line.args);
-        linePointer++;
-    }
-};
-
-Game.Interpreter.prototype.print = function(args) {
-    alert(args);
 };
