@@ -94,7 +94,7 @@ Game.playState = {
             this.currentScript = this.map.getScript(this.party.x, this.party.y);
             // immediate scripts
             if (this.currentScript && this.currentScript.properties.startOnEnter) {
-                this.inter.run(this.currentScript);
+                this.inter.run(this.currentScript.script);
             }
             break;
 
@@ -115,7 +115,7 @@ Game.playState = {
             case "Space":
             if (this.currentScript) {
                 // TODO: should run startOnEnter scripts?
-                this.inter.run(this.currentScript);
+                this.inter.run(this.currentScript.script);
             }
             break;
 

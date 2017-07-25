@@ -40,7 +40,7 @@ Game.playState = {
 
                 // immediate scripts
                 if (this.currentScript && this.currentScript.properties.startOnEnter) {
-                    this.inter.run(this.currentScript);
+                    this.inter.run(this.currentScript.script);
                 }
 
                 break;
@@ -58,7 +58,7 @@ Game.playState = {
             // Fire map tile action script
             case "Space":
                 if (this.currentScript) { // TODO: should run startOnEnter scripts?
-                    this.inter.run(this.currentScript);
+                    this.inter.run(this.currentScript.script);
                 }
                 break;
 

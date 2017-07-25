@@ -28,7 +28,6 @@ Game.Party.prototype.moveForward = function(map) {
 
     if (this.canPass(tileInfo)) {
         this.setPosition(pos.x, pos.y);
-        //Trigger tile effects(ie. damage, heal, teleport, script)
     } else {
         console.log("Game.Party: Party can't pass");
     }
