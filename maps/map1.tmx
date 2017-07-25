@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" nextobjectid="5">
  <properties>
-  <property name="script">{&quot;18x2&quot;: [
+  <property name="script">{&quot;18x2&quot;: {&quot;script&quot;: [
 {&quot;action&quot;: &quot;print&quot;, &quot;args&quot;: &quot;Hello, world!&quot;},
 {&quot;action&quot;: &quot;print&quot;, &quot;args&quot;: &quot;ZORPG ir here!&quot;}
-]
+], &quot;properties&quot;: {&quot;allowedFacing&quot;: 0}}
 ,
- &quot;12x15&quot;: [
-{&quot;action&quot;: &quot;print&quot;, &quot;args&quot;: &quot;Hello again!&quot;},
-]
+ &quot;12x15&quot;: {&quot;script&quot;: [
+{&quot;action&quot;: &quot;print&quot;, &quot;args&quot;: &quot;Hello again, traveler!&quot;}
+], &quot;properties&quot;: {&quot;startOnEnter&quot;: true}}
 }</property>
  </properties>
  <tileset firstgid="1" name="floor" tilewidth="32" tileheight="32" tilecount="100" columns="10">

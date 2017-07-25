@@ -26,7 +26,7 @@
  "orientation":"orthogonal",
  "properties":
     {
-     "script":"{\"18x2\": \"script_content\",\n \"12x15\": \"another_content\"}"
+     "script":"{\"18x2\": {\"script\": [\n{\"action\": \"print\", \"args\": \"Hello, world!\"},\n{\"action\": \"print\", \"args\": \"ZORPG ir here!\"}\n], \"properties\": {\"allowedFacing\": 0}}\n,\n \"12x15\": {\"script\": [\n{\"action\": \"print\", \"args\": \"Hello again, traveler!\"}\n], \"properties\": {\"startOnEnter\": true}}\n}"
     },
  "propertytypes":
     {
