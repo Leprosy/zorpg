@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" nextobjectid="5">
  <properties>
-  <property name="script">{&quot;18x2&quot;: &quot;script_content&quot;,
- &quot;12x15&quot;: &quot;another_content&quot;}</property>
+  <property name="script">{&quot;18x2&quot;: [
+{&quot;action&quot;: &quot;print&quot;, &quot;args&quot;: &quot;Hello, world!&quot;},
+{&quot;action&quot;: &quot;print&quot;, &quot;args&quot;: &quot;ZORPG ir here!&quot;}
+]
+,
+ &quot;12x15&quot;: [
+{&quot;action&quot;: &quot;print&quot;, &quot;args&quot;: &quot;Hello again!&quot;},
+]
+}</property>
  </properties>
  <tileset firstgid="1" name="floor" tilewidth="32" tileheight="32" tilecount="100" columns="10">
   <image source="../img/floor.png" width="320" height="320"/>

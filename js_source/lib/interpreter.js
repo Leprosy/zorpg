@@ -1,12 +1,17 @@
+/**
+ * Interpreter class. This execute map scripting.
+ * 
+ */
+
 Game.Interpreter = function() {
     this.script = [];
 }
 
-Game.Interpreter.prototype.run = function() {
+Game.Interpreter.prototype.run = function(script) {
     var linePointer = 0;
-    var script = [{action: "print", args: "hello"},
+    /*var script = [{action: "print", args: "hello"},
                   {action: "print", args: "world"},
-                  {action: "confirm", args: "Do you like to restart?"}]
+                  {action: "confirm", args: "Do you like to restart?"}]*/
 
     console.log("Game.Interpreter: running", script, this)
 
@@ -25,5 +30,5 @@ Game.Interpreter.prototype.run = function() {
 }
 
 Game.Interpreter.prototype.print = function(args) {
-    
+    alert(args);
 }

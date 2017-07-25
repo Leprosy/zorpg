@@ -84,18 +84,11 @@ Game.playState = {
         document.getElementById("debug").value = this.party.x + " - " + this.party.y;
     },
     _inputHandler: function(ev) {
-        console.log("keypressed", ev);
+        //console.log("keypressed", ev)
         switch (ev.code) {
           // Party movement
             case "ArrowUp":
-            var pos = this.party.getForward();
-            var tileInfo = this.map.getTile(pos.x, pos.y);
-            console.log("checking", tileInfo);
-            if (this.party.canPass(tileInfo)) {
-                this.party.setPosition(pos.x, pos.y);
-            } else {
-                console.log("can't pass");
-            }
+            this.party.moveForward(this.map);
             break;
 
           case "ArrowDown":
@@ -146,6 +139,17 @@ Game.Party.prototype.setPosition = function(x, y) {
     // Do the math
     this.obj.x = x * Game.tileSize + Game.tileSize / 2;
     this.obj.y = y * Game.tileSize + Game.tileSize / 2;
+};
+
+Game.Party.prototype.moveForward = function(map) {
+    var pos = this.getForward();
+    var tileInfo = map.getTile(pos.x, pos.y);
+    console.log("Game.Party: Checking forward position", tileInfo);
+    if (this.canPass(tileInfo)) {
+        this.setPosition(pos.x, pos.y);
+    } else {
+        console.log("Game.Party: Party can't pass");
+    }
 };
 
 Game.Party.prototype.getForward = function() {
@@ -241,18 +245,11 @@ Game.Interpreter = function() {
     this.script = [];
 };
 
-Game.Interpreter.prototype.run = function() {
+Game.Interpreter.prototype.run = function(script) {
     var linePointer = 0;
-    var script = [ {
-        action: "print",
-        args: "hello"
-    }, {
-        action: "print",
-        args: "world"
-    }, {
-        action: "confirm",
-        args: "Do you like to restart?"
-    } ];
+    /*var script = [{action: "print", args: "hello"},
+                  {action: "print", args: "world"},
+                  {action: "confirm", args: "Do you like to restart?"}]*/
     console.log("Game.Interpreter: running", script, this);
     while (linePointer < script.length) {
         console.log("Game.Interpreter: line", linePointer);
@@ -266,4 +263,6 @@ Game.Interpreter.prototype.run = function() {
     }
 };
 
-Game.Interpreter.prototype.print = function(args) {};
+Game.Interpreter.prototype.print = function(args) {
+    alert(args);
+};
