@@ -2,8 +2,9 @@
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" nextobjectid="5">
  <properties>
   <property name="script">{&quot;18x2&quot;: {&quot;script&quot;: [
-{&quot;action&quot;: &quot;print&quot;, &quot;args&quot;: &quot;Hello, world!&quot;},
-{&quot;action&quot;: &quot;print&quot;, &quot;args&quot;: &quot;ZORPG ir here!&quot;}
+{&quot;action&quot;: &quot;print&quot;, &quot;args&quot;: &quot;Hello, traveler!&quot;},
+{&quot;action&quot;: &quot;print&quot;, &quot;args&quot;: &quot;In order to travel on ZORPG, I'll give you some gold&quot;},
+{&quot;action&quot;: &quot;giveGold&quot;, &quot;args&quot;: 100}
 ], &quot;properties&quot;: {&quot;allowedFacing&quot;: 0}}
 ,
  &quot;12x15&quot;: {&quot;script&quot;: [
