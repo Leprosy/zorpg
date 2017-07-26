@@ -1,19 +1,17 @@
 /**
- * Interpreter class. This execute map scripting.
- *
+ * Interpreter class. This execute map scripting, using play state to modify
+ * game objects.
  */
 
 Game.Interpreter = function() {
     this.script = [];
+    this.state = Engine.state.getCurrentState();
 }
 
 Game.Interpreter.prototype.run = function(script) {
     var linePointer = 0;
-    /*var script = [{action: "print", args: "hello"},
-                  {action: "print", args: "world"},
-                  {action: "confirm", args: "Do you like to restart?"}]*/
 
-    console.log("Game.Interpreter: running", script, this)
+    console.log("Game.Interpreter: running", script)
 
     while (linePointer < script.length) {
         console.log("Game.Interpreter: line", linePointer)
@@ -29,6 +27,12 @@ Game.Interpreter.prototype.run = function(script) {
     }
 }
 
+
+
 Game.Interpreter.prototype.print = function(args) {
     alert(args);
+}
+
+Game.Interpreter.prototype.giveGold = function(args) {
+    this.state.party.gold += args;
 }
