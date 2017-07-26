@@ -10,6 +10,9 @@ Game.Party = function() {
     this.d_angle = Math.PI / 2
     this.d_dist = Game.tileSize;
 
+    this.gold = 2000;
+    this.gems = 50;
+
     this.setPosition(0, 0);
 }
 
