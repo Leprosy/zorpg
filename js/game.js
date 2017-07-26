@@ -63,9 +63,6 @@ Game.mainState = {
  *  Play loop state
  */
 Game.playState = {
-    map: null,
-    party: null,
-    cursors: null,
     preload: function() {
         Engine.load.tilemap("map", "maps/map1.json", null, Phaser.Tilemap.TILED_JSON);
     },
@@ -75,7 +72,7 @@ Game.playState = {
         // Create gameplay objects
         this.map = new Game.Map();
         this.party = new Game.Party();
-        this.inter = new Game.Interpreter();
+        this.interpreter = new Game.Interpreter();
         this.currentScript = null;
         // Input
         Engine.input.keyboard.onDownCallback = function(ev) {
@@ -83,7 +80,7 @@ Game.playState = {
         };
     },
     update: function() {
-        document.getElementById("debug").value = this.party.x + " - " + this.party.y;
+        document.getElementById("debug").innerHTML = "position:" + this.party.x + " - " + this.party.y + "\n" + "gold:" + this.party.gold;
     },
     _inputHandler: function(ev) {
         //console.log("keypressed", ev)
@@ -94,7 +91,7 @@ Game.playState = {
             this.currentScript = this.map.getScript(this.party.x, this.party.y);
             // immediate scripts
             if (this.currentScript && this.currentScript.properties.startOnEnter) {
-                this.inter.run(this.currentScript.script);
+                this.interpreter.run(this.currentScript.script);
             }
             break;
 
@@ -115,7 +112,7 @@ Game.playState = {
             case "Space":
             if (this.currentScript) {
                 // TODO: should run startOnEnter scripts?
-                this.inter.run(this.currentScript.script);
+                this.interpreter.run(this.currentScript.script);
             }
             break;
 
@@ -152,19 +149,17 @@ window.onload = function() {
 };
 
 /**
- * Interpreter class. This execute map scripting.
- *
+ * Interpreter class. This execute map scripting, using play state to modify
+ * game objects.
  */
 Game.Interpreter = function() {
     this.script = [];
+    this.state = Engine.state.getCurrentState();
 };
 
 Game.Interpreter.prototype.run = function(script) {
     var linePointer = 0;
-    /*var script = [{action: "print", args: "hello"},
-                  {action: "print", args: "world"},
-                  {action: "confirm", args: "Do you like to restart?"}]*/
-    console.log("Game.Interpreter: running", script, this);
+    console.log("Game.Interpreter: running", script);
     while (linePointer < script.length) {
         console.log("Game.Interpreter: line", linePointer);
         var line = script[linePointer];
@@ -179,6 +174,10 @@ Game.Interpreter.prototype.run = function(script) {
 
 Game.Interpreter.prototype.print = function(args) {
     alert(args);
+};
+
+Game.Interpreter.prototype.giveGold = function(args) {
+    this.state.party.gold += args;
 };
 
 /**
@@ -226,6 +225,8 @@ Game.Party = function() {
     this.y = 0;
     this.d_angle = Math.PI / 2;
     this.d_dist = Game.tileSize;
+    this.gold = 2e3;
+    this.gems = 50;
     this.setPosition(0, 0);
 };
 

@@ -2,10 +2,6 @@
  *  Play loop state
  */
 Game.playState = {
-    map: null,
-    party: null,
-    cursors: null,
-
     preload: function() {
         Engine.load.tilemap("map", "maps/map1.json", null, Phaser.Tilemap.TILED_JSON);
     },
@@ -16,7 +12,7 @@ Game.playState = {
         // Create gameplay objects
         this.map = new Game.Map();
         this.party = new Game.Party();
-        this.inter = new Game.Interpreter();
+        this.interpreter = new Game.Interpreter();
         this.currentScript = null;
 
         // Input
@@ -25,7 +21,9 @@ Game.playState = {
         //Game.layer.resizeWorld();
     },
     update: function() {
-        document.getElementById("debug").value = this.party.x + " - " + this.party.y;
+        document.getElementById("debug").innerHTML = 
+            "position:" + this.party.x + " - " + this.party.y + "\n" +
+            "gold:" + this.party.gold;
     },
 
 
@@ -40,7 +38,7 @@ Game.playState = {
 
                 // immediate scripts
                 if (this.currentScript && this.currentScript.properties.startOnEnter) {
-                    this.inter.run(this.currentScript.script);
+                    this.interpreter.run(this.currentScript.script);
                 }
 
                 break;
@@ -58,7 +56,7 @@ Game.playState = {
             // Fire map tile action script
             case "Space":
                 if (this.currentScript) { // TODO: should run startOnEnter scripts?
-                    this.inter.run(this.currentScript.script);
+                    this.interpreter.run(this.currentScript.script);
                 }
                 break;
 
