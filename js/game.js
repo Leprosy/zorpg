@@ -127,7 +127,14 @@ Game.playState = {
           // Party movement
             case "ArrowUp":
             this.party.moveForward(this.map);
-            this.interpreter.load(this.map.getScript(this.party.x, this.party.y).script);
+            var scriptData = this.map.getScript(this.party.x, this.party.y);
+            if (scriptData) {
+                console.log("PlayState: loaded script", scriptData);
+            }
+            this.interpreter.load(scriptData.script);
+            if (scriptData && scriptData.properties.startOnEnter) {
+                this.gameStatus = Game.SCRIPT;
+            }
             break;
 
           case "ArrowDown":
@@ -145,8 +152,12 @@ Game.playState = {
 
           // Fire map tile action script
             case "Space":
-            this.gameStatus = Game.SCRIPT;
-            console.log("PlayState: entering script mode");
+            if (this.interpreter.script) {
+                this.gameStatus = Game.SCRIPT;
+                console.log("PlayState: entering script mode");
+            } else {
+                console.log("PlayState: no script");
+            }
             break;
 
           // Exit
