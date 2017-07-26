@@ -5,34 +5,50 @@
 
 Game.Interpreter = function() {
     this.script = [];
+    this.linePointer = 0;
     this.state = Engine.state.getCurrentState();
 }
 
-Game.Interpreter.prototype.run = function(script) {
-    var linePointer = 0;
+// Loads a script into the interpreter
+Game.Interpreter.prototype.load = function(script) {
+    this.script = script;
+    this.linePointer = 0;
+}
 
-    console.log("Game.Interpreter: running", script)
+// Runs the current line of script
+Game.Interpreter.prototype.run = function() {
+    // End script and return to play mode
+    // TODO: This only works if script is repeatable
+    if (this.linePointer >= this.script.length) {
+        this.linePointer = 0;
+        this.state.gameStatus = Game.PLAYING;
+        console.log("Game.Interpreter: ending script & restarting");
+        return;
+    }
 
-    while (linePointer < script.length) {
-        console.log("Game.Interpreter: line", linePointer)
-        var line = script[linePointer];
+    if (this.state.gameStatus === Game.SCRIPT) {
+        var line = this.script[this.linePointer];
+        console.info("Game.Interpreter: running line", this.linePointer, line);
 
         if (!this.__proto__.hasOwnProperty(line.action)) {
-            console.error("Game.Interpreter: invalid action", line.action, "line", linePointer, line);
+            console.error("Game.Interpreter: invalid line", this.linePointer, line);
             return;
         }
 
         this[line.action](line.args);
-        linePointer++;
+        this.linePointer++;
     }
 }
 
 
-
+// Shows a message to the player
 Game.Interpreter.prototype.print = function(args) {
-    alert(args);
+    this.state.gameStatus = Game.MESSAGE; // on Message object?
+    console.log("Game.Interpreter: entering message mode")
+    this.state.message.show("Message", args);
 }
 
+// Gives a specific gold to the party
 Game.Interpreter.prototype.giveGold = function(args) {
     this.state.party.gold += args;
 }

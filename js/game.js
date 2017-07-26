@@ -62,6 +62,20 @@ Game.mainState = {
 /**
  *  Play loop state
  */
+Game.NONE = 0;
+
+Game.PLAYING = 1;
+
+Game.FIGHTING = 2;
+
+Game.BROWSING = 3;
+
+Game.SCRIPT = 4;
+
+Game.MESSAGE = 10;
+
+Game.DEAD = 666;
+
 Game.playState = {
     preload: function() {
         Engine.load.tilemap("map", "maps/map1.json", null, Phaser.Tilemap.TILED_JSON);
@@ -69,30 +83,51 @@ Game.playState = {
     create: function() {
         console.info(Game.name + " play state", Game);
         var _this = this;
+        // Game play attributes
+        this.gameStatus = Game.PLAYING;
         // Create gameplay objects
         this.map = new Game.Map();
         this.party = new Game.Party();
         this.interpreter = new Game.Interpreter();
-        this.currentScript = null;
+        this.message = new Game.Message();
         // Input
         Engine.input.keyboard.onDownCallback = function(ev) {
             _this._inputHandler(ev);
         };
     },
     update: function() {
-        document.getElementById("debug").innerHTML = "position:" + this.party.x + " - " + this.party.y + "\n" + "gold:" + this.party.gold;
+        // Run script
+        if (this.gameStatus === Game.SCRIPT) {
+            this.interpreter.run();
+        }
+        // Update HUD
+        document.getElementById("debug").innerHTML = "position:" + this.party.x + " - " + this.party.y + "\n" + "gameStatus:" + this.gameStatus + "\n" + "gold:" + this.party.gold;
     },
     _inputHandler: function(ev) {
         //console.log("keypressed", ev)
+        switch (this.gameStatus) {
+          case Game.PLAYING:
+            this._checkPlayingInput(ev);
+            break;
+
+          case Game.MESSAGE:
+            // A key was pressed, remove message
+            this.gameStatus = Game.SCRIPT;
+            this.message.close();
+            console.log("PlayState: exit message mode, returning to script mode");
+            break;
+
+          default:
+            console.error("PlayState: invalid playing state.");
+            break;
+        }
+    },
+    _checkPlayingInput: function(ev) {
         switch (ev.code) {
           // Party movement
             case "ArrowUp":
             this.party.moveForward(this.map);
-            this.currentScript = this.map.getScript(this.party.x, this.party.y);
-            // immediate scripts
-            if (this.currentScript && this.currentScript.properties.startOnEnter) {
-                this.interpreter.run(this.currentScript.script);
-            }
+            this.interpreter.load(this.map.getScript(this.party.x, this.party.y).script);
             break;
 
           case "ArrowDown":
@@ -110,18 +145,41 @@ Game.playState = {
 
           // Fire map tile action script
             case "Space":
-            if (this.currentScript) {
-                // TODO: should run startOnEnter scripts?
-                this.interpreter.run(this.currentScript.script);
-            }
+            this.gameStatus = Game.SCRIPT;
+            console.log("PlayState: entering script mode");
             break;
 
           // Exit
             case "Escape":
+            console.log("PlayState: return to main state");
             Engine.state.start("main");
             break;
         }
     }
+};
+
+Game.Message = function() {
+    this.group = Engine.add.group();
+};
+
+Game.Message.prototype.show = function(title, message) {
+    this.close();
+    this.group.add(Engine.add.text(10, 10, title, {
+        font: "20px Arial",
+        fill: "#ffffff"
+    }));
+    this.group.add(Engine.add.text(10, 30, message, {
+        font: "20px Arial",
+        fill: "#ffffff"
+    }));
+    this.group.add(Engine.add.text(10, 60, "<press a key>", {
+        font: "20px Arial",
+        fill: "#000000"
+    }));
+};
+
+Game.Message.prototype.close = function() {
+    this.group.removeAll();
 };
 
 // Setting up main states
@@ -154,28 +212,47 @@ window.onload = function() {
  */
 Game.Interpreter = function() {
     this.script = [];
+    this.linePointer = 0;
     this.state = Engine.state.getCurrentState();
 };
 
-Game.Interpreter.prototype.run = function(script) {
-    var linePointer = 0;
-    console.log("Game.Interpreter: running", script);
-    while (linePointer < script.length) {
-        console.log("Game.Interpreter: line", linePointer);
-        var line = script[linePointer];
+// Loads a script into the interpreter
+Game.Interpreter.prototype.load = function(script) {
+    this.script = script;
+    this.linePointer = 0;
+};
+
+// Runs the current line of script
+Game.Interpreter.prototype.run = function() {
+    // End script and return to play mode
+    // TODO: This only works if script is repeatable
+    if (this.linePointer >= this.script.length) {
+        this.linePointer = 0;
+        this.state.gameStatus = Game.PLAYING;
+        console.log("Game.Interpreter: ending script & restarting");
+        return;
+    }
+    if (this.state.gameStatus === Game.SCRIPT) {
+        var line = this.script[this.linePointer];
+        console.info("Game.Interpreter: running line", this.linePointer, line);
         if (!this.__proto__.hasOwnProperty(line.action)) {
-            console.error("Game.Interpreter: invalid action", line.action, "line", linePointer, line);
+            console.error("Game.Interpreter: invalid line", this.linePointer, line);
             return;
         }
         this[line.action](line.args);
-        linePointer++;
+        this.linePointer++;
     }
 };
 
+// Shows a message to the player
 Game.Interpreter.prototype.print = function(args) {
-    alert(args);
+    this.state.gameStatus = Game.MESSAGE;
+    // on Message object?
+    console.log("Game.Interpreter: entering message mode");
+    this.state.message.show("Message", args);
 };
 
+// Gives a specific gold to the party
 Game.Interpreter.prototype.giveGold = function(args) {
     this.state.party.gold += args;
 };
