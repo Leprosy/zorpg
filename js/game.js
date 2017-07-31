@@ -174,6 +174,8 @@ Game.Message = function() {
 };
 
 Game.Message.prototype.show = function(title, message) {
+    console.log("Game.Message: entering message mode");
+    Game.playState.gameStatus = Game.MESSAGE;
     this.close();
     this.group.add(Engine.add.text(10, 10, title, {
         font: "20px Arial",
@@ -257,15 +259,13 @@ Game.Interpreter.prototype.run = function() {
 
 // Shows a message to the player
 Game.Interpreter.prototype.print = function(args) {
-    this.state.gameStatus = Game.MESSAGE;
-    // on Message object?
-    console.log("Game.Interpreter: entering message mode");
     this.state.message.show("Message", args);
 };
 
 // Gives a specific gold to the party
 Game.Interpreter.prototype.giveGold = function(args) {
     this.state.party.gold += args;
+    this.state.message.show("Party found", args + " Gold");
 };
 
 /**
@@ -280,8 +280,9 @@ Game.Map = function() {
     this.obj = Engine.add.tilemap("map", Game.tileSize, Game.tileSize);
     this.obj.addTilesetImage("floor", "floorTileset");
     this.obj.addTilesetImage("object", "objectTileset");
-    this.obj.createLayer("floor");
+    var layer = this.obj.createLayer("floor");
     this.obj.createLayer("object");
+    layer.resizeWorld();
     this.script = JSON.parse(this.obj.properties.script);
 };
 
@@ -307,14 +308,18 @@ Game.Map.prototype.getScript = function(x, y) {
  *
  */
 Game.Party = function() {
+    // Setup the phaser object and some metadata
     this.obj = Engine.add.sprite(0, 0, "objectTileset", 10);
     this.obj.anchor.setTo(.5, .5);
     this.x = 0;
     this.y = 0;
     this.d_angle = Math.PI / 2;
     this.d_dist = Game.tileSize;
+    // Party attributes and stats
     this.gold = 2e3;
     this.gems = 50;
+    Engine.camera.follow(this.obj);
+    // follow the party through the map
     this.setPosition(0, 0);
 };
 
