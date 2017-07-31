@@ -101,7 +101,7 @@ Game.playState = {
             this.interpreter.run();
         }
         // Update HUD
-        document.getElementById("debug").innerHTML = "position:" + this.party.x + " - " + this.party.y + "\n" + "gameStatus:" + this.gameStatus + "\n" + "gold:" + this.party.gold + "\n" + "party:" + this.party;
+        document.getElementById("debug").innerHTML = "position:" + this.party.x + " - " + this.party.y + "\n" + "gameStatus:" + this.gameStatus + "\n" + this.party;
     },
     _inputHandler: function(ev) {
         //console.log("keypressed", ev)
@@ -169,33 +169,6 @@ Game.playState = {
     }
 };
 
-Game.Message = function() {
-    this.group = Engine.add.group();
-    this.group.fixedToCamera = true;
-};
-
-Game.Message.prototype.show = function(title, message) {
-    console.log("Game.Message: entering message mode");
-    Game.playState.gameStatus = Game.MESSAGE;
-    this.close();
-    this.group.add(Engine.add.text(10, 10, title, {
-        font: "20px Arial",
-        fill: "#ffffff"
-    }));
-    this.group.add(Engine.add.text(10, 30, message, {
-        font: "20px Arial",
-        fill: "#ffffff"
-    }));
-    this.group.add(Engine.add.text(10, 60, "<press a key>", {
-        font: "20px Arial",
-        fill: "#000000"
-    }));
-};
-
-Game.Message.prototype.close = function() {
-    this.group.removeAll();
-};
-
 // Setting up main states
 Engine = new Phaser.Game({
     //enableDebug: false,
@@ -236,14 +209,19 @@ Game.Interpreter.prototype.load = function(script) {
     this.linePointer = 0;
 };
 
+//Exits script mode, stopping the execution, and returns the pointer to the start
+Game.Interpreter.prototype.endScript = function() {
+    this.state.gameStatus = Game.PLAYING;
+    this.linePointer = 0;
+    console.log("Game.Interpreter: ending script & restarting");
+};
+
 // Runs the current line of script
 Game.Interpreter.prototype.run = function() {
     // End script and return to play mode
     // TODO: This only works if script is repeatable
     if (this.linePointer >= this.script.length) {
-        this.linePointer = 0;
-        this.state.gameStatus = Game.PLAYING;
-        console.log("Game.Interpreter: ending script & restarting");
+        this.endScript();
         return;
     }
     if (this.state.gameStatus === Game.SCRIPT) {
@@ -251,6 +229,7 @@ Game.Interpreter.prototype.run = function() {
         console.info("Game.Interpreter: running line", this.linePointer, line);
         if (!this.__proto__.hasOwnProperty(line.action)) {
             console.error("Game.Interpreter: invalid line", this.linePointer, line);
+            this.endScript();
             return;
         }
         this[line.action](line.args);
@@ -267,6 +246,61 @@ Game.Interpreter.prototype.print = function(args) {
 Game.Interpreter.prototype.giveGold = function(args) {
     this.state.party.gold += args;
     this.state.message.show("Party found", args + " Gold");
+};
+
+// Gives a quest
+Game.Interpreter.prototype.giveQuest = function(args) {
+    if (!this.state.party.hasQuest(args.questId)) {
+        this.state.party.giveQuest(args);
+    } else {
+        console.error("Game.Interpreter: party already has the quest", args);
+    }
+};
+
+// Gives an award
+Game.Interpreter.prototype.giveAward = function(args) {
+    if (!this.state.party.hasAward(args.awardId)) {
+        this.state.party.giveAward(args);
+    } else {
+        console.error("Game.Interpreter: party already has the award", args);
+    }
+};
+
+// Quest completed, remove it
+Game.Interpreter.prototype.removeQuest = function(args) {
+    if (!this.state.party.hasQuest(args.questId)) {
+        this.state.party.removeQuest(args);
+    } else {
+        console.error("Game.Interpreter: party don't have the quest", args);
+    }
+};
+
+// Exit the script
+Game.Interpreter.prototype.exit = function(args) {
+    this.endScript();
+};
+
+// If's
+// Test for several conditions, if true goes to first line, if false, to the second.
+// If party have a quest
+Game.Interpreter.prototype.ifQuest = function(args) {
+    this._ifGoto(this.state.party.hasQuest(args.questId), args);
+};
+
+// If party have an award
+Game.Interpreter.prototype.ifAward = function(args) {
+    this._ifGoto(this.state.party.hasAward(args.awardId), args);
+};
+
+// If goto
+Game.Interpreter.prototype._ifGoto = function(condition, args) {
+    if (condition) {
+        console.log("Game.Interpreter: Condition is true");
+        this.linePointer = args.onTrue - 1;
+    } else {
+        console.log("Game.Interpreter: Condition is false");
+        this.linePointer = args.onFalse - 1;
+    }
 };
 
 /**
@@ -305,6 +339,37 @@ Game.Map.prototype.getScript = function(x, y) {
 };
 
 /**
+ * Messages in the game
+ * 
+ */
+Game.Message = function() {
+    this.group = Engine.add.group();
+    this.group.fixedToCamera = true;
+};
+
+Game.Message.prototype.show = function(title, message) {
+    console.log("Game.Message: entering message mode");
+    Game.playState.gameStatus = Game.MESSAGE;
+    this.close();
+    this.group.add(Engine.add.text(10, 10, title, {
+        font: "20px Arial",
+        fill: "#ffffff"
+    }));
+    this.group.add(Engine.add.text(10, 30, message, {
+        font: "20px Arial",
+        fill: "#ffffff"
+    }));
+    this.group.add(Engine.add.text(10, 60, "<press a key>", {
+        font: "20px Arial",
+        fill: "#000000"
+    }));
+};
+
+Game.Message.prototype.close = function() {
+    this.group.removeAll();
+};
+
+/**
  * Party class. This represents the player party in the game.
  *
  */
@@ -319,12 +384,57 @@ Game.Party = function() {
     // Party attributes and stats
     this.gold = 2e3;
     this.gems = 50;
+    this.quests = {};
+    //"quest0001": "Check out the statue on the lava temple."};
+    this.awards = {};
     this.characters = [ new Game.Character("Sir Lepro"), new Game.Character("Lady Aindir"), new Game.Character("Edward the cat") ];
     Engine.camera.follow(this.obj);
     // follow the party through the map
     this.setPosition(0, 0);
 };
 
+// Party's quest & awards methods. Checks, adds and removes
+Game.Party.prototype.hasQuest = function(questId) {
+    if (typeof this.quests[questId] !== "undefined") {
+        return this.quests[questId];
+    } else {
+        return false;
+    }
+};
+
+Game.Party.prototype.hasAward = function(awardId) {
+    if (typeof this.awards[awardId] !== "undefined") {
+        return this.awards[awardId];
+    } else {
+        return false;
+    }
+};
+
+Game.Party.prototype.removeQuest = function(questId) {
+    if (typeof this.quests[questId] !== "undefined") {
+        delete this.quests[questId];
+    } else {
+        console.error("Game.Party: Party doesn't have quest.", questId);
+    }
+};
+
+Game.Party.prototype.giveQuest = function(obj) {
+    try {
+        this.quests[obj.questId] = obj.desc;
+    } catch (e) {
+        console.error("Game.Party: Adding invalid quest obj", obj);
+    }
+};
+
+Game.Party.prototype.giveAward = function(obj) {
+    try {
+        this.awards[obj.awardId] = obj.desc;
+    } catch (e) {
+        console.error("Game.Party: Adding invalid award obj", obj);
+    }
+};
+
+// Sets the party position in the current world map
 Game.Party.prototype.setPosition = function(x, y) {
     this.x = x;
     this.y = y;
@@ -333,6 +443,7 @@ Game.Party.prototype.setPosition = function(x, y) {
     this.obj.y = y * Game.tileSize + Game.tileSize / 2;
 };
 
+// Movement methods
 Game.Party.prototype.moveForward = function(map) {
     var pos = this.getForward();
     var tileInfo = map.getTile(pos.x, pos.y);
@@ -376,11 +487,20 @@ Game.Party.prototype.canPass = function(tile) {
     return !tile.floor.properties.block && (!tile.object || !tile.object.properties.block);
 };
 
+// Party object debug string form
 Game.Party.prototype.toString = function() {
     // debug
-    var txt = "";
+    var txt = "PartyInfo:\nGold: " + this.gold + " Gems: " + this.gems + "\nChars:\n";
     for (i = 0; i < this.characters.length; ++i) {
-        txt += this.characters[i] + "\n";
+        txt += this.characters[i] + " | ";
+    }
+    txt += "\nQuests:\n";
+    for (i in this.quests) {
+        txt += this.quests[i] + "(" + i + ")\n";
+    }
+    txt += "\nAwards:\n";
+    for (i in this.awards) {
+        txt += this.awards[i] + "(" + i + ")\n";
     }
     return txt;
 };

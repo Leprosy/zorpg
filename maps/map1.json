@@ -26,7 +26,7 @@
  "orientation":"orthogonal",
  "properties":
     {
-     "script":"{\"18x2\": {\"script\": [\n{\"action\": \"print\", \"args\": \"Hello, traveler!\"},\n{\"action\": \"print\", \"args\": \"In order to travel on ZORPG, I'll give you some gold\"},\n{\"action\": \"giveGold\", \"args\": 100}\n], \"properties\": {\"allowedFacing\": 0}}\n,\n \"12x15\": {\"script\": [\n{\"action\": \"print\", \"args\": \"Hello again, traveler!\"}\n], \"properties\": {\"startOnEnter\": true}}\n}"
+     "script":"{\"18x2\": {\"script\": [\n{\"action\": \"ifAward\", \"args\": {\"awardId\": \"awd001\", \"onTrue\": 666, \"onFalse\": 1}},\n{\"action\": \"ifQuest\", \"args\": {\"questId\": \"qst001\", \"onTrue\": 6, \"onFalse\": 2}},\n{\"action\": \"print\", \"args\": \"Hello, traveler!\"},\n{\"action\": \"print\", \"args\": \"In order to travel on ZORPG, I'll give you some gold\"},\n{\"action\": \"giveGold\", \"args\": 100},\n{\"action\": \"giveQuest\", \"args\": {\"questId\": \"qst001\", \"desc\": \"Visit the statue in the lava temple\"}},\n{\"action\": \"print\", \"args\": \"Go to the lava temple statue...\"}\n], \"properties\": {\"allowedFacing\": 0}}\n,\n \"12x15\": {\"script\": [\n{\"action\": \"ifQuest\", \"args\": {\"questId\":\"qst001\", \"onTrue\":3, \"onFalse\":1}},\n{\"action\": \"print\", \"args\": \"I don't know you, traveler...\"},\n{\"action\": \"exit\"},\n{\"action\": \"print\", \"args\": \"Hello again, traveler! You completed your quest...\"},\n{\"action\": \"giveGold\", \"args\": 1200},\n{\"action\":\"removeQuest\", \"args\": \"qst001\"},\n{\"action\":\"giveAward\", \"args\": {\"awardId\": \"awd001\", \"desc\": \"Visited the lava temple statue\"}}\n], \"properties\": {\"startOnEnter\": true}}\n}"
     },
  "propertytypes":
     {

@@ -41,8 +41,7 @@ Game.playState = {
         document.getElementById("debug").innerHTML =
             "position:" + this.party.x + " - " + this.party.y + "\n" +
             "gameStatus:" + this.gameStatus + "\n" +
-            "gold:" + this.party.gold + "\n" +
-            "party:" + this.party;
+            this.party
     },
 
 

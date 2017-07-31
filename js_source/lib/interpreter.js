@@ -15,14 +15,19 @@ Game.Interpreter.prototype.load = function(script) {
     this.linePointer = 0;
 }
 
+//Exits script mode, stopping the execution, and returns the pointer to the start
+Game.Interpreter.prototype.endScript = function() {
+    this.state.gameStatus = Game.PLAYING;
+    this.linePointer = 0;
+    console.log("Game.Interpreter: ending script & restarting");
+}
+
 // Runs the current line of script
 Game.Interpreter.prototype.run = function() {
     // End script and return to play mode
     // TODO: This only works if script is repeatable
     if (this.linePointer >= this.script.length) {
-        this.linePointer = 0;
-        this.state.gameStatus = Game.PLAYING;
-        console.log("Game.Interpreter: ending script & restarting");
+        this.endScript();
         return;
     }
 
@@ -32,6 +37,7 @@ Game.Interpreter.prototype.run = function() {
 
         if (!this.__proto__.hasOwnProperty(line.action)) {
             console.error("Game.Interpreter: invalid line", this.linePointer, line);
+            this.endScript();
             return;
         }
 
@@ -50,4 +56,55 @@ Game.Interpreter.prototype.print = function(args) {
 Game.Interpreter.prototype.giveGold = function(args) {
     this.state.party.gold += args;
     this.state.message.show("Party found", args + " Gold");
+}
+
+// Gives a quest
+Game.Interpreter.prototype.giveQuest = function(args) {
+    if (!this.state.party.hasQuest(args.questId)) {
+        this.state.party.giveQuest(args);
+    } else {
+        console.error("Game.Interpreter: party already has the quest", args);
+    }
+}
+// Gives an award
+Game.Interpreter.prototype.giveAward = function(args) {
+    if (!this.state.party.hasAward(args.awardId)) {
+        this.state.party.giveAward(args);
+    } else {
+        console.error("Game.Interpreter: party already has the award", args);
+    }
+}
+// Quest completed, remove it
+Game.Interpreter.prototype.removeQuest = function(args) {
+    if (!this.state.party.hasQuest(args.questId)) {
+        this.state.party.removeQuest(args);
+    } else {
+        console.error("Game.Interpreter: party don't have the quest", args);
+    }
+}
+
+// Exit the script
+Game.Interpreter.prototype.exit = function(args) {
+    this.endScript();
+}
+
+// If's
+// Test for several conditions, if true goes to first line, if false, to the second.
+// If party have a quest
+Game.Interpreter.prototype.ifQuest = function(args) {
+    this._ifGoto(this.state.party.hasQuest(args.questId), args);
+}
+// If party have an award
+Game.Interpreter.prototype.ifAward = function(args) {
+    this._ifGoto(this.state.party.hasAward(args.awardId), args);
+}
+// If goto
+Game.Interpreter.prototype._ifGoto = function(condition, args) {
+    if (condition) {
+        console.log("Game.Interpreter: Condition is true");
+        this.linePointer = args.onTrue - 1;
+    } else {
+        console.log("Game.Interpreter: Condition is false");
+        this.linePointer = args.onFalse - 1;
+    }
 }

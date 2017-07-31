@@ -14,13 +14,52 @@ Game.Party = function() {
     // Party attributes and stats
     this.gold = 2000;
     this.gems = 50;
-
+    this.quests = {}; //"quest0001": "Check out the statue on the lava temple."};
+    this.awards = {};
     this.characters = [new Game.Character("Sir Lepro"), new Game.Character("Lady Aindir"), new Game.Character("Edward the cat")];
 
     Engine.camera.follow(this.obj); // follow the party through the map
     this.setPosition(0, 0);
 }
 
+// Party's quest & awards methods. Checks, adds and removes
+Game.Party.prototype.hasQuest = function(questId) {
+    if (typeof this.quests[questId] !== "undefined") {
+        return this.quests[questId];
+    } else {
+        return false;
+    }
+}
+Game.Party.prototype.hasAward = function(awardId) {
+    if (typeof this.awards[awardId] !== "undefined") {
+        return this.awards[awardId];
+    } else {
+        return false;
+    }
+}
+Game.Party.prototype.removeQuest = function(questId) {
+    if (typeof this.quests[questId] !== "undefined") {
+        delete this.quests[questId];
+    } else {
+        console.error("Game.Party: Party doesn't have quest.", questId);
+    }
+}
+Game.Party.prototype.giveQuest = function(obj) {
+    try {
+        this.quests[obj.questId] = obj.desc;
+    } catch(e) {
+        console.error("Game.Party: Adding invalid quest obj", obj);
+    }
+}
+Game.Party.prototype.giveAward = function(obj) {
+    try {
+        this.awards[obj.awardId] = obj.desc;
+    } catch(e) {
+        console.error("Game.Party: Adding invalid award obj", obj);
+    }
+}
+
+// Sets the party position in the current world map
 Game.Party.prototype.setPosition = function(x, y) {
     this.x = x;
     this.y = y;
@@ -29,6 +68,8 @@ Game.Party.prototype.setPosition = function(x, y) {
     this.obj.x = x * Game.tileSize + Game.tileSize / 2;
     this.obj.y = y * Game.tileSize + Game.tileSize / 2;
 }
+
+// Movement methods
 Game.Party.prototype.moveForward = function(map) {
     var pos = this.getForward();
     var tileInfo = map.getTile(pos.x, pos.y);
@@ -68,12 +109,20 @@ Game.Party.prototype.canPass = function(tile) { // Meant to be used with Game.Ma
     return !tile.floor.properties.block && (!tile.object || !tile.object.properties.block);
 }
 
+// Party object debug string form
 Game.Party.prototype.toString = function() { // debug
-    var txt = "";
+    var txt = "PartyInfo:\nGold: " + this.gold + " Gems: " + this.gems + "\nChars:\n";
     for (i = 0; i < this.characters.length; ++i) {
-        txt += this.characters[i] + "\n";
+        txt += this.characters[i] + " | ";
     }
-
+    txt+= "\nQuests:\n";
+    for (i in this.quests) {
+        txt += this.quests[i] + "(" + i + ")\n";
+    }
+    txt+= "\nAwards:\n";
+    for (i in this.awards) {
+        txt += this.awards[i] + "(" + i + ")\n";
+    }
     return txt;
 }
 
