@@ -43,12 +43,11 @@ Game.Interpreter.prototype.run = function() {
 
 // Shows a message to the player
 Game.Interpreter.prototype.print = function(args) {
-    this.state.gameStatus = Game.MESSAGE; // on Message object?
-    console.log("Game.Interpreter: entering message mode")
     this.state.message.show("Message", args);
 }
 
 // Gives a specific gold to the party
 Game.Interpreter.prototype.giveGold = function(args) {
     this.state.party.gold += args;
+    this.state.message.show("Party found", args + " Gold");
 }
