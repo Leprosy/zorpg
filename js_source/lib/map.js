@@ -11,9 +11,10 @@ Game.Map = function() {
 
     this.obj.addTilesetImage("floor", "floorTileset")
     this.obj.addTilesetImage("object", "objectTileset")
-    this.obj.createLayer("floor");
+    var layer = this.obj.createLayer("floor");
     this.obj.createLayer("object");
 
+    layer.resizeWorld();
     this.script = JSON.parse(this.obj.properties.script);
 }
 
