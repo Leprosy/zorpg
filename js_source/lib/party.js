@@ -3,6 +3,7 @@
  *
  */
 Game.Party = function() {
+    // Setup the phaser object and some metadata
     this.obj = Engine.add.sprite(0, 0, "objectTileset", 10);
     this.obj.anchor.setTo(0.5, 0.5);
     this.x = 0;
@@ -10,9 +11,11 @@ Game.Party = function() {
     this.d_angle = Math.PI / 2
     this.d_dist = Game.tileSize;
 
+    // Party attributes and stats
     this.gold = 2000;
     this.gems = 50;
 
+    Engine.camera.follow(this.obj); // follow the party through the map
     this.setPosition(0, 0);
 }
 
