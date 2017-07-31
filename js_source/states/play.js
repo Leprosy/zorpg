@@ -38,10 +38,11 @@ Game.playState = {
         }
 
         // Update HUD
-        document.getElementById("debug").innerHTML = 
+        document.getElementById("debug").innerHTML =
             "position:" + this.party.x + " - " + this.party.y + "\n" +
-            "gameStatus:" + this.gameStatus + "\n" + 
-            "gold:" + this.party.gold;
+            "gameStatus:" + this.gameStatus + "\n" +
+            "gold:" + this.party.gold + "\n" +
+            "party:" + this.party;
     },
 
 
@@ -113,6 +114,7 @@ Game.playState = {
 
 Game.Message = function() {
     this.group = Engine.add.group();
+    this.group.fixedToCamera = true;
 }
 
 Game.Message.prototype.show = function(title, message) {

@@ -15,6 +15,8 @@ Game.Party = function() {
     this.gold = 2000;
     this.gems = 50;
 
+    this.characters = [new Game.Character("Sir Lepro"), new Game.Character("Lady Aindir"), new Game.Character("Edward the cat")];
+
     Engine.camera.follow(this.obj); // follow the party through the map
     this.setPosition(0, 0);
 }
@@ -64,4 +66,26 @@ Game.Party.prototype.canPass = function(tile) { // Meant to be used with Game.Ma
     if (!tile.floor) return false;
 
     return !tile.floor.properties.block && (!tile.object || !tile.object.properties.block);
+}
+
+Game.Party.prototype.toString = function() { // debug
+    var txt = "";
+    for (i = 0; i < this.characters.length; ++i) {
+        txt += this.characters[i] + "\n";
+    }
+
+    return txt;
+}
+
+
+/*
+ * Character class. Represents a character in the party
+ */
+Game.Character = function(name) {
+    this.name = name;
+    this.hp = 100;
+}
+
+Game.Character.prototype.toString = function() {
+    return this.name + " - " + this.hp;
 }

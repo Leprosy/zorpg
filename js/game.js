@@ -101,7 +101,7 @@ Game.playState = {
             this.interpreter.run();
         }
         // Update HUD
-        document.getElementById("debug").innerHTML = "position:" + this.party.x + " - " + this.party.y + "\n" + "gameStatus:" + this.gameStatus + "\n" + "gold:" + this.party.gold;
+        document.getElementById("debug").innerHTML = "position:" + this.party.x + " - " + this.party.y + "\n" + "gameStatus:" + this.gameStatus + "\n" + "gold:" + this.party.gold + "\n" + "party:" + this.party;
     },
     _inputHandler: function(ev) {
         //console.log("keypressed", ev)
@@ -171,6 +171,7 @@ Game.playState = {
 
 Game.Message = function() {
     this.group = Engine.add.group();
+    this.group.fixedToCamera = true;
 };
 
 Game.Message.prototype.show = function(title, message) {
@@ -318,6 +319,7 @@ Game.Party = function() {
     // Party attributes and stats
     this.gold = 2e3;
     this.gems = 50;
+    this.characters = [ new Game.Character("Sir Lepro"), new Game.Character("Lady Aindir"), new Game.Character("Edward the cat") ];
     Engine.camera.follow(this.obj);
     // follow the party through the map
     this.setPosition(0, 0);
@@ -372,4 +374,25 @@ Game.Party.prototype.canPass = function(tile) {
     // Meant to be used with Game.Map.getTile() method
     if (!tile.floor) return false;
     return !tile.floor.properties.block && (!tile.object || !tile.object.properties.block);
+};
+
+Game.Party.prototype.toString = function() {
+    // debug
+    var txt = "";
+    for (i = 0; i < this.characters.length; ++i) {
+        txt += this.characters[i] + "\n";
+    }
+    return txt;
+};
+
+/*
+ * Character class. Represents a character in the party
+ */
+Game.Character = function(name) {
+    this.name = name;
+    this.hp = 100;
+};
+
+Game.Character.prototype.toString = function() {
+    return this.name + " - " + this.hp;
 };
