@@ -14,7 +14,7 @@ Game.playState = {
         Engine.load.tilemap("map", "maps/map1.json", null, Phaser.Tilemap.TILED_JSON);
     },
     create: function() {
-        console.info(Game.name + " play state", Game);
+
         var _this = this;
 
         // Game play attributes
@@ -52,6 +52,7 @@ Game.playState = {
             case Game.PLAYING:
                 this._checkPlayingInput(ev);
                 break;
+
             case Game.MESSAGE:
                 // A key was pressed, remove message(if confirm, just accept Y/N)
                 if (!this.message.isConfirm || (ev.code === "KeyY" || ev.code === "KeyN")) {
@@ -61,6 +62,7 @@ Game.playState = {
                     console.log("PlayState: exit message mode, returning to script mode");
                 }
                 break;
+
             default:
                 console.error("PlayState: invalid playing state.");
                 break;
