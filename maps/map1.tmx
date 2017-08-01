@@ -4,22 +4,27 @@
   <property name="script">{&quot;18x2&quot;: {&quot;script&quot;: [
 {&quot;action&quot;: &quot;ifAward&quot;, &quot;args&quot;: {&quot;awardId&quot;: &quot;awd001&quot;, &quot;onTrue&quot;: 666, &quot;onFalse&quot;: 1}},
 {&quot;action&quot;: &quot;ifQuest&quot;, &quot;args&quot;: {&quot;questId&quot;: &quot;qst001&quot;, &quot;onTrue&quot;: 6, &quot;onFalse&quot;: 2}},
-{&quot;action&quot;: &quot;print&quot;, &quot;args&quot;: &quot;Hello, traveler!&quot;},
-{&quot;action&quot;: &quot;print&quot;, &quot;args&quot;: &quot;In order to travel on ZORPG, I'll give you some gold&quot;},
+{&quot;action&quot;: &quot;showDialog&quot;, &quot;args&quot;: {&quot;name&quot;: &quot;Corak the Mysterious&quot;, &quot;face&quot;: 1, &quot;msg&quot;: &quot;Hello, traveler!&quot;}},
+{&quot;action&quot;: &quot;showDialog&quot;, &quot;args&quot;: {&quot;name&quot;: &quot;Corak the Mysterious&quot;, &quot;face&quot;: 1, &quot;msg&quot;: &quot;In order to travel on ZORPG, I'll give you some gold&quot;}},
 {&quot;action&quot;: &quot;giveGold&quot;, &quot;args&quot;: 100},
 {&quot;action&quot;: &quot;giveQuest&quot;, &quot;args&quot;: {&quot;questId&quot;: &quot;qst001&quot;, &quot;desc&quot;: &quot;Visit the statue in the lava temple&quot;}},
-{&quot;action&quot;: &quot;print&quot;, &quot;args&quot;: &quot;Go to the lava temple statue...&quot;}
+{&quot;action&quot;: &quot;show&quot;, &quot;args&quot;: &quot;Corak says: 'Go to the lava temple statue...'&quot;}
 ], &quot;properties&quot;: {&quot;allowedFacing&quot;: 0}}
 ,
  &quot;12x15&quot;: {&quot;script&quot;: [
 {&quot;action&quot;: &quot;ifQuest&quot;, &quot;args&quot;: {&quot;questId&quot;:&quot;qst001&quot;, &quot;onTrue&quot;:3, &quot;onFalse&quot;:1}},
-{&quot;action&quot;: &quot;print&quot;, &quot;args&quot;: &quot;I don't know you, traveler...&quot;},
+{&quot;action&quot;: &quot;show&quot;, &quot;args&quot;: &quot;A robed figure says: 'I don't know you, traveler...'&quot;},
 {&quot;action&quot;: &quot;exit&quot;},
-{&quot;action&quot;: &quot;print&quot;, &quot;args&quot;: &quot;Hello again, traveler! You completed your quest...&quot;},
+{&quot;action&quot;: &quot;showDialog&quot;, &quot;args&quot;: {&quot;name&quot;: &quot;Corak the Mysterious&quot;, &quot;face&quot;: 1, &quot;msg&quot;: &quot;Hello again, traveler! You completed your quest...&quot;}},
 {&quot;action&quot;: &quot;giveGold&quot;, &quot;args&quot;: 1200},
 {&quot;action&quot;:&quot;removeQuest&quot;, &quot;args&quot;: &quot;qst001&quot;},
 {&quot;action&quot;:&quot;giveAward&quot;, &quot;args&quot;: {&quot;awardId&quot;: &quot;awd001&quot;, &quot;desc&quot;: &quot;Visited the lava temple statue&quot;}}
 ], &quot;properties&quot;: {&quot;startOnEnter&quot;: true}}
+,
+&quot;12x12&quot;: {&quot;script&quot;: [
+{&quot;action&quot;: &quot;ifConfirm&quot;, &quot;args&quot;: {&quot;msg&quot;: &quot;Do you want to go to the other side?&quot;, &quot;onTrue&quot;: 1, &quot;onFalse&quot;: 6}},
+{&quot;action&quot;: &quot;changeMap&quot;, &quot;args&quot;: &quot;map2&quot;}
+],&quot;properties&quot;: {}}
 }</property>
  </properties>
  <tileset firstgid="1" name="floor" tilewidth="32" tileheight="32" tilecount="100" columns="10">

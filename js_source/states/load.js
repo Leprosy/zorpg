@@ -8,6 +8,7 @@ Game.loadState = {
 
         Engine.load.spritesheet("floorTileset", "img/floor.png", Game.tileSize, Game.tileSize);
         Engine.load.spritesheet("objectTileset", "img/object.png", Game.tileSize, Game.tileSize);
+        Engine.load.spritesheet("npcFaces", "img/npc.png", 62, 62); // odd dimentions :S 
         /*Engine.load.spritesheet("sprites", "img/sprites.png", Game.tileSize, Game.tileSize);
         Engine.load.spritesheet("tiles", "img/tiles.png", Game.tileSize, Game.tileSize);
         Engine.load.tilemap("map", "maps/map.json", null, Phaser.Tilemap.TILED_JSON);*/

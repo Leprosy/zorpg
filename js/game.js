@@ -30,6 +30,7 @@ Game.loadState = {
         loadText.anchor.y = .5;
         Engine.load.spritesheet("floorTileset", "img/floor.png", Game.tileSize, Game.tileSize);
         Engine.load.spritesheet("objectTileset", "img/object.png", Game.tileSize, Game.tileSize);
+        Engine.load.spritesheet("npcFaces", "img/npc.png", 62, 62);
     },
     create: function() {
         Engine.state.start("main");
@@ -104,17 +105,20 @@ Game.playState = {
         document.getElementById("debug").innerHTML = "position:" + this.party.x + " - " + this.party.y + "\n" + "gameStatus:" + this.gameStatus + "\n" + this.party;
     },
     _inputHandler: function(ev) {
-        //console.log("keypressed", ev)
+        console.log("keypressed", ev);
         switch (this.gameStatus) {
           case Game.PLAYING:
             this._checkPlayingInput(ev);
             break;
 
           case Game.MESSAGE:
-            // A key was pressed, remove message
-            this.gameStatus = Game.SCRIPT;
-            this.message.close();
-            console.log("PlayState: exit message mode, returning to script mode");
+            // A key was pressed, remove message(if confirm, just accept Y/N)
+            if (!this.message.isConfirm || (ev.code === "KeyY" || ev.code === "KeyN")) {
+                this.gameStatus = Game.SCRIPT;
+                this.message.close();
+                this.message.lastConfirm = ev.code === "KeyY";
+                console.log("PlayState: exit message mode, returning to script mode");
+            }
             break;
 
           default:
@@ -237,15 +241,19 @@ Game.Interpreter.prototype.run = function() {
     }
 };
 
-// Shows a message to the player
-Game.Interpreter.prototype.print = function(args) {
-    this.state.message.show("Message", args);
+// Shows static messages to the player
+Game.Interpreter.prototype.show = function(args) {
+    this.state.message.show(args);
+};
+
+Game.Interpreter.prototype.showDialog = function(args) {
+    this.state.message.showDialog(args.name, args.face, args.msg);
 };
 
 // Gives a specific gold to the party
 Game.Interpreter.prototype.giveGold = function(args) {
     this.state.party.gold += args;
-    this.state.message.show("Party found", args + " Gold");
+    this.state.message.show("Party found " + args + " Gold");
 };
 
 // Gives a quest
@@ -280,19 +288,29 @@ Game.Interpreter.prototype.exit = function(args) {
     this.endScript();
 };
 
-// If's
-// Test for several conditions, if true goes to first line, if false, to the second.
-// If party have a quest
+// Ifs: Tests for several conditions, if true goes to first line, if false, to the second.
+// If party have a quest/award
 Game.Interpreter.prototype.ifQuest = function(args) {
     this._ifGoto(this.state.party.hasQuest(args.questId), args);
 };
 
-// If party have an award
 Game.Interpreter.prototype.ifAward = function(args) {
     this._ifGoto(this.state.party.hasAward(args.awardId), args);
 };
 
-// If goto
+// If party confirms
+Game.Interpreter.prototype.ifConfirm = function(args) {
+    // May be it's hacky...but I find this hilarious, so I put it here anyway XD 
+    if (this.state.message.lastConfirm === null) {
+        this.state.message.showConfirm(args.msg);
+        this.linePointer--;
+    } else {
+        this._ifGoto(this.state.message.lastConfirm, args);
+        this.state.message.lastConfirm = null;
+    }
+};
+
+// If goto method
 Game.Interpreter.prototype._ifGoto = function(condition, args) {
     if (condition) {
         console.log("Game.Interpreter: Condition is true");
@@ -301,6 +319,7 @@ Game.Interpreter.prototype._ifGoto = function(condition, args) {
         console.log("Game.Interpreter: Condition is false");
         this.linePointer = args.onFalse - 1;
     }
+    console.log("Game.Interpreter: Going to line", this.linePointer + 1);
 };
 
 /**
@@ -345,17 +364,40 @@ Game.Map.prototype.getScript = function(x, y) {
 Game.Message = function() {
     this.group = Engine.add.group();
     this.group.fixedToCamera = true;
+    this.lastConfirm = null;
+    this.isConfirm = false;
 };
 
-Game.Message.prototype.show = function(title, message) {
+// Init - closing previous message and entering MESSAGE mode
+Game.Message.prototype._init = function() {
     console.log("Game.Message: entering message mode");
     Game.playState.gameStatus = Game.MESSAGE;
-    this.close();
-    this.group.add(Engine.add.text(10, 10, title, {
+    this.lastConfirm = null;
+    this.isConfirm = false;
+};
+
+// Shows a basic message to the player
+Game.Message.prototype.show = function(message) {
+    this._init();
+    this.group.add(Engine.add.text(10, 10, message, {
         font: "20px Arial",
         fill: "#ffffff"
     }));
-    this.group.add(Engine.add.text(10, 30, message, {
+    this.group.add(Engine.add.text(10, 30, "<press a key>", {
+        font: "20px Arial",
+        fill: "#000000"
+    }));
+};
+
+//Shows a dialog message, with an NPC
+Game.Message.prototype.showDialog = function(name, face, message) {
+    this._init();
+    this.group.add(Engine.add.sprite(0, 0, "npcFaces", face));
+    this.group.add(Engine.add.text(70, 5, name, {
+        font: "20px Arial",
+        fill: "#ffffff"
+    }));
+    this.group.add(Engine.add.text(70, 35, message, {
         font: "20px Arial",
         fill: "#ffffff"
     }));
@@ -365,6 +407,21 @@ Game.Message.prototype.show = function(title, message) {
     }));
 };
 
+//Shows a confirm message to the player
+Game.Message.prototype.showConfirm = function(message) {
+    this._init();
+    this.isConfirm = true;
+    this.group.add(Engine.add.text(10, 10, message, {
+        font: "20px Arial",
+        fill: "#ffffff"
+    }));
+    this.group.add(Engine.add.text(10, 30, "<(Y)es or (N)o>", {
+        font: "20px Arial",
+        fill: "#000000"
+    }));
+};
+
+// Closes message and reset confirm status
 Game.Message.prototype.close = function() {
     this.group.removeAll();
 };

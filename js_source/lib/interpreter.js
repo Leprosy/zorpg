@@ -47,15 +47,18 @@ Game.Interpreter.prototype.run = function() {
 }
 
 
-// Shows a message to the player
-Game.Interpreter.prototype.print = function(args) {
-    this.state.message.show("Message", args);
+// Shows static messages to the player
+Game.Interpreter.prototype.show = function(args) {
+    this.state.message.show(args);
+}
+Game.Interpreter.prototype.showDialog = function(args) {
+    this.state.message.showDialog(args.name, args.face, args.msg);
 }
 
 // Gives a specific gold to the party
 Game.Interpreter.prototype.giveGold = function(args) {
     this.state.party.gold += args;
-    this.state.message.show("Party found", args + " Gold");
+    this.state.message.show("Party found " + args + " Gold");
 }
 
 // Gives a quest
@@ -66,6 +69,7 @@ Game.Interpreter.prototype.giveQuest = function(args) {
         console.error("Game.Interpreter: party already has the quest", args);
     }
 }
+
 // Gives an award
 Game.Interpreter.prototype.giveAward = function(args) {
     if (!this.state.party.hasAward(args.awardId)) {
@@ -74,6 +78,7 @@ Game.Interpreter.prototype.giveAward = function(args) {
         console.error("Game.Interpreter: party already has the award", args);
     }
 }
+
 // Quest completed, remove it
 Game.Interpreter.prototype.removeQuest = function(args) {
     if (!this.state.party.hasQuest(args.questId)) {
@@ -88,17 +93,26 @@ Game.Interpreter.prototype.exit = function(args) {
     this.endScript();
 }
 
-// If's
-// Test for several conditions, if true goes to first line, if false, to the second.
-// If party have a quest
+// Ifs: Tests for several conditions, if true goes to first line, if false, to the second.
+// If party have a quest/award
 Game.Interpreter.prototype.ifQuest = function(args) {
     this._ifGoto(this.state.party.hasQuest(args.questId), args);
 }
-// If party have an award
 Game.Interpreter.prototype.ifAward = function(args) {
     this._ifGoto(this.state.party.hasAward(args.awardId), args);
 }
-// If goto
+// If party confirms
+Game.Interpreter.prototype.ifConfirm = function(args) {
+    // May be it's hacky...but I find this hilarious, so I put it here anyway XD 
+    if (this.state.message.lastConfirm === null) {
+        this.state.message.showConfirm(args.msg);
+        this.linePointer--;
+    } else {
+        this._ifGoto(this.state.message.lastConfirm, args);
+        this.state.message.lastConfirm = null;
+    }
+}
+// If goto method
 Game.Interpreter.prototype._ifGoto = function(condition, args) {
     if (condition) {
         console.log("Game.Interpreter: Condition is true");
@@ -107,4 +121,6 @@ Game.Interpreter.prototype._ifGoto = function(condition, args) {
         console.log("Game.Interpreter: Condition is false");
         this.linePointer = args.onFalse - 1;
     }
+
+    console.log("Game.Interpreter: Going to line", this.linePointer + 1);
 }
