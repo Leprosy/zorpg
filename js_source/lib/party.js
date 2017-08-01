@@ -77,6 +77,12 @@ Game.Party.prototype.moveForward = function(map) {
 
     if (this.canPass(tileInfo)) {
         this.setPosition(pos.x, pos.y);
+
+        // Check possible damage
+        var damage = map.getTileDamage(pos.x, pos.y);
+        if (damage > 0) {
+            Game.Utils.damage(damage);
+        }
     } else {
         console.log("Game.Party: Party can't pass");
     }

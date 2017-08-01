@@ -47,6 +47,11 @@
     <property name="block" type="bool" value="true"/>
    </properties>
   </tile>
+  <tile id="4">
+   <properties>
+    <property name="damage" value="20d10"/>
+   </properties>
+  </tile>
   <tile id="5">
    <properties>
     <property name="damage" value="1d6"/>

@@ -339,6 +339,7 @@ Game.Map = function() {
     this.script = JSON.parse(this.obj.properties.script);
 };
 
+// Get tile info from a x-y position
 Game.Map.prototype.getTile = function(x, y) {
     return {
         x: x,
@@ -348,6 +349,19 @@ Game.Map.prototype.getTile = function(x, y) {
     };
 };
 
+// Get the damage tile inflicts in party(object + floor)
+Game.Map.prototype.getTileDamage = function(x, y) {
+    var floor = this.obj.getTile(x, y, "floor"), object = this.obj.getTile(x, y, "object"), dmg = 0;
+    if (floor && floor.properties.damage) {
+        dmg += Game.Utils.die(floor.properties.damage);
+    }
+    if (object && object.properties.damage) {
+        dmg += Game.Utils.die(object.properties.damage);
+    }
+    return dmg;
+};
+
+// Get tile script, if any
 Game.Map.prototype.getScript = function(x, y) {
     if (typeof this.script[x + "x" + y] !== "undefined") {
         return this.script[x + "x" + y];
@@ -506,6 +520,11 @@ Game.Party.prototype.moveForward = function(map) {
     console.log("Game.Party: Checking forward position", tileInfo);
     if (this.canPass(tileInfo)) {
         this.setPosition(pos.x, pos.y);
+        // Check possible damage
+        var damage = map.getTileDamage(pos.x, pos.y);
+        if (damage > 0) {
+            Game.Utils.damage(damage);
+        }
     } else {
         console.log("Game.Party: Party can't pass");
     }
@@ -593,4 +612,11 @@ Game.Utils.die = function(str) {
         console.error("Game.Utils.die: Bad die string", str);
         return false;
     }
+};
+
+// Damage animation
+Game.Utils.damage = function(damage) {
+    Engine.camera.shake(damage / 1e3, 300, true);
+    Engine.camera.flash(16711680, 100, true);
+    console.log("Game.Utils.damage: Party gets damage for " + damage);
 };

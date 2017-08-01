@@ -21,3 +21,10 @@ Game.Utils.die = function(str) {
         return false;
     }
 }
+
+// Damage animation
+Game.Utils.damage = function(damage) {
+    Engine.camera.shake(damage / 1000, 300, true);
+    Engine.camera.flash(0xff0000, 100, true)
+    console.log("Game.Utils.damage: Party gets damage for " + damage)
+}
