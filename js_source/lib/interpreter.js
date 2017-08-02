@@ -55,10 +55,16 @@ Game.Interpreter.prototype.showDialog = function(args) {
     this.state.message.showDialog(args.name, args.face, args.msg);
 }
 
-// Gives a specific gold to the party
+// Gives a specific amount of gold to the party
 Game.Interpreter.prototype.giveGold = function(args) {
     this.state.party.gold += args;
     this.state.message.show("Party found " + args + " Gold");
+}
+
+// Change map
+Game.Interpreter.prototype.changeMap = function(args) {
+    this.state.map.load(args.map);
+    this.state.party.setPosition(args.x, args.y);     // Need a way to set the position of player?
 }
 
 // Gives a quest
@@ -86,11 +92,6 @@ Game.Interpreter.prototype.removeQuest = function(args) {
     } else {
         console.error("Game.Interpreter: party don't have the quest", args);
     }
-}
-
-// Exit the script
-Game.Interpreter.prototype.exit = function(args) {
-    this.endScript();
 }
 
 // Ifs: Tests for several conditions, if true goes to first line, if false, to the second.
@@ -123,4 +124,9 @@ Game.Interpreter.prototype._ifGoto = function(condition, args) {
     }
 
     console.log("Game.Interpreter: Going to line", this.linePointer + 1);
+}
+
+//Exit the script
+Game.Interpreter.prototype.exit = function(args) {
+    this.endScript();
 }

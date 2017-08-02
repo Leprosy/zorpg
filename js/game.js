@@ -79,7 +79,8 @@ Game.DEAD = 666;
 
 Game.playState = {
     preload: function() {
-        Engine.load.tilemap("map", "maps/map1.json", null, Phaser.Tilemap.TILED_JSON);
+        Engine.load.tilemap("map1", "maps/map1.json", null, Phaser.Tilemap.TILED_JSON);
+        Engine.load.tilemap("map2", "maps/map2.json", null, Phaser.Tilemap.TILED_JSON);
     },
     create: function() {
         var _this = this;
@@ -104,7 +105,7 @@ Game.playState = {
         document.getElementById("debug").innerHTML = "position:" + this.party.x + " - " + this.party.y + "\n" + "gameStatus:" + this.gameStatus + "\n" + this.party;
     },
     _inputHandler: function(ev) {
-        console.log("keypressed", ev);
+        //console.log("keypressed", ev)
         switch (this.gameStatus) {
           case Game.PLAYING:
             this._checkPlayingInput(ev);
@@ -249,10 +250,16 @@ Game.Interpreter.prototype.showDialog = function(args) {
     this.state.message.showDialog(args.name, args.face, args.msg);
 };
 
-// Gives a specific gold to the party
+// Gives a specific amount of gold to the party
 Game.Interpreter.prototype.giveGold = function(args) {
     this.state.party.gold += args;
     this.state.message.show("Party found " + args + " Gold");
+};
+
+// Change map
+Game.Interpreter.prototype.changeMap = function(args) {
+    this.state.map.load(args.map);
+    this.state.party.setPosition(args.x, args.y);
 };
 
 // Gives a quest
@@ -280,11 +287,6 @@ Game.Interpreter.prototype.removeQuest = function(args) {
     } else {
         console.error("Game.Interpreter: party don't have the quest", args);
     }
-};
-
-// Exit the script
-Game.Interpreter.prototype.exit = function(args) {
-    this.endScript();
 };
 
 // Ifs: Tests for several conditions, if true goes to first line, if false, to the second.
@@ -321,6 +323,11 @@ Game.Interpreter.prototype._ifGoto = function(condition, args) {
     console.log("Game.Interpreter: Going to line", this.linePointer + 1);
 };
 
+//Exit the script
+Game.Interpreter.prototype.exit = function(args) {
+    this.endScript();
+};
+
 /**
  * Map class. Methods to interact with the tile based game maps.
  *
@@ -330,13 +337,30 @@ Game.Interpreter.prototype._ifGoto = function(condition, args) {
  * damage: the tile damages the player(using a die string)
  */
 Game.Map = function() {
-    this.obj = Engine.add.tilemap("map", Game.tileSize, Game.tileSize);
+    this.group = Engine.add.group();
+    this.group.z = 0;
+    this.obj = null;
+    this.script = {};
+    this.properties = {};
+    // Load default first map
+    this.load("map1");
+};
+
+// Load map
+Game.Map.prototype.load = function(key) {
+    // Remove old map
+    this.group.removeAll();
+    // Create new one
+    this.obj = Engine.add.tilemap(key, Game.tileSize, Game.tileSize);
     this.obj.addTilesetImage("floor", "floorTileset");
     this.obj.addTilesetImage("object", "objectTileset");
-    var layer = this.obj.createLayer("floor");
-    this.obj.createLayer("object");
-    layer.resizeWorld();
+    var floor = this.obj.createLayer("floor");
+    var object = this.obj.createLayer("object");
+    floor.resizeWorld();
+    this.group.add(floor);
+    this.group.add(object);
     this.script = JSON.parse(this.obj.properties.script);
+    this.properties = this.obj.properties;
 };
 
 // Get tile info from a x-y position
@@ -377,6 +401,7 @@ Game.Map.prototype.getScript = function(x, y) {
 Game.Message = function() {
     this.group = Engine.add.group();
     this.group.fixedToCamera = true;
+    this.group.z = 200;
     this.lastConfirm = null;
     this.isConfirm = false;
 };
@@ -449,6 +474,7 @@ Game.Party = function() {
     this.obj.anchor.setTo(.5, .5);
     this.x = 0;
     this.y = 0;
+    this.z = 100;
     this.d_angle = Math.PI / 2;
     this.d_dist = Game.tileSize;
     // Party attributes and stats

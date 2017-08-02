@@ -5,6 +5,7 @@
 Game.Message = function() {
     this.group = Engine.add.group();
     this.group.fixedToCamera = true;
+    this.group.z = 200;
     this.lastConfirm = null;
     this.isConfirm = false;
 }

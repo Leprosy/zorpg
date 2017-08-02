@@ -7,15 +7,34 @@
  * damage: the tile damages the player(using a die string)
  */
 Game.Map = function() {
-    this.obj = Engine.add.tilemap("map", Game.tileSize, Game.tileSize);
+    this.group = Engine.add.group();
+    this.group.z = 0;
+    this.obj = null;
+    this.script = {};
+    this.properties = {};
 
-    this.obj.addTilesetImage("floor", "floorTileset")
-    this.obj.addTilesetImage("object", "objectTileset")
-    var layer = this.obj.createLayer("floor");
-    this.obj.createLayer("object");
+    // Load default first map
+    this.load("map1");
+}
 
-    layer.resizeWorld();
+// Load map
+Game.Map.prototype.load = function(key) {
+    // Remove old map
+    this.group.removeAll();
+
+    // Create new one
+    this.obj = Engine.add.tilemap(key, Game.tileSize, Game.tileSize);
+    this.obj.addTilesetImage("floor", "floorTileset");
+    this.obj.addTilesetImage("object", "objectTileset");
+
+    var floor = this.obj.createLayer("floor");
+    var object = this.obj.createLayer("object");
+    floor.resizeWorld();
+    this.group.add(floor);
+    this.group.add(object);
+
     this.script = JSON.parse(this.obj.properties.script);
+    this.properties = this.obj.properties;
 }
 
 // Get tile info from a x-y position

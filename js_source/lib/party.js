@@ -8,6 +8,7 @@ Game.Party = function() {
     this.obj.anchor.setTo(0.5, 0.5);
     this.x = 0;
     this.y = 0;
+    this.z = 100;
     this.d_angle = Math.PI / 2
     this.d_dist = Game.tileSize;
 

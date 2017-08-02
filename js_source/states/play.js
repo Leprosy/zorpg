@@ -11,10 +11,10 @@ Game.DEAD = 666;
 
 Game.playState = {
     preload: function() {
-        Engine.load.tilemap("map", "maps/map1.json", null, Phaser.Tilemap.TILED_JSON);
+        Engine.load.tilemap("map1", "maps/map1.json", null, Phaser.Tilemap.TILED_JSON);
+        Engine.load.tilemap("map2", "maps/map2.json", null, Phaser.Tilemap.TILED_JSON);
     },
     create: function() {
-
         var _this = this;
 
         // Game play attributes
@@ -28,8 +28,6 @@ Game.playState = {
 
         // Input
         Engine.input.keyboard.onDownCallback = function(ev) { _this._inputHandler(ev) };
-
-        //Game.layer.resizeWorld();
     },
     update: function() {
         // Run script
@@ -46,7 +44,7 @@ Game.playState = {
 
 
     _inputHandler: function(ev) {
-        console.log("keypressed", ev)
+        //console.log("keypressed", ev)
 
         switch(this.gameStatus) {
             case Game.PLAYING:
