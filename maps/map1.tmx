@@ -23,7 +23,7 @@
 ,
 &quot;12x12&quot;: {&quot;script&quot;: [
 {&quot;action&quot;: &quot;ifConfirm&quot;, &quot;args&quot;: {&quot;msg&quot;: &quot;Do you want to go to the other side?&quot;, &quot;onTrue&quot;: 1, &quot;onFalse&quot;: 6}},
-{&quot;action&quot;: &quot;changeMap&quot;, &quot;args&quot;: &quot;map2&quot;}
+{&quot;action&quot;: &quot;changeMap&quot;, &quot;args&quot;: {&quot;map&quot;: &quot;map2&quot;, &quot;x&quot;: 1, &quot;y&quot;: 1}}
 ],&quot;properties&quot;: {}}
 }</property>
  </properties>
