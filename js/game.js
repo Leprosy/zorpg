@@ -375,14 +375,15 @@ Game.Map.prototype.getTile = function(x, y) {
 
 // Get the damage tile inflicts in party(object + floor)
 Game.Map.prototype.getTileDamage = function(x, y) {
-    var floor = this.obj.getTile(x, y, "floor"), object = this.obj.getTile(x, y, "object"), dmg = 0;
+    var dices = [];
+    var floor = this.obj.getTile(x, y, "floor"), object = this.obj.getTile(x, y, "object");
     if (floor && floor.properties.damage) {
-        dmg += Game.Utils.die(floor.properties.damage);
+        dices.push(floor.properties.damage);
     }
     if (object && object.properties.damage) {
-        dmg += Game.Utils.die(object.properties.damage);
+        dices.push(object.properties.damage);
     }
-    return dmg;
+    return dices;
 };
 
 // Get tile script, if any
@@ -530,6 +531,28 @@ Game.Party.prototype.giveAward = function(obj) {
     }
 };
 
+// Damage a random number of party members, for a die of damage
+Game.Party.prototype.damageN = function(number, dieString) {
+    for (i = 0; i < number; ++i) {
+        var damage = Game.Utils.die(dieString);
+        var char = this.characters[Game.Utils.die("1d" + (number - 1) + "+1")];
+        console.log("Game.Party: Damaging " + char + " for " + damage);
+        char.hp -= damage;
+        Game.Utils.damage(damage);
+    }
+};
+
+// Damage all
+Game.Party.prototype.damageAll = function(dieString) {
+    for (i = 0; i < this.characters.length; ++i) {
+        var damage = Game.Utils.die(dieString);
+        var char = this.characters[i];
+        console.log("Game.Party: Damaging " + char + " for " + damage);
+        char.hp -= damage;
+        Game.Utils.damage(damage);
+    }
+};
+
 // Sets the party position in the current world map
 Game.Party.prototype.setPosition = function(x, y) {
     this.x = x;
@@ -547,9 +570,9 @@ Game.Party.prototype.moveForward = function(map) {
     if (this.canPass(tileInfo)) {
         this.setPosition(pos.x, pos.y);
         // Check possible damage
-        var damage = map.getTileDamage(pos.x, pos.y);
-        if (damage > 0) {
-            Game.Utils.damage(damage);
+        var damageDices = map.getTileDamage(pos.x, pos.y);
+        for (i in damageDices) {
+            this.damageAll(damageDices[i]);
         }
     } else {
         console.log("Game.Party: Party can't pass");
@@ -615,7 +638,7 @@ Game.Character = function(name) {
 };
 
 Game.Character.prototype.toString = function() {
-    return this.name + " - " + this.hp;
+    return this.name + "(" + this.hp + "hp)";
 };
 
 /**

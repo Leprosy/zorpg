@@ -48,18 +48,18 @@ Game.Map.prototype.getTile = function(x, y) {
 
 // Get the damage tile inflicts in party(object + floor)
 Game.Map.prototype.getTileDamage = function(x, y) {
+    var dices = [];
     var floor  = this.obj.getTile(x, y, "floor"),
-        object = this.obj.getTile(x, y, "object"),
-        dmg = 0;
+        object = this.obj.getTile(x, y, "object");
 
     if (floor && floor.properties.damage) {
-        dmg += Game.Utils.die(floor.properties.damage);
+        dices.push(floor.properties.damage);
     }
     if (object && object.properties.damage) {
-        dmg += Game.Utils.die(object.properties.damage);
+        dices.push(object.properties.damage);
     }
 
-    return dmg;
+    return dices;
 }
 
 // Get tile script, if any
