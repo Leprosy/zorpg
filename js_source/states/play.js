@@ -69,9 +69,11 @@ Game.playState = {
 
     _checkPlayingInput: function(ev) {
         switch(ev.code) {
-            // Party movement
+            // Party movement back/forth
             case "ArrowUp":
-                this.party.moveForward(this.map)
+            case "ArrowDown":
+                ev.code === "ArrowUp" ? this.party.moveForward() : this.party.moveBackward();
+
                 var scriptData = this.map.getScript(this.party.x, this.party.y);
 
                 if (scriptData) {
@@ -83,10 +85,6 @@ Game.playState = {
                 if (scriptData && scriptData.properties.startOnEnter) {
                     this.gameStatus = Game.SCRIPT;
                 }
-                break;
-            case "ArrowDown":
-                this.party.getBack();
-                //Copy logic from forward case
                 break;
             case "ArrowLeft":
                 this.party.rotateLeft();

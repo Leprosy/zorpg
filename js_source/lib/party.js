@@ -20,8 +20,9 @@ Game.Party = function() {
     this.characters = [new Game.Character("Sir Lepro"), new Game.Character("Lady Aindir"), new Game.Character("Edward the cat")];
 
     Engine.camera.follow(this.obj); // follow the party through the map
-    this.setPosition(0, 0);
+    //this.setPosition(0, 0);
 }
+
 
 // Party's quest & awards methods. Checks, adds and removes
 Game.Party.prototype.hasQuest = function(questId) {
@@ -60,27 +61,27 @@ Game.Party.prototype.giveAward = function(obj) {
     }
 }
 
+
 // Damage a random number of party members, for a die of damage
 Game.Party.prototype.damageN = function(number, dieString) {
-    for (i = 0; i < number; ++i) {
-        var damage = Game.Utils.die(dieString);
-        var char = this.characters[Game.Utils.die("1d" + (number - 1) + "+1")];
-        console.log("Game.Party: Damaging " + char + " for " + damage);
-        char.hp -= damage;
+    var damage = Game.Utils.die(dieString);
 
-        Game.Utils.damage(damage);
+    for (i = 0; i < number; ++i) {
+        this.damageChar(Game.Utils.die("1d" + (number - 1) + "+1"), damage);
     }
 }
 // Damage all
 Game.Party.prototype.damageAll = function(dieString) {
-    for (i = 0; i < this.characters.length; ++i) {
-        var damage = Game.Utils.die(dieString);
-        var char = this.characters[i];
-        console.log("Game.Party: Damaging " + char + " for " + damage);
-        char.hp -= damage;
+    var damage = Game.Utils.die(dieString);
 
-        Game.Utils.damage(damage);
+    for (i = 0; i < this.characters.length; ++i) {
+        this.damageChar(this.characters[i], damage);
     }
+}
+Game.Party.prototype.damageChar = function(char, damage) {
+    console.log("Game.Party: Damaging " + char + " for " + damage);
+    char.hp -= damage;
+    Game.Utils.damage(damage);
 }
 
 // Sets the party position in the current world map
@@ -91,23 +92,32 @@ Game.Party.prototype.setPosition = function(x, y) {
     // Do the math
     this.obj.x = x * Game.tileSize + Game.tileSize / 2;
     this.obj.y = y * Game.tileSize + Game.tileSize / 2;
+
+    // Check possible tile damage
+    var map = Game.playState.map;
+    var damageDices = map.getTileDamage(x, y);
+
+    for (i in damageDices) {
+        this.damageAll(damageDices[i]);
+    }
 }
 
 // Movement methods
-Game.Party.prototype.moveForward = function(map) {
+Game.Party.prototype.moveForward = function() {
     var pos = this.getForward();
+    this.doMove(pos);
+}
+Game.Party.prototype.moveBackward = function() {
+    var pos = this.getBack();
+    this.doMove(pos);
+}
+Game.Party.prototype.doMove = function(pos) {
+    var map = Game.playState.map;
     var tileInfo = map.getTile(pos.x, pos.y);
     console.log("Game.Party: Checking forward position", tileInfo);
 
     if (this.canPass(tileInfo)) {
         this.setPosition(pos.x, pos.y);
-
-        // Check possible damage
-        var damageDices = map.getTileDamage(pos.x, pos.y);
-        for (i in damageDices) {
-            this.damageAll(damageDices[i]);
-        }
-
     } else {
         console.log("Game.Party: Party can't pass");
     }
@@ -134,6 +144,9 @@ Game.Party.prototype.rotateLeft = function() {
 Game.Party.prototype.rotateRight = function() {
     this.obj.rotation = (this.obj.rotation + this.d_angle) % (Math.PI * 2);
 }
+
+
+// Checks if the party can pass over certain map tile(exists/is passable/skills required)
 Game.Party.prototype.canPass = function(tile) { // Meant to be used with Game.Map.getTile() method
     if (!tile.floor) return false;
 
@@ -156,6 +169,8 @@ Game.Party.prototype.toString = function() { // debug
     }
     return txt;
 }
+
+
 
 
 /*
