@@ -22,23 +22,28 @@ Game.playState = {
 
         // Create gameplay objects
         this.map = new Game.Map();
-        this.party = new Game.Party();
         this.interpreter = new Game.Interpreter();
         this.message = new Game.Message();
-        // WOW. starting game. TODO: where is this code should be?
+
+        this.party = new Game.Party();
         this.party.setPosition(1, 1);
 
-        // TOTALLY DEBUG Monsters
+        // TOTALLY DEBUG add 1 Monsters
         this.monsters = [];
+        for (i = 0; i < 1; ++i) {
+            this.monsters.push(new Game.Monster());
+        }
 
         // Input
         Engine.input.keyboard.onDownCallback = function(ev) { _this._inputHandler(ev) };
     },
     update: function() {
-        // Run script
+        // Continue running the current script, if any
         if (this.gameStatus === Game.SCRIPT) {
             this.interpreter.run();
         }
+
+        // Missiles(spells, arrows)?
 
         // Update HUD
         document.getElementById("debug").innerHTML =
@@ -47,6 +52,12 @@ Game.playState = {
             this.party
     },
 
+    _checkTurn: function() {
+        // Monsters
+        for (i = 0; i < this.monsters.length; ++i) {
+            this.monsters[i].seekParty();
+        }
+    },
 
     _inputHandler: function(ev) {
         //console.log("keypressed", ev)
@@ -79,6 +90,7 @@ Game.playState = {
             case "ArrowDown":
                 ev.code === "ArrowUp" ? this.party.moveForward() : this.party.moveBackward();
 
+                // Load script. If inmediate, run it.
                 var scriptData = this.map.getScript(this.party.x, this.party.y);
 
                 if (scriptData) {
@@ -90,6 +102,9 @@ Game.playState = {
                 if (scriptData && scriptData.properties.startOnEnter) {
                     this.gameStatus = Game.SCRIPT;
                 }
+
+                // Check turn based events(monster movement, time, etc.)
+                this._checkTurn();
                 break;
             case "ArrowLeft":
                 this.party.rotateLeft();

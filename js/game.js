@@ -88,25 +88,34 @@ Game.playState = {
         this.gameStatus = Game.PLAYING;
         // Create gameplay objects
         this.map = new Game.Map();
-        this.party = new Game.Party();
         this.interpreter = new Game.Interpreter();
         this.message = new Game.Message();
-        // WOW. starting game. TODO: where is this code should be?
+        this.party = new Game.Party();
         this.party.setPosition(1, 1);
-        // TOTALLY DEBUG Monsters
+        // TOTALLY DEBUG add 1 Monsters
         this.monsters = [];
+        for (i = 0; i < 1; ++i) {
+            this.monsters.push(new Game.Monster());
+        }
         // Input
         Engine.input.keyboard.onDownCallback = function(ev) {
             _this._inputHandler(ev);
         };
     },
     update: function() {
-        // Run script
+        // Continue running the current script, if any
         if (this.gameStatus === Game.SCRIPT) {
             this.interpreter.run();
         }
+        // Missiles(spells, arrows)?
         // Update HUD
         document.getElementById("debug").innerHTML = "position:" + this.party.x + " - " + this.party.y + "\n" + "gameStatus:" + this.gameStatus + "\n" + this.party;
+    },
+    _checkTurn: function() {
+        // Monsters
+        for (i = 0; i < this.monsters.length; ++i) {
+            this.monsters[i].seekParty();
+        }
     },
     _inputHandler: function(ev) {
         //console.log("keypressed", ev)
@@ -136,6 +145,7 @@ Game.playState = {
             case "ArrowUp":
           case "ArrowDown":
             ev.code === "ArrowUp" ? this.party.moveForward() : this.party.moveBackward();
+            // Load script. If inmediate, run it.
             var scriptData = this.map.getScript(this.party.x, this.party.y);
             if (scriptData) {
                 console.log("PlayState: loaded script", scriptData);
@@ -144,6 +154,8 @@ Game.playState = {
             if (scriptData && scriptData.properties.startOnEnter) {
                 this.gameStatus = Game.SCRIPT;
             }
+            // Check turn based events(monster movement, time, etc.)
+            this._checkTurn();
             break;
 
           case "ArrowLeft":
@@ -474,7 +486,7 @@ Game.MapObject = function() {
     this.obj.anchor.setTo(.5, .5);
     this.x = 0;
     this.y = 0;
-    this.z = 100;
+    this.obj.z = 100;
     this.d_angle = Math.PI / 2;
     this.d_dist = Game.tileSize;
 };
@@ -497,7 +509,7 @@ Game.MapObject.prototype.doMove = function(pos) {
     if (this.canPass(tileInfo)) {
         this.setPosition(pos.x, pos.y);
     } else {
-        console.log("Game.MapObject: Can't pass");
+        console.log("Game.MapObjecthttp://68.media.tumblr.com/099a185af5e8d56f404d16101c50f76a/tumblr_ou9hh4ncE51qzhjh2o1_400.gif: Can't pass");
     }
 };
 
@@ -542,6 +554,40 @@ Game.MapObject.prototype.setPosition = function(x, y) {
     // Do the math
     this.obj.x = x * Game.tileSize + Game.tileSize / 2;
     this.obj.y = y * Game.tileSize + Game.tileSize / 2;
+};
+
+/**
+ * Monster class. Baddies >D
+ */
+Game.Monster = function() {
+    Game.MapObject.call(this);
+    this.obj.tint = Math.random() * 16777215;
+    // Monster attributes
+    this.name = "Bad demon";
+    this.hp = 100;
+    this.xp = 20;
+    this.gold = 10;
+    this.setPosition(10, 10);
+};
+
+Game.Monster.prototype = Object.create(Game.MapObject.prototype);
+
+Game.Monster.prototype.constructor = Game.Monster;
+
+// Basic seek algorithm
+Game.Monster.prototype.seekParty = function() {
+    var party = Game.playState.party;
+    if (party.x < this.x) {
+        this.x--;
+    } else if (party.x > this.x) {
+        this.x++;
+    }
+    if (party.y < this.y) {
+        this.y--;
+    } else if (party.y > this.y) {
+        this.y++;
+    }
+    this.setPosition(this.x, this.y);
 };
 
 /**
