@@ -25,6 +25,11 @@ Game.playState = {
         this.party = new Game.Party();
         this.interpreter = new Game.Interpreter();
         this.message = new Game.Message();
+        // WOW. starting game. TODO: where is this code should be?
+        this.party.setPosition(1, 1);
+
+        // TOTALLY DEBUG Monsters
+        this.monsters = [];
 
         // Input
         Engine.input.keyboard.onDownCallback = function(ev) { _this._inputHandler(ev) };

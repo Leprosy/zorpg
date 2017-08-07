@@ -91,6 +91,10 @@ Game.playState = {
         this.party = new Game.Party();
         this.interpreter = new Game.Interpreter();
         this.message = new Game.Message();
+        // WOW. starting game. TODO: where is this code should be?
+        this.party.setPosition(1, 1);
+        // TOTALLY DEBUG Monsters
+        this.monsters = [];
         // Input
         Engine.input.keyboard.onDownCallback = function(ev) {
             _this._inputHandler(ev);
@@ -462,10 +466,9 @@ Game.Message.prototype.close = function() {
 };
 
 /**
- * Party class. This represents the player party in the game.
- *
+ * Positioned objects in the map(Monsters, Party, etc)
  */
-Game.Party = function() {
+Game.MapObject = function() {
     // Setup the phaser object and some metadata
     this.obj = Engine.add.sprite(0, 0, "objectTileset", 10);
     this.obj.anchor.setTo(.5, .5);
@@ -474,6 +477,79 @@ Game.Party = function() {
     this.z = 100;
     this.d_angle = Math.PI / 2;
     this.d_dist = Game.tileSize;
+};
+
+//Movement methods
+Game.MapObject.prototype.moveForward = function() {
+    var pos = this.getForward();
+    this.doMove(pos);
+};
+
+Game.MapObject.prototype.moveBackward = function() {
+    var pos = this.getBack();
+    this.doMove(pos);
+};
+
+Game.MapObject.prototype.doMove = function(pos) {
+    var map = Game.playState.map;
+    var tileInfo = map.getTile(pos.x, pos.y);
+    console.log("Game.MapObject: Checking forward position", tileInfo);
+    if (this.canPass(tileInfo)) {
+        this.setPosition(pos.x, pos.y);
+    } else {
+        console.log("Game.MapObject: Can't pass");
+    }
+};
+
+Game.MapObject.prototype.getForward = function() {
+    var x = this.obj.x + this.d_dist * Math.cos(this.obj.rotation);
+    var y = this.obj.y + this.d_dist * Math.sin(this.obj.rotation);
+    return {
+        x: Math.round((x - Game.tileSize / 2) / Game.tileSize),
+        y: Math.round((y - Game.tileSize / 2) / Game.tileSize)
+    };
+};
+
+Game.MapObject.prototype.getBack = function() {
+    var x = this.obj.x - this.d_dist * Math.cos(this.obj.rotation);
+    var y = this.obj.y - this.d_dist * Math.sin(this.obj.rotation);
+    return {
+        x: Math.round((x - Game.tileSize / 2) / Game.tileSize),
+        y: Math.round((y - Game.tileSize / 2) / Game.tileSize)
+    };
+};
+
+Game.MapObject.prototype.rotateLeft = function() {
+    this.obj.rotation = (this.obj.rotation - this.d_angle) % (Math.PI * 2);
+};
+
+Game.MapObject.prototype.rotateRight = function() {
+    this.obj.rotation = (this.obj.rotation + this.d_angle) % (Math.PI * 2);
+};
+
+// Checks if the tile is passable/exists(needs to be extended to include Party/Monsters exclusive rules
+Game.MapObject.prototype.canPass = function(tile) {
+    // Meant to be used with Game.Map.getTile() method
+    if (!tile.floor) return false;
+    return !tile.floor.properties.block && (!tile.object || !tile.object.properties.block);
+};
+
+// Change object position in the current world map
+Game.MapObject.prototype.setPosition = function(x, y) {
+    console.log("Game.MapObject setPosition");
+    this.x = x;
+    this.y = y;
+    // Do the math
+    this.obj.x = x * Game.tileSize + Game.tileSize / 2;
+    this.obj.y = y * Game.tileSize + Game.tileSize / 2;
+};
+
+/**
+ * Party class. This represents the player party in the game.
+ *
+ */
+Game.Party = function() {
+    Game.MapObject.call(this);
     // Party attributes and stats
     this.gold = 2e3;
     this.gems = 50;
@@ -483,6 +559,10 @@ Game.Party = function() {
     this.characters = [ new Game.Character("Sir Lepro"), new Game.Character("Lady Aindir"), new Game.Character("Edward the cat") ];
     Engine.camera.follow(this.obj);
 };
+
+Game.Party.prototype = Object.create(Game.MapObject.prototype);
+
+Game.Party.prototype.constructor = Game.Party;
 
 // Party's quest & awards methods. Checks, adds and removes
 Game.Party.prototype.hasQuest = function(questId) {
@@ -547,75 +627,20 @@ Game.Party.prototype.damageChar = function(char, damage) {
     Game.Utils.damage(damage);
 };
 
-// Sets the party position in the current world map
-Game.Party.prototype.setPosition = function(x, y) {
-    this.x = x;
-    this.y = y;
-    // Do the math
-    this.obj.x = x * Game.tileSize + Game.tileSize / 2;
-    this.obj.y = y * Game.tileSize + Game.tileSize / 2;
-    // Check possible tile damage
-    var map = Game.playState.map;
-    var damageDices = map.getTileDamage(x, y);
-    for (i in damageDices) {
-        this.damageAll(damageDices[i]);
-    }
-};
-
-// Movement methods
-Game.Party.prototype.moveForward = function() {
-    var pos = this.getForward();
-    this.doMove(pos);
-};
-
-Game.Party.prototype.moveBackward = function() {
-    var pos = this.getBack();
-    this.doMove(pos);
-};
-
-Game.Party.prototype.doMove = function(pos) {
-    var map = Game.playState.map;
-    var tileInfo = map.getTile(pos.x, pos.y);
-    console.log("Game.Party: Checking forward position", tileInfo);
-    if (this.canPass(tileInfo)) {
-        this.setPosition(pos.x, pos.y);
-    } else {
-        console.log("Game.Party: Party can't pass");
-    }
-};
-
-Game.Party.prototype.getForward = function() {
-    var x = this.obj.x + this.d_dist * Math.cos(this.obj.rotation);
-    var y = this.obj.y + this.d_dist * Math.sin(this.obj.rotation);
-    return {
-        x: Math.round((x - Game.tileSize / 2) / Game.tileSize),
-        y: Math.round((y - Game.tileSize / 2) / Game.tileSize)
+// Set position extension for Party - calculates tile damage
+Game.Party.prototype.setPostiion = function(setPosition) {
+    Game.Party.prototype.setPosition = function(x, y) {
+        setPosition.call(this, x, y);
+        // Run parent method
+        // Extending code - check tile damage for party
+        console.log("Game.Party setPosition");
+        var map = Game.playState.map;
+        var damageDices = map.getTileDamage(x, y);
+        for (i in damageDices) {
+            this.damageAll(damageDices[i]);
+        }
     };
-};
-
-Game.Party.prototype.getBack = function() {
-    var x = this.obj.x - this.d_dist * Math.cos(this.obj.rotation);
-    var y = this.obj.y - this.d_dist * Math.sin(this.obj.rotation);
-    return {
-        x: Math.round((x - Game.tileSize / 2) / Game.tileSize),
-        y: Math.round((y - Game.tileSize / 2) / Game.tileSize)
-    };
-};
-
-Game.Party.prototype.rotateLeft = function() {
-    this.obj.rotation = (this.obj.rotation - this.d_angle) % (Math.PI * 2);
-};
-
-Game.Party.prototype.rotateRight = function() {
-    this.obj.rotation = (this.obj.rotation + this.d_angle) % (Math.PI * 2);
-};
-
-// Checks if the party can pass over certain map tile(exists/is passable/skills required)
-Game.Party.prototype.canPass = function(tile) {
-    // Meant to be used with Game.Map.getTile() method
-    if (!tile.floor) return false;
-    return !tile.floor.properties.block && (!tile.object || !tile.object.properties.block);
-};
+}(Game.Party.prototype.setPosition);
 
 // Party object debug string form
 Game.Party.prototype.toString = function() {
