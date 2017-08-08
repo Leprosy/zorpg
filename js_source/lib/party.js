@@ -28,7 +28,7 @@ Game.MapObject.prototype.doMove = function(pos) {
     if (this.canPass(tileInfo)) {
         this.setPosition(pos.x, pos.y);
     } else {
-        console.log("Game.MapObjecthttp://68.media.tumblr.com/099a185af5e8d56f404d16101c50f76a/tumblr_ou9hh4ncE51qzhjh2o1_400.gif: Can't pass");
+        console.log("Game.MapObject: Can't pass");
     }
 }
 Game.MapObject.prototype.getForward = function() {
@@ -96,20 +96,24 @@ Game.Monster.prototype.constructor = Game.Monster;
 Game.Monster.prototype.seekParty = function() {
     var party = Game.playState.party;
 
-    if (party.x < this.x) {
-        this.x--;
-    } else if (party.x > this.x) {
-        this.x++;
-    }
+    // If not near, forget it
+    if (Engine.physics.arcade.distanceBetween(party.obj, this.obj) <= Game.tileSize * 3) {
+        if (party.x < this.x) {
+            this.x--;
+        } else if (party.x > this.x) {
+            this.x++;
+        }
 
-    if (party.y < this.y) {
-        this.y--;
-    } else if (party.y > this.y) {
-        this.y++;
-    }
+        if (party.y < this.y) {
+            this.y--;
+        } else if (party.y > this.y) {
+            this.y++;
+        }
 
-    this.setPosition(this.x, this.y);
+        this.setPosition(this.x, this.y);
+    }
 }
+
 
 
 
