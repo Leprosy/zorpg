@@ -96,37 +96,37 @@ Game.Monster.prototype.constructor = Game.Monster;
 Game.Monster.prototype.seekParty = function() {
     var party = Game.playState.party;
 
+    console.log("Checking", "monster", this.x, this.y, "party", party.x, party.y)
+
     // If not near, forget it
     if (Math.abs(party.x - this.x) < 3 && Math.abs(party.y - this.y) < 3) {
+        // If angle is horizontal, try to match vertically first, and viceversa
+        var first = "x", second = "y";
 
-        if (party.obj.angle === 0 || party.obj.angle === -180) { // Party is looking horizontally, match vertically first
-            if (party.y > this.y) {
-                this.y++;
-            } else if (party.y < this.y) {
-                this.y--;
-            } else {
-                if (party.x > this.x) {
-                    this.x++;
-                } else {
-                    this.x--;
-                }
-            }
-        } else { // Party is looking vertically
-            if (party.x > this.x) {
-                this.x++;
-            } else if (party.x < this.x) {
-                this.x--;
-            } else {
-                if (party.y > this.y) {
-                    this.y++;
-                } else {
-                    this.y--;
-                }
+        if (party.obj.angle === 0 || party.obj.angle === -180) {
+            first = "y"; second = "x"
+        }
+
+        // Try to match first coordinate, then the second
+        if (party[first] > this[first]) {
+            this[first]++;
+        } else if (party[first] < this[first]) {
+            this[first]--;
+        } else {
+            if (party[second] > this[second]) {
+                this[second]++;
+            } else if (party[second] < this[second]){
+                this[second]--;
             }
         }
 
-        console.log(this)
         this.setPosition(this.x, this.y);
+
+        // TAG
+        if (this.x === party.x && this.y === party.y) {
+            console.log("TAG")
+            Game.playState.gameStatus = Game.FIGHTING;
+        }
     }
 }
 

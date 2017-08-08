@@ -24,7 +24,6 @@ Game.playState = {
         this.map = new Game.Map();
         this.interpreter = new Game.Interpreter();
         this.message = new Game.Message();
-
         this.party = new Game.Party();
         this.party.setPosition(1, 1);
 
