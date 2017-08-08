@@ -97,19 +97,35 @@ Game.Monster.prototype.seekParty = function() {
     var party = Game.playState.party;
 
     // If not near, forget it
-    if (Engine.physics.arcade.distanceBetween(party.obj, this.obj) <= Game.tileSize * 3) {
-        if (party.x < this.x) {
-            this.x--;
-        } else if (party.x > this.x) {
-            this.x++;
+    if (Math.abs(party.x - this.x) < 3 && Math.abs(party.y - this.y) < 3) {
+
+        if (party.obj.angle === 0 || party.obj.angle === -180) { // Party is looking horizontally, match vertically first
+            if (party.y > this.y) {
+                this.y++;
+            } else if (party.y < this.y) {
+                this.y--;
+            } else {
+                if (party.x > this.x) {
+                    this.x++;
+                } else {
+                    this.x--;
+                }
+            }
+        } else { // Party is looking vertically
+            if (party.x > this.x) {
+                this.x++;
+            } else if (party.x < this.x) {
+                this.x--;
+            } else {
+                if (party.y > this.y) {
+                    this.y++;
+                } else {
+                    this.y--;
+                }
+            }
         }
 
-        if (party.y < this.y) {
-            this.y--;
-        } else if (party.y > this.y) {
-            this.y++;
-        }
-
+        console.log(this)
         this.setPosition(this.x, this.y);
     }
 }

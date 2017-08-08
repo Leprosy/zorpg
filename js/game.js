@@ -168,12 +168,15 @@ Game.playState = {
 
           // Fire map tile action script
             case "Space":
+            // Run script, if there is any
             if (this.interpreter.script) {
                 this.gameStatus = Game.SCRIPT;
                 console.log("PlayState: entering script mode");
             } else {
                 console.log("PlayState: no script");
             }
+            // Check turn based events(monster movement, time, etc.)
+            this._checkTurn();
             break;
 
           // Exit
@@ -578,17 +581,36 @@ Game.Monster.prototype.constructor = Game.Monster;
 Game.Monster.prototype.seekParty = function() {
     var party = Game.playState.party;
     // If not near, forget it
-    if (Engine.physics.arcade.distanceBetween(party.obj, this.obj) <= Game.tileSize * 3) {
-        if (party.x < this.x) {
-            this.x--;
-        } else if (party.x > this.x) {
-            this.x++;
+    if (Math.abs(party.x - this.x) < 6 && Math.abs(party.y - this.y) < 6) {
+        //3
+        if (party.obj.angle === 0 || party.obj.angle === -180) {
+            // Party is looking horizontally
+            if (party.y > this.y) {
+                this.y++;
+            } else if (party.y < this.y) {
+                this.y--;
+            } else {
+                if (party.x > this.x) {
+                    this.x++;
+                } else {
+                    this.x--;
+                }
+            }
+        } else {
+            // Party is looking vertically
+            if (party.x > this.x) {
+                this.x++;
+            } else if (party.x < this.x) {
+                this.x--;
+            } else {
+                if (party.y > this.y) {
+                    this.y++;
+                } else {
+                    this.y--;
+                }
+            }
         }
-        if (party.y < this.y) {
-            this.y--;
-        } else if (party.y > this.y) {
-            this.y++;
-        }
+        console.log(this);
         this.setPosition(this.x, this.y);
     }
 };
