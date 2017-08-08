@@ -115,12 +115,16 @@ Game.playState = {
 
             // Fire map tile action script
             case "Space":
+                // Run script, if there is any
                 if (this.interpreter.script) {
                     this.gameStatus = Game.SCRIPT;
                     console.log("PlayState: entering script mode");
                 } else {
                     console.log("PlayState: no script");
                 }
+
+                // Check turn based events(monster movement, time, etc.)
+                this._checkTurn();
                 break;
 
             // Exit
