@@ -1,15 +1,75 @@
 <!doctype html>
 <html>
     <head>
-        <meta charset="UTF-8" />
+        <link rel="stylesheet" href="css/bootflat.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta charset="utf-8">
         <title>_zorpg</title>
+
+        <style>
+            textarea{width:100%}
+            /*body{background-color:#000}
+            .container{background-color:#333; color:#fff} */
+        </style>
+    </head>
+
+    <body>
+        <!-- <table>
+            <tr>
+                <td>
+                    <div id="game"></div>
+                </td>
+                <td>
+                    <div id="commands">
+                        Map:<br />
+                        <hr />
+                        Commands:
+                        <button></button><button></button><button></button><br />
+                        <button></button><button></button><button></button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                Debug: <textarea id="debug" rows="15" cols="80"></textarea>
+                </td>
+            </tr>
+        </table> -->
+
+        <div class="container">
+            <h4>_zorpg</h4>
+
+            <div class="row">
+                <div class="col-md-8">
+                    3dview
+                    <div id="game"></div>
+                </div>
+                <div class="col-md-4">
+                    map:
+                    <hr/>
+                    commands:
+                    <hr />
+                    console:
+                    <div>
+                        <textarea rows="20" id="console"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="roster">
+                        <textarea id="debug" rows="10"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <script src="js/jquery.js"></script>
+        <script src="js/bootflat.js"></script>
         <script src="js/phaser.js"></script>
         <script type="text/javascript" src="js/game.js"></script>
-    </head>
-    <body>
-        <div id="game"></div>
-        <hr />
-        Debug: <textarea id="debug" rows="15" cols="80"></textarea>
-        <hr />
     </body>
 </html>

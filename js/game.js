@@ -213,6 +213,13 @@ window.onload = function() {
 };
 
 /**
+ * Utils & Helpers
+ */
+Game.Log = function(str, opt) {
+    $("#console").append("[" + new Date().toString().split(" ")[4] + "] " + str + "\n");
+};
+
+/**
  * Interpreter class. This execute map scripting, using play state to modify
  * game objects.
  */
