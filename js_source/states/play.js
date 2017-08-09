@@ -10,6 +10,7 @@ Game.MESSAGE = 10;
 Game.DEAD = 666;
 
 Game.playState = {
+    // Standard framework methods to preload, create and update state and it's elements
     preload: function() {
         Engine.load.tilemap("map1", "maps/map1.json", null, Phaser.Tilemap.TILED_JSON);
         Engine.load.tilemap("map2", "maps/map2.json", null, Phaser.Tilemap.TILED_JSON);
@@ -24,6 +25,7 @@ Game.playState = {
         this.map = new Game.Map();
         this.interpreter = new Game.Interpreter();
         this.message = new Game.Message();
+        this.combatQueue = [];
         this.party = new Game.Party();
         this.party.setPosition(1, 1);
 
@@ -33,7 +35,7 @@ Game.playState = {
             this.monsters.push(new Game.Monster());
         }
 
-        // Input
+        // Input handler
         Engine.input.keyboard.onDownCallback = function(ev) { _this._inputHandler(ev) };
     },
     update: function() {
@@ -46,24 +48,27 @@ Game.playState = {
 
         // Update HUD
         document.getElementById("debug").innerHTML =
-            "position:" + this.party.x + " - " + this.party.y + "\n" +
-            "gameStatus:" + this.gameStatus + "\n" +
-            this.party
+            "[Pos]:" + this.party.x + "," + this.party.y + " [gameStatus]:" + this.gameStatus + "\n" +
+            this.party + "\n" +
+            "[FIGHTING]\n" + this.combatQueue.join("\n");
     },
 
-    _checkTurn: function() {
-        // Monsters
-        for (i = 0; i < this.monsters.length; ++i) {
-            this.monsters[i].seekParty();
-        }
-    },
 
+
+
+    /**
+     * We process inputs. Turns start here, after a keypress
+     */
     _inputHandler: function(ev) {
-        //console.log("keypressed", ev)
+        console.log("PlayState: key pressed", ev);
 
         switch(this.gameStatus) {
             case Game.PLAYING:
                 this._checkPlayingInput(ev);
+                break;
+
+            case Game.FIGHTING:
+                this._checkFightingInput(ev);
                 break;
 
             case Game.MESSAGE:
@@ -82,6 +87,26 @@ Game.playState = {
         }
     },
 
+    // Fighting input check
+    _checkFightingInput: function(ev) {
+        switch(ev.code) {
+            // Party member attacks
+            case "KeyA":
+                Game.Log("Attack!");
+                break;
+
+            // Party member attempts to block
+            case "KeyB":
+                Game.Log("Block!");
+            default:
+                break;
+        }
+
+        // After key, check turn based events(monster movement, time, etc.)
+        this._checkTurn();
+    },
+
+    // Movement input check
     _checkPlayingInput: function(ev) {
         switch(ev.code) {
             // Party movement back/forth
@@ -131,6 +156,18 @@ Game.playState = {
                 console.log("PlayState: return to main state");
                 Engine.state.start("main");
                 break;
+        }
+    },
+
+    
+    /**
+     * Update turn based events here
+     * 
+     */
+    _checkTurn: function() {
+        // Monsters seek the party
+        for (i = 0; i < this.monsters.length; ++i) {
+            this.monsters[i].seekParty();
         }
     }
 }

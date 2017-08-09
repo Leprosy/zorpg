@@ -73,6 +73,10 @@ Game.MapObject.prototype.setPosition = function(x, y) {
 
 
 
+
+
+
+
 /**
  * Monster class. Baddies >D
  */
@@ -125,10 +129,19 @@ Game.Monster.prototype.seekParty = function() {
         // TAG
         if (this.x === party.x && this.y === party.y) {
             console.log("TAG")
+            Game.playState.combatQueue.push(this);
             Game.playState.gameStatus = Game.FIGHTING;
         }
     }
 }
+
+Game.Monster.prototype.toString = function() {
+    return this.name + "(" + this.hp + ")";
+}
+
+
+
+
 
 
 
@@ -230,15 +243,15 @@ Game.Party.prototype.setPostiion = (function(setPosition) {
 
 // Party object debug string form
 Game.Party.prototype.toString = function() { // debug
-    var txt = "PartyInfo:\nGold: " + this.gold + " Gems: " + this.gems + "\nChars:\n";
+    var txt = "[PartyInfo] Gold: " + this.gold + " Gems: " + this.gems + "\n[CHARS]";
     for (i = 0; i < this.characters.length; ++i) {
         txt += this.characters[i] + " | ";
     }
-    txt+= "\nQuests:\n";
+    txt+= "\n[QUESTS]\n";
     for (i in this.quests) {
         txt += this.quests[i] + "(" + i + ")\n";
     }
-    txt+= "\nAwards:\n";
+    txt+= "\n[AwARDS]\n";
     for (i in this.awards) {
         txt += this.awards[i] + "(" + i + ")\n";
     }
