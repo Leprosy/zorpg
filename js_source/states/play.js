@@ -25,7 +25,7 @@ Game.playState = {
         this.map = new Game.Map();
         this.interpreter = new Game.Interpreter();
         this.message = new Game.Message();
-        this.combatQueue = [];
+        this.combat = new Game.Combat();
         this.party = new Game.Party();
         this.party.setPosition(1, 1);
 
@@ -50,7 +50,7 @@ Game.playState = {
         document.getElementById("debug").innerHTML =
             "[Pos]:" + this.party.x + "," + this.party.y + " [gameStatus]:" + this.gameStatus + "\n" +
             this.party + "\n" +
-            "[FIGHTING]\n" + this.combatQueue.join("\n");
+            "[FIGHTING]\n" + this.combat;
     },
 
 
@@ -92,12 +92,13 @@ Game.playState = {
         switch(ev.code) {
             // Party member attacks
             case "KeyA":
-                Game.Log("Attack!");
+                Game.Log("Attacks!");
+                this.combat.next();
                 break;
 
             // Party member attempts to block
             case "KeyB":
-                Game.Log("Block!");
+                Game.Log("Blocks!");
             default:
                 break;
         }
@@ -162,12 +163,41 @@ Game.playState = {
     
     /**
      * Update turn based events here
-     * 
      */
     _checkTurn: function() {
-        // Monsters seek the party
+        // MONSTERS: Monsters seek the party
         for (i = 0; i < this.monsters.length; ++i) {
             this.monsters[i].seekParty();
+        }
+
+
+        // COMBAT: Manage combat
+        if (this.gameStatus === Game.FIGHTING) {
+            // Here, we start the next combat turn
+            if (this.combat.index === -1) {
+                console.log("PlayState: starting combat turn");
+                this.combat.reset();
+            }
+
+            // Process current turn
+            if (this.combat.index > 0) {
+                var fighter = this.combat.get();
+
+                // index points a monster
+                if (fighter instanceof Game.Monster) {
+                    Game.Log("Monster Attacks!", fighter);
+                    console.log("PlayState: monster attacks", fighter);
+
+                    // Calculate fight - for now, damage all
+                    this.party.damageAll("1d6");
+
+                    // Advance queue(this checks limit)
+                    this.combat.next();
+                } else {
+                    Game.Log("Character Attacks!", fighter);
+                    console.log("PlayState: character attacks", fighter);
+                }
+            }
         }
     }
 }

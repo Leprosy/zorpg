@@ -91,7 +91,7 @@ Game.playState = {
         this.map = new Game.Map();
         this.interpreter = new Game.Interpreter();
         this.message = new Game.Message();
-        this.combatQueue = [];
+        this.combat = new Game.Combat();
         this.party = new Game.Party();
         this.party.setPosition(1, 1);
         // TOTALLY DEBUG add 1 Monsters
@@ -111,10 +111,10 @@ Game.playState = {
         }
         // Missiles(spells, arrows)?
         // Update HUD
-        document.getElementById("debug").innerHTML = "[Pos]:" + this.party.x + "," + this.party.y + " [gameStatus]:" + this.gameStatus + "\n" + this.party + "\n" + "[FIGHTING]\n" + this.combatQueue.join("\n");
+        document.getElementById("debug").innerHTML = "[Pos]:" + this.party.x + "," + this.party.y + " [gameStatus]:" + this.gameStatus + "\n" + this.party + "\n" + "[FIGHTING]\n" + this.combat;
     },
     /**
-     * We process inputs. Turns start here
+     * We process inputs. Turns start here, after a keypress
      */
     _inputHandler: function(ev) {
         console.log("PlayState: key pressed", ev);
@@ -147,12 +147,13 @@ Game.playState = {
         switch (ev.code) {
           // Party member attacks
             case "KeyA":
-            Game.Log("Attack!");
+            Game.Log("Attacks!");
+            this.combat.next();
             break;
 
           // Party member attempts to block
             case "KeyB":
-            Game.Log("Block!");
+            Game.Log("Blocks!");
 
           default:
             break;
@@ -210,12 +211,35 @@ Game.playState = {
     },
     /**
      * Update turn based events here
-     * 
      */
     _checkTurn: function() {
-        // Monsters seek the party
+        // MONSTERS: Monsters seek the party
         for (i = 0; i < this.monsters.length; ++i) {
             this.monsters[i].seekParty();
+        }
+        // COMBAT: Manage combat
+        if (this.gameStatus === Game.FIGHTING) {
+            // Here, we start the next combat turn
+            if (this.combat.index === -1) {
+                console.log("PlayState: starting combat turn");
+                this.combat.reset();
+            }
+            // Process current turn
+            if (this.combat.index > 0) {
+                var fighter = this.combat.get();
+                // index points a monster
+                if (fighter instanceof Game.Monster) {
+                    Game.Log("Monster Attacks!", fighter);
+                    console.log("PlayState: monster attacks", fighter);
+                    // Calculate fight - for now, damage all
+                    this.party.damageAll("1d6");
+                    // Advance queue(this checks limit)
+                    this.combat.next();
+                } else {
+                    Game.Log("Character Attacks!", fighter);
+                    console.log("PlayState: character attacks", fighter);
+                }
+            }
         }
     }
 };
@@ -242,6 +266,71 @@ Engine.state.add("play", Game.playState);
 window.onload = function() {
     console.info(Game.name + " init");
     Engine.state.start("load");
+};
+
+/**
+ * Combat queue class. Methods to manage the combat system
+ * 
+ * each turn, the combatants queue is iterated, until each combatant does an action
+ * then, it's reset
+ */
+Game.Combat = function() {
+    this.monsters = [];
+    this.queue = [];
+    this.index = -1;
+};
+
+// Adds a monster to the melee group(3 max)
+Game.Combat.prototype.add = function(monster) {
+    this.monsters.push(monster);
+};
+
+//Returns current combatant
+Game.Combat.prototype.get = function() {
+    return this.queue[this.index];
+};
+
+// Go next in the queue
+Game.Combat.prototype.next = function() {
+    this.index++;
+    console.log("Game.Combat: Advancing queue", this.index);
+    if (this.index > this.queue.length) {
+        console.log("Game.Combat: End of queue, needs reset");
+        this.index = -1;
+    }
+};
+
+// Reset the combat queue
+Game.Combat.prototype.reset = function() {
+    console.log("Game.Combat: Reseting queue", this.index);
+    this.index = -1;
+    this.queue = [];
+    var chars = Game.playState.party.characters;
+    // Remove dead monsters?
+    // Order combat queue by speed(including alive monsters and chars)
+    for (i in this.monsters) {
+        this.queue.push(this.monsters[i]);
+    }
+    for (i in chars) {
+        // if able to fight...
+        this.queue.push(chars[i]);
+    }
+    this.queue.sort(function compare(a, b) {
+        // Sorting by speed, desc
+        if (a.speed < b.speed) {
+            return 1;
+        }
+        if (a.speed > b.speed) {
+            return -1;
+        }
+        return 0;
+    });
+    // Start combat turn
+    this.index = 0;
+};
+
+Game.Combat.prototype.toString = function() {
+    return this.queue.join("\n");
 };
 
 /**
@@ -450,76 +539,6 @@ Game.Map.prototype.getScript = function(x, y) {
 };
 
 /**
- * Messages in the game
- * 
- */
-Game.Message = function() {
-    this.group = Engine.add.group();
-    this.group.fixedToCamera = true;
-    this.group.z = 200;
-    this.lastConfirm = null;
-    this.isConfirm = false;
-};
-
-// Init - closing previous message and entering MESSAGE mode
-Game.Message.prototype._init = function() {
-    console.log("Game.Message: entering message mode");
-    Game.playState.gameStatus = Game.MESSAGE;
-    this.lastConfirm = null;
-    this.isConfirm = false;
-};
-
-// Shows a basic message to the player
-Game.Message.prototype.show = function(message) {
-    this._init();
-    this.group.add(Engine.add.text(10, 10, message, {
-        font: "20px Arial",
-        fill: "#ffffff"
-    }));
-    this.group.add(Engine.add.text(10, 30, "<press a key>", {
-        font: "20px Arial",
-        fill: "#000000"
-    }));
-};
-
-//Shows a dialog message, with an NPC
-Game.Message.prototype.showDialog = function(name, face, message) {
-    this._init();
-    this.group.add(Engine.add.sprite(0, 0, "npcFaces", face));
-    this.group.add(Engine.add.text(70, 5, name, {
-        font: "20px Arial",
-        fill: "#ffffff"
-    }));
-    this.group.add(Engine.add.text(70, 35, message, {
-        font: "20px Arial",
-        fill: "#ffffff"
-    }));
-    this.group.add(Engine.add.text(10, 60, "<press a key>", {
-        font: "20px Arial",
-        fill: "#000000"
-    }));
-};
-
-//Shows a confirm message to the player
-Game.Message.prototype.showConfirm = function(message) {
-    this._init();
-    this.isConfirm = true;
-    this.group.add(Engine.add.text(10, 10, message, {
-        font: "20px Arial",
-        fill: "#ffffff"
-    }));
-    this.group.add(Engine.add.text(10, 30, "<(Y)es or (N)o>", {
-        font: "20px Arial",
-        fill: "#000000"
-    }));
-};
-
-// Closes message and reset confirm status
-Game.Message.prototype.close = function() {
-    this.group.removeAll();
-};
-
-/**
  * Positioned objects in the map(Monsters, Party, etc)
  */
 Game.MapObject = function() {
@@ -528,6 +547,7 @@ Game.MapObject = function() {
     this.obj.anchor.setTo(.5, .5);
     this.x = 0;
     this.y = 0;
+    this.speed = 1;
     this.obj.z = 100;
     this.d_angle = Math.PI / 2;
     this.d_dist = Game.tileSize;
@@ -609,6 +629,7 @@ Game.Monster = function() {
     this.hp = 100;
     this.xp = 20;
     this.gold = 10;
+    this.isFighting = false;
     this.setPosition(10, 10);
 };
 
@@ -622,13 +643,13 @@ Game.Monster.prototype.seekParty = function() {
     console.log("Checking", "monster", this.x, this.y, "party", party.x, party.y);
     // If not near, forget it
     if (Math.abs(party.x - this.x) < 3 && Math.abs(party.y - this.y) < 3) {
-        // If angle is horizontal, try to match vertically first, and viceversa
+        // If angle is horizontal, try to match vertical coordinate first, and viceversa
         var first = "x", second = "y";
         if (party.obj.angle === 0 || party.obj.angle === -180) {
             first = "y";
             second = "x";
         }
-        // Try to match first coordinate, then the second
+        // Try to match first coordinate, then the second one
         if (party[first] > this[first]) {
             this[first]++;
         } else if (party[first] < this[first]) {
@@ -641,17 +662,18 @@ Game.Monster.prototype.seekParty = function() {
             }
         }
         this.setPosition(this.x, this.y);
-        // TAG
-        if (this.x === party.x && this.y === party.y) {
+        // TAG...if monster reachs party, push to the queue.
+        if (this.x === party.x && this.y === party.y && !this.isFighting) {
             console.log("TAG");
-            Game.playState.combatQueue.push(this);
+            this.isFighting = true;
+            Game.playState.combat.add(this);
             Game.playState.gameStatus = Game.FIGHTING;
         }
     }
 };
 
 Game.Monster.prototype.toString = function() {
-    return this.name + "(" + this.hp + ")";
+    return this.name + "(hp:" + this.hp + "-spd:" + this.speed + ")";
 };
 
 /**
@@ -664,9 +686,12 @@ Game.Party = function() {
     this.gold = 2e3;
     this.gems = 50;
     this.quests = {};
-    //"quest0001": "Check out the statue on the lava temple."};
     this.awards = {};
+    // debug start party
     this.characters = [ new Game.Character("Sir Lepro"), new Game.Character("Lady Aindir"), new Game.Character("Edward the cat") ];
+    this.characters[0].speed = 12;
+    this.characters[1].speed = 10;
+    this.characters[2].speed = 20;
     Engine.camera.follow(this.obj);
 };
 
@@ -779,7 +804,77 @@ Game.Character = function(name) {
 };
 
 Game.Character.prototype.toString = function() {
-    return this.name + "(" + this.hp + "hp)";
+    return this.name + "(hp:" + this.hp + "-spd:" + this.speed + ")";
+};
+
+/**
+ * Messages in the game
+ * 
+ */
+Game.Message = function() {
+    this.group = Engine.add.group();
+    this.group.fixedToCamera = true;
+    this.group.z = 200;
+    this.lastConfirm = null;
+    this.isConfirm = false;
+};
+
+// Init - closing previous message and entering MESSAGE mode
+Game.Message.prototype._init = function() {
+    console.log("Game.Message: entering message mode");
+    Game.playState.gameStatus = Game.MESSAGE;
+    this.lastConfirm = null;
+    this.isConfirm = false;
+};
+
+// Shows a basic message to the player
+Game.Message.prototype.show = function(message) {
+    this._init();
+    this.group.add(Engine.add.text(10, 10, message, {
+        font: "20px Arial",
+        fill: "#ffffff"
+    }));
+    this.group.add(Engine.add.text(10, 30, "<press a key>", {
+        font: "20px Arial",
+        fill: "#000000"
+    }));
+};
+
+//Shows a dialog message, with an NPC
+Game.Message.prototype.showDialog = function(name, face, message) {
+    this._init();
+    this.group.add(Engine.add.sprite(0, 0, "npcFaces", face));
+    this.group.add(Engine.add.text(70, 5, name, {
+        font: "20px Arial",
+        fill: "#ffffff"
+    }));
+    this.group.add(Engine.add.text(70, 35, message, {
+        font: "20px Arial",
+        fill: "#ffffff"
+    }));
+    this.group.add(Engine.add.text(10, 60, "<press a key>", {
+        font: "20px Arial",
+        fill: "#000000"
+    }));
+};
+
+//Shows a confirm message to the player
+Game.Message.prototype.showConfirm = function(message) {
+    this._init();
+    this.isConfirm = true;
+    this.group.add(Engine.add.text(10, 10, message, {
+        font: "20px Arial",
+        fill: "#ffffff"
+    }));
+    this.group.add(Engine.add.text(10, 30, "<(Y)es or (N)o>", {
+        font: "20px Arial",
+        fill: "#000000"
+    }));
+};
+
+// Closes message and reset confirm status
+Game.Message.prototype.close = function() {
+    this.group.removeAll();
 };
 
 /**

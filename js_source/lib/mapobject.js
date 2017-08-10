@@ -7,6 +7,7 @@ Game.MapObject = function() {
     this.obj.anchor.setTo(0.5, 0.5);
     this.x = 0;
     this.y = 0;
+    this.speed = 1;
     this.obj.z = 100;
     this.d_angle = Math.PI / 2
     this.d_dist = Game.tileSize;
@@ -90,6 +91,7 @@ Game.Monster = function() {
     this.hp = 100;
     this.xp = 20;
     this.gold = 10;
+    this.isFighting = false;
 
     this.setPosition(10, 10);
 }
@@ -104,14 +106,14 @@ Game.Monster.prototype.seekParty = function() {
 
     // If not near, forget it
     if (Math.abs(party.x - this.x) < 3 && Math.abs(party.y - this.y) < 3) {
-        // If angle is horizontal, try to match vertically first, and viceversa
+        // If angle is horizontal, try to match vertical coordinate first, and viceversa
         var first = "x", second = "y";
 
         if (party.obj.angle === 0 || party.obj.angle === -180) {
             first = "y"; second = "x"
         }
 
-        // Try to match first coordinate, then the second
+        // Try to match first coordinate, then the second one
         if (party[first] > this[first]) {
             this[first]++;
         } else if (party[first] < this[first]) {
@@ -126,17 +128,18 @@ Game.Monster.prototype.seekParty = function() {
 
         this.setPosition(this.x, this.y);
 
-        // TAG
-        if (this.x === party.x && this.y === party.y) {
+        // TAG...if monster reachs party, push to the queue.
+        if (this.x === party.x && this.y === party.y && !this.isFighting) {
             console.log("TAG")
-            Game.playState.combatQueue.push(this);
+            this.isFighting = true;
+            Game.playState.combat.add(this);
             Game.playState.gameStatus = Game.FIGHTING;
         }
     }
 }
 
 Game.Monster.prototype.toString = function() {
-    return this.name + "(" + this.hp + ")";
+    return this.name + "(hp:" + this.hp + "-spd:" + this.speed + ")";
 }
 
 
@@ -156,9 +159,16 @@ Game.Party = function() {
     // Party attributes and stats
     this.gold = 2000;
     this.gems = 50;
-    this.quests = {}; //"quest0001": "Check out the statue on the lava temple."};
+    this.quests = {};
     this.awards = {};
-    this.characters = [new Game.Character("Sir Lepro"), new Game.Character("Lady Aindir"), new Game.Character("Edward the cat")];
+
+    // debug start party
+    this.characters = [new Game.Character("Sir Lepro"),
+                       new Game.Character("Lady Aindir"),
+                       new Game.Character("Edward the cat")];
+    this.characters[0].speed = 12;
+    this.characters[1].speed = 10;
+    this.characters[2].speed = 20;
 
     Engine.camera.follow(this.obj); // follow the party through the map
 }
@@ -270,5 +280,5 @@ Game.Character = function(name) {
 }
 
 Game.Character.prototype.toString = function() {
-    return this.name + "(" + this.hp + "hp)";
+    return this.name + "(hp:" + this.hp + "-spd:" + this.speed + ")";
 }
