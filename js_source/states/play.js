@@ -93,7 +93,6 @@ Game.playState = {
             // Party member attacks
             case "KeyA":
                 Game.Log("Attacks!");
-                this.combat.next();
                 break;
 
             // Party member attempts to block
@@ -165,9 +164,11 @@ Game.playState = {
      * Update turn based events here
      */
     _checkTurn: function() {
-        // MONSTERS: Monsters seek the party
+        // MONSTERS: Monsters seek the party if they are not engaging it already
         for (i = 0; i < this.monsters.length; ++i) {
-            this.monsters[i].seekParty();
+            if (!this.monsters[i].isFighting) {
+                this.monsters[i].seekParty();
+            }
         }
 
 
@@ -179,24 +180,28 @@ Game.playState = {
                 this.combat.reset();
             }
 
+            this.combat.next();
+
             // Process current turn
-            if (this.combat.index > 0) {
-                var fighter = this.combat.get();
+            console.log("PlayState: combat turn, queue", this.combat.index)
+            var fighter = this.combat.get();
 
-                // index points a monster
-                if (fighter instanceof Game.Monster) {
-                    Game.Log("Monster Attacks!", fighter);
-                    console.log("PlayState: monster attacks", fighter);
+            // Index points a monster - We need to _checkTurn at the end
+            if (fighter instanceof Game.Monster) {
+                Game.Log("It's monster " + fighter + " turn...");
+                console.log("PlayState: monster turn", fighter);
 
-                    // Calculate fight - for now, damage all
-                    this.party.damageAll("1d6");
+                // Calculate fight - for now, damage all
+                this.party.damageN(1, fighter.hitDie);
+                Game.Log("Monster " + fighter + "attacks")
+                console.log("PlayState: monster attacks", fighter);
 
-                    // Advance queue(this checks limit)
-                    this.combat.next();
-                } else {
-                    Game.Log("Character Attacks!", fighter);
-                    console.log("PlayState: character attacks", fighter);
-                }
+                // Advance queue(this checks limit)
+                this.combat.next();
+                this._checkTurn();
+            } else { // Index points a character - We need to wait for input
+                Game.Log("It's " + fighter + " turn...");
+                console.log("PlayState: character turn", fighter);
             }
         }
     }

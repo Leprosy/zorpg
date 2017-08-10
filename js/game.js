@@ -148,7 +148,6 @@ Game.playState = {
           // Party member attacks
             case "KeyA":
             Game.Log("Attacks!");
-            this.combat.next();
             break;
 
           // Party member attempts to block
@@ -213,9 +212,11 @@ Game.playState = {
      * Update turn based events here
      */
     _checkTurn: function() {
-        // MONSTERS: Monsters seek the party
+        // MONSTERS: Monsters seek the party if they are not engaging it already
         for (i = 0; i < this.monsters.length; ++i) {
-            this.monsters[i].seekParty();
+            if (!this.monsters[i].isFighting) {
+                this.monsters[i].seekParty();
+            }
         }
         // COMBAT: Manage combat
         if (this.gameStatus === Game.FIGHTING) {
@@ -224,21 +225,25 @@ Game.playState = {
                 console.log("PlayState: starting combat turn");
                 this.combat.reset();
             }
+            this.combat.next();
             // Process current turn
-            if (this.combat.index > 0) {
-                var fighter = this.combat.get();
-                // index points a monster
-                if (fighter instanceof Game.Monster) {
-                    Game.Log("Monster Attacks!", fighter);
-                    console.log("PlayState: monster attacks", fighter);
-                    // Calculate fight - for now, damage all
-                    this.party.damageAll("1d6");
-                    // Advance queue(this checks limit)
-                    this.combat.next();
-                } else {
-                    Game.Log("Character Attacks!", fighter);
-                    console.log("PlayState: character attacks", fighter);
-                }
+            console.log("PlayState: combat turn, queue", this.combat.index);
+            var fighter = this.combat.get();
+            // Index points a monster - We need to _checkTurn at the end
+            if (fighter instanceof Game.Monster) {
+                Game.Log("It's monster " + fighter + " turn...");
+                console.log("PlayState: monster turn", fighter);
+                // Calculate fight - for now, damage all
+                this.party.damageN(1, fighter.hitDie);
+                Game.Log("Monster " + fighter + "attacks");
+                console.log("PlayState: monster attacks", fighter);
+                // Advance queue(this checks limit)
+                this.combat.next();
+                this._checkTurn();
+            } else {
+                // Index points a character - We need to wait for input
+                Game.Log("It's " + fighter + " turn...");
+                console.log("PlayState: character turn", fighter);
             }
         }
     }
@@ -294,7 +299,7 @@ Game.Combat.prototype.get = function() {
 Game.Combat.prototype.next = function() {
     this.index++;
     console.log("Game.Combat: Advancing queue", this.index);
-    if (this.index > this.queue.length) {
+    if (this.index >= this.queue.length) {
         console.log("Game.Combat: End of queue, needs reset");
         this.index = -1;
     }
@@ -325,8 +330,6 @@ Game.Combat.prototype.reset = function() {
         }
         return 0;
     });
-    // Start combat turn
-    this.index = 0;
 };
 
 Game.Combat.prototype.toString = function() {
@@ -610,7 +613,7 @@ Game.MapObject.prototype.canPass = function(tile) {
 
 // Change object position in the current world map
 Game.MapObject.prototype.setPosition = function(x, y) {
-    console.log("Game.MapObject setPosition");
+    console.log("Game.MapObject setPosition of", this, "to", x, y);
     this.x = x;
     this.y = y;
     // Do the math
@@ -628,6 +631,7 @@ Game.Monster = function() {
     this.name = "Bad demon";
     this.hp = 100;
     this.xp = 20;
+    this.hitDie = "1d6";
     this.gold = 10;
     this.isFighting = false;
     this.setPosition(10, 10);
@@ -640,7 +644,7 @@ Game.Monster.prototype.constructor = Game.Monster;
 // Basic seek algorithm
 Game.Monster.prototype.seekParty = function() {
     var party = Game.playState.party;
-    console.log("Checking", "monster", this.x, this.y, "party", party.x, party.y);
+    console.log("Game.Monster: checking", "monster", this.x, this.y, "party", party.x, party.y);
     // If not near, forget it
     if (Math.abs(party.x - this.x) < 3 && Math.abs(party.y - this.y) < 3) {
         // If angle is horizontal, try to match vertical coordinate first, and viceversa
@@ -664,7 +668,7 @@ Game.Monster.prototype.seekParty = function() {
         this.setPosition(this.x, this.y);
         // TAG...if monster reachs party, push to the queue.
         if (this.x === party.x && this.y === party.y && !this.isFighting) {
-            console.log("TAG");
+            console.log("Game.Monster: Monster added to the queue", this);
             this.isFighting = true;
             Game.playState.combat.add(this);
             Game.playState.gameStatus = Game.FIGHTING;
@@ -743,8 +747,9 @@ Game.Party.prototype.giveAward = function(obj) {
 // Damage a random number of party members, for a die of damage
 Game.Party.prototype.damageN = function(number, dieString) {
     var damage = Game.Utils.die(dieString);
+    var charIndex = Game.Utils.die("1d" + (this.characters.length - 1));
     for (i = 0; i < number; ++i) {
-        this.damageChar(Game.Utils.die("1d" + (number - 1) + "+1"), damage);
+        this.damageChar(this.characters[charIndex], damage);
     }
 };
 
@@ -757,6 +762,7 @@ Game.Party.prototype.damageAll = function(dieString) {
 };
 
 Game.Party.prototype.damageChar = function(char, damage) {
+    Game.Log(char + " received " + damage + " damage!");
     console.log("Game.Party: Damaging " + char + " for " + damage);
     char.hp -= damage;
     Game.Utils.damage(damage);
@@ -801,6 +807,7 @@ Game.Party.prototype.toString = function() {
 Game.Character = function(name) {
     this.name = name;
     this.hp = 100;
+    this.hitDie = "1d8";
 };
 
 Game.Character.prototype.toString = function() {
@@ -901,7 +908,11 @@ Game.Utils.die = function(str) {
 
 // Damage animation
 Game.Utils.damage = function(damage) {
-    Engine.camera.shake(damage / 1e3, 300, true);
-    Engine.camera.flash(16711680, 100, true);
-    console.log("Game.Utils.damage: Party gets damage for " + damage);
+    if (damage > 0) {
+        Engine.camera.shake(damage / 1e3, 300, true);
+        Engine.camera.flash(16711680, 100, true);
+        console.log("Game.Utils.damage: Party gets damage for " + damage);
+    } else {
+        console.log("Game.Utils.damage: Party avoids damage");
+    }
 };

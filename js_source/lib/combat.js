@@ -26,7 +26,7 @@ Game.Combat.prototype.next = function() {
     this.index++;
     console.log("Game.Combat: Advancing queue", this.index);
 
-    if (this.index > this.queue.length) {
+    if (this.index >= this.queue.length) {
         console.log("Game.Combat: End of queue, needs reset");
         this.index = -1;
     }
@@ -59,9 +59,6 @@ Game.Combat.prototype.reset = function() {
         }
         return 0;
     });
-
-    // Start combat turn
-    this.index = 0;
 }
 
 Game.Combat.prototype.toString = function() {

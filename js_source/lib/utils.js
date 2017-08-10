@@ -24,7 +24,11 @@ Game.Utils.die = function(str) {
 
 // Damage animation
 Game.Utils.damage = function(damage) {
-    Engine.camera.shake(damage / 1000, 300, true);
-    Engine.camera.flash(0xff0000, 100, true)
-    console.log("Game.Utils.damage: Party gets damage for " + damage)
+    if (damage > 0) {
+        Engine.camera.shake(damage / 1000, 300, true);
+        Engine.camera.flash(0xff0000, 100, true)
+        console.log("Game.Utils.damage: Party gets damage for " + damage)
+    } else {
+        console.log("Game.Utils.damage: Party avoids damage");
+    }
 }
