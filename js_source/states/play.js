@@ -92,7 +92,7 @@ Game.playState = {
         switch(ev.code) {
             // Party member attacks
             case "KeyA":
-                Game.Log("Attacks!");
+                this.combat.attack();
                 break;
 
             // Party member attempts to block
@@ -175,29 +175,15 @@ Game.playState = {
         // COMBAT: Manage combat
         if (this.gameStatus === Game.FIGHTING) {
             // Here, we start the next combat turn
-            if (this.combat.index === -1) {
-                console.log("PlayState: starting combat turn");
-                this.combat.reset();
-            }
-
             this.combat.next();
 
             // Process current turn
             console.log("PlayState: combat turn, queue", this.combat.index)
             var fighter = this.combat.get();
 
-            // Index points a monster - We need to _checkTurn at the end
+            // Index points a monster - We need to do a _checkTurn
             if (fighter instanceof Game.Monster) {
-                Game.Log("It's monster " + fighter + " turn...");
-                console.log("PlayState: monster turn", fighter);
-
-                // Calculate fight - for now, damage all
-                this.party.damageN(1, fighter.hitDie);
-                Game.Log("Monster " + fighter + "attacks")
-                console.log("PlayState: monster attacks", fighter);
-
-                // Advance queue(this checks limit)
-                this.combat.next();
+                this.combat.attack();
                 this._checkTurn();
             } else { // Index points a character - We need to wait for input
                 Game.Log("It's " + fighter + " turn...");

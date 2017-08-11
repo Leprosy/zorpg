@@ -147,7 +147,7 @@ Game.playState = {
         switch (ev.code) {
           // Party member attacks
             case "KeyA":
-            Game.Log("Attacks!");
+            this.combat.attack();
             break;
 
           // Party member attempts to block
@@ -221,24 +221,13 @@ Game.playState = {
         // COMBAT: Manage combat
         if (this.gameStatus === Game.FIGHTING) {
             // Here, we start the next combat turn
-            if (this.combat.index === -1) {
-                console.log("PlayState: starting combat turn");
-                this.combat.reset();
-            }
             this.combat.next();
             // Process current turn
             console.log("PlayState: combat turn, queue", this.combat.index);
             var fighter = this.combat.get();
-            // Index points a monster - We need to _checkTurn at the end
+            // Index points a monster - We need to do a _checkTurn
             if (fighter instanceof Game.Monster) {
-                Game.Log("It's monster " + fighter + " turn...");
-                console.log("PlayState: monster turn", fighter);
-                // Calculate fight - for now, damage all
-                this.party.damageN(1, fighter.hitDie);
-                Game.Log("Monster " + fighter + "attacks");
-                console.log("PlayState: monster attacks", fighter);
-                // Advance queue(this checks limit)
-                this.combat.next();
+                this.combat.attack();
                 this._checkTurn();
             } else {
                 // Index points a character - We need to wait for input
@@ -283,6 +272,27 @@ Game.Combat = function() {
     this.monsters = [];
     this.queue = [];
     this.index = -1;
+    this.target = 0;
+};
+
+// Current index queue fighter attacks
+Game.Combat.prototype.attack = function() {
+    var attacker = this.queue[this.index];
+    var party = Game.playState.party;
+    if (attacker instanceof Game.Monster) {
+        // it's a monster, attack a character
+        // Damage someone on the party
+        party.damageN(1, attacker.hitDie);
+        Game.Log("Monster " + attacker + " attacks");
+        console.log("Game.Combat: monster attacks", attacker);
+    } else {
+        // it's a character, attacks target monster
+        var damage = Game.Utils.die(attacker.hitDie);
+        var target = this.monsters[this.target];
+        target.hp -= damage;
+        Game.Log("Character " + attacker + " attacks");
+        console.log("Game.Combat: character attacks", attacker);
+    }
 };
 
 // Adds a monster to the melee group(3 max)
@@ -295,8 +305,23 @@ Game.Combat.prototype.get = function() {
     return this.queue[this.index];
 };
 
+//Returns targeted monster
+Game.Combat.prototype.getTarget = function() {
+    if (this.target < 0 || this.target >= this.monsters.length) {
+        this.target = 0;
+    }
+    if (this.monsters.length > 0) {
+        return this.monsters[this.target];
+    }
+    return false;
+};
+
 // Go next in the queue
 Game.Combat.prototype.next = function() {
+    if (this.index === -1) {
+        console.log("Game.Combat: Starting combat turn");
+        this.reset();
+    }
     this.index++;
     console.log("Game.Combat: Advancing queue", this.index);
     if (this.index >= this.queue.length) {
@@ -806,7 +831,7 @@ Game.Party.prototype.toString = function() {
  */
 Game.Character = function(name) {
     this.name = name;
-    this.hp = 100;
+    this.hp = 30;
     this.hitDie = "1d8";
 };
 

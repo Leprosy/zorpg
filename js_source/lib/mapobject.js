@@ -279,7 +279,7 @@ Game.Party.prototype.toString = function() { // debug
  */
 Game.Character = function(name) {
     this.name = name;
-    this.hp = 100;
+    this.hp = 30;
     this.hitDie = "1d8";
 }
 
