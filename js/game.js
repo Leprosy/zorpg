@@ -297,7 +297,9 @@ Game.Combat.prototype.attack = function() {
 
 // Adds a monster to the melee group(3 max)
 Game.Combat.prototype.add = function(monster) {
-    this.monsters.push(monster);
+    if (this.monsters.length < 3) {
+        this.monsters.push(monster);
+    }
 };
 
 //Returns current combatant
@@ -327,6 +329,7 @@ Game.Combat.prototype.next = function() {
     if (this.index >= this.queue.length) {
         console.log("Game.Combat: End of queue, needs reset");
         this.index = -1;
+        this.next();
     }
 };
 
