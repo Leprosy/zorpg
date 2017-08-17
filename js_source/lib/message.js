@@ -41,7 +41,16 @@ Game.Message.prototype.showConfirm = function(message) {
     this.group.add(Engine.add.text(10, 30, "<(Y)es or (N)o>", {font: "20px Arial", fill: "#000000"}));
 }
 
-// Closes message and reset confirm status
-Game.Message.prototype.close = function() {
+// Closes message setting confirm status in case of need. Returns to Script mode
+Game.Message.prototype.close = function(key) {
+    console.log("Game.Message: closing message, returning to script mode")
+    Game.playState.gameStatus = Game.SCRIPT;
+
+    if (this.isConfirm) {
+        this.lastConfirm = (key === "KeyY");
+    } else {
+        this.lastConfirm = null;
+    }
+
     this.group.removeAll();
 }
