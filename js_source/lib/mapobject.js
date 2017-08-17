@@ -54,6 +54,10 @@ Game.MapObject.prototype.rotateLeft = function() {
 Game.MapObject.prototype.rotateRight = function() {
     this.obj.rotation = (this.obj.rotation + this.d_angle) % (Math.PI * 2);
 }
+// Check two mapobjs on the same position
+Game.MapObject.prototype.samePos = function(mapObj) {
+    return mapObj.x === this.x && mapObj.y === this.y;
+}
 // Checks if the tile is passable/exists(needs to be extended to include Party/Monsters exclusive rules
 Game.MapObject.prototype.canPass = function(tile) { // Meant to be used with Game.Map.getTile() method
     if (!tile.floor) return false;
@@ -92,9 +96,8 @@ Game.Monster = function() {
     this.xp = 20;
     this.hitDie = "1d6";
     this.gold = 10;
-    this.isFighting = false;
 
-    this.setPosition(10, 10);
+    this.setPosition(Game.Utils.die("1d10"), Game.Utils.die("1d10"));
 }
 Game.Monster.prototype = Object.create(Game.MapObject.prototype);
 Game.Monster.prototype.constructor = Game.Monster;
@@ -106,7 +109,11 @@ Game.Monster.prototype.seekParty = function() {
     console.log("Game.Monster: checking", "monster", this.x, this.y, "party", party.x, party.y)
 
     // If not near, forget it
-    if (Math.abs(party.x - this.x) < 3 && Math.abs(party.y - this.y) < 3) {
+    if (Math.abs(party.x - this.x) <= 3 && Math.abs(party.y - this.y) <= 3) {
+        // Backup coords.
+        var oldX = this.x;
+        var oldY = this.y;
+
         // If angle is horizontal, try to match vertical coordinate first, and viceversa
         var first = "x", second = "y";
 
@@ -127,14 +134,18 @@ Game.Monster.prototype.seekParty = function() {
             }
         }
 
-        this.setPosition(this.x, this.y);
-
         // TAG...if monster reachs party, push to the queue.
-        if (this.x === party.x && this.y === party.y && !this.isFighting) {
-            console.log("Game.Monster: Monster added to the queue", this);
-            this.isFighting = true;
-            Game.playState.combat.add(this);
-            Game.playState.gameStatus = Game.FIGHTING;
+        if (this.samePos(party)) {
+            if (Game.playState.combat.add(this)) {
+                console.log("Game.Monster: Monster added to combat queue", this)
+                Game.playState.gameStatus = Game.FIGHTING;
+                this.setPosition(this.x, this.y);
+            } else {
+                this.x = oldX;
+                this.y = oldY;
+            }
+        } else {
+            this.setPosition(this.x, this.y);
         }
     }
 }

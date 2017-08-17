@@ -78,7 +78,9 @@ Game.MESSAGE = 10;
 Game.DEAD = 666;
 
 Game.playState = {
-    // Standard framework methods to preload, create and update state and it's elements
+    /**
+     * Standard framework methods to preload, create and update state and it's elements
+     */
     preload: function() {
         Engine.load.tilemap("map1", "maps/map1.json", null, Phaser.Tilemap.TILED_JSON);
         Engine.load.tilemap("map2", "maps/map2.json", null, Phaser.Tilemap.TILED_JSON);
@@ -94,7 +96,7 @@ Game.playState = {
         this.combat = new Game.Combat();
         this.party = new Game.Party();
         this.party.setPosition(1, 1);
-        // TOTALLY DEBUG add 1 Monsters
+        // TOTALLY DEBUG add  Monsters
         this.monsters = [];
         for (i = 0; i < 1; ++i) {
             this.monsters.push(new Game.Monster());
@@ -105,16 +107,31 @@ Game.playState = {
         };
     },
     update: function() {
-        // Continue running the current script, if any
-        if (this.gameStatus === Game.SCRIPT) {
+        switch (this.gameStatus) {
+          // SCRIPT MODE: Continue running the current script, if any
+            case Game.SCRIPT:
             this.interpreter.run();
+            break;
+
+          // COMBAT MODE: Continue running the combat turns
+            case Game.FIGHTING:
+            if (!this.combat.get()) {
+                // Start combat round if not already started
+                this.combat.next();
+            }
+            if (!this.combat.isHuman()) {
+                // If monster next, attack, else, leave control to player
+                this.combat.attack();
+                this.combat.next();
+            }
+            break;
         }
-        // Missiles(spells, arrows)?
-        // Update HUD
+        // Missiles(spells, arrows)????
+        // Always: Update HUD
         document.getElementById("debug").innerHTML = "[Pos]:" + this.party.x + "," + this.party.y + " [gameStatus]:" + this.gameStatus + "\n" + this.party + "\n" + "[FIGHTING]\n" + this.combat;
     },
     /**
-     * We process inputs. Turns start here, after a keypress
+     * Input handler. This derives the key event to the correct handler (this.gameStatus points it)
      */
     _inputHandler: function(ev) {
         console.log("PlayState: key pressed", ev);
@@ -125,15 +142,13 @@ Game.playState = {
 
           case Game.FIGHTING:
             this._checkFightingInput(ev);
+            //if (this.combat is done) this._checkTurn();
             break;
 
           case Game.MESSAGE:
             // A key was pressed, remove message(if confirm, just accept Y/N)
             if (!this.message.isConfirm || (ev.code === "KeyY" || ev.code === "KeyN")) {
-                this.gameStatus = Game.SCRIPT;
-                this.message.close();
-                this.message.lastConfirm = ev.code === "KeyY";
-                console.log("PlayState: exit message mode, returning to script mode");
+                this.message.close(ev.code);
             }
             break;
 
@@ -148,6 +163,7 @@ Game.playState = {
           // Party member attacks
             case "KeyA":
             this.combat.attack();
+            this.combat.next();
             break;
 
           // Party member attempts to block
@@ -157,8 +173,6 @@ Game.playState = {
           default:
             break;
         }
-        // After key, check turn based events(monster movement, time, etc.)
-        this._checkTurn();
     },
     // Movement input check
     _checkPlayingInput: function(ev) {
@@ -169,14 +183,8 @@ Game.playState = {
             ev.code === "ArrowUp" ? this.party.moveForward() : this.party.moveBackward();
             // Load script. If inmediate, run it.
             var scriptData = this.map.getScript(this.party.x, this.party.y);
-            if (scriptData) {
-                console.log("PlayState: loaded script", scriptData);
-            }
             this.interpreter.load(scriptData.script);
-            if (scriptData && scriptData.properties.startOnEnter) {
-                this.gameStatus = Game.SCRIPT;
-            }
-            // Check turn based events(monster movement, time, etc.)
+            if (scriptData && scriptData.properties.startOnEnter) this.gameStatus = Game.SCRIPT;
             this._checkTurn();
             break;
 
@@ -197,7 +205,6 @@ Game.playState = {
             } else {
                 console.log("PlayState: no script");
             }
-            // Check turn based events(monster movement, time, etc.)
             this._checkTurn();
             break;
 
@@ -212,27 +219,14 @@ Game.playState = {
      * Update turn based events here
      */
     _checkTurn: function() {
-        // MONSTERS: Monsters seek the party if they are not engaging it already
+        // MONSTERS: Monsters seek the party if they are not engaging it already. Remove dead ones.
         for (i = 0; i < this.monsters.length; ++i) {
-            if (!this.monsters[i].isFighting) {
-                this.monsters[i].seekParty();
-            }
-        }
-        // COMBAT: Manage combat
-        if (this.gameStatus === Game.FIGHTING) {
-            // Here, we start the next combat turn
-            this.combat.next();
-            // Process current turn
-            console.log("PlayState: combat turn, queue", this.combat.index);
-            var fighter = this.combat.get();
-            // Index points a monster - We need to do a _checkTurn
-            if (fighter instanceof Game.Monster) {
-                this.combat.attack();
-                this._checkTurn();
+            if (this.monsters[i].hp <= 0) {
+                this.monsters.splice(i, 1);
             } else {
-                // Index points a character - We need to wait for input
-                Game.Log("It's " + fighter + " turn...");
-                console.log("PlayState: character turn", fighter);
+                if (!this.monsters[i].samePos(this.party)) {
+                    this.monsters[i].seekParty();
+                }
             }
         }
     }
@@ -269,6 +263,10 @@ window.onload = function() {
  * then, it's reset
  */
 Game.Combat = function() {
+    this.init();
+};
+
+Game.Combat.prototype.init = function() {
     this.monsters = [];
     this.queue = [];
     this.index = -1;
@@ -279,32 +277,49 @@ Game.Combat = function() {
 Game.Combat.prototype.attack = function() {
     var attacker = this.queue[this.index];
     var party = Game.playState.party;
-    if (attacker instanceof Game.Monster) {
+    if (!this.isHuman()) {
         // it's a monster, attack a character
         // Damage someone on the party
-        party.damageN(1, attacker.hitDie);
         Game.Log("Monster " + attacker + " attacks");
         console.log("Game.Combat: monster attacks", attacker);
+        party.damageN(1, attacker.hitDie);
     } else {
         // it's a character, attacks target monster
+        Game.Log("Character " + attacker + " attacks");
+        console.log("Game.Combat: character attacks", attacker);
         var damage = Game.Utils.die(attacker.hitDie);
         var target = this.monsters[this.target];
         target.hp -= damage;
-        Game.Log("Character " + attacker + " attacks");
-        console.log("Game.Combat: character attacks", attacker);
+        // Killed?
+        if (target.hp <= 0) {
+            this.monsters.splice(this.target, 1);
+        }
+        // All killed?
+        if (this.monsters.length === 0) {
+            this.init();
+            Game.playState.gameStatus = Game.PLAYING;
+        }
     }
 };
 
 // Adds a monster to the melee group(3 max)
 Game.Combat.prototype.add = function(monster) {
-    if (this.monsters.length < 3) {
+    if (this.monsters.length < 3 && this.monsters.indexOf(monster) < 0) {
         this.monsters.push(monster);
+        return true;
+    } else {
+        return false;
     }
 };
 
 //Returns current combatant
 Game.Combat.prototype.get = function() {
     return this.queue[this.index];
+};
+
+//True if current fighter is human
+Game.Combat.prototype.isHuman = function() {
+    return !(this.get() instanceof Game.Monster);
 };
 
 //Returns targeted monster
@@ -321,13 +336,14 @@ Game.Combat.prototype.getTarget = function() {
 // Go next in the queue
 Game.Combat.prototype.next = function() {
     if (this.index === -1) {
-        console.log("Game.Combat: Starting combat turn");
         this.reset();
     }
     this.index++;
     console.log("Game.Combat: Advancing queue", this.index);
+    console.log("Game.Combat: " + this.get() + " turn...");
+    Game.Log(this.get() + " turn...");
     if (this.index >= this.queue.length) {
-        console.log("Game.Combat: End of queue, needs reset");
+        console.log("Game.Combat: End of queue, round needs reset");
         this.index = -1;
         this.next();
     }
@@ -335,18 +351,19 @@ Game.Combat.prototype.next = function() {
 
 // Reset the combat queue
 Game.Combat.prototype.reset = function() {
-    console.log("Game.Combat: Reseting queue", this.index);
+    console.log("Game.Combat: Starting combat round");
     this.index = -1;
     this.queue = [];
     var chars = Game.playState.party.characters;
-    // Remove dead monsters?
-    // Order combat queue by speed(including alive monsters and chars)
+    // Order combat queue by speed.
     for (i in this.monsters) {
         this.queue.push(this.monsters[i]);
     }
     for (i in chars) {
         // if able to fight...
-        this.queue.push(chars[i]);
+        if (chars[i].hp > 0) {
+            this.queue.push(chars[i]);
+        }
     }
     this.queue.sort(function compare(a, b) {
         // Sorting by speed, desc
@@ -632,6 +649,11 @@ Game.MapObject.prototype.rotateRight = function() {
     this.obj.rotation = (this.obj.rotation + this.d_angle) % (Math.PI * 2);
 };
 
+// Check two mapobjs on the same position
+Game.MapObject.prototype.samePos = function(mapObj) {
+    return mapObj.x === this.x && mapObj.y === this.y;
+};
+
 // Checks if the tile is passable/exists(needs to be extended to include Party/Monsters exclusive rules
 Game.MapObject.prototype.canPass = function(tile) {
     // Meant to be used with Game.Map.getTile() method
@@ -661,8 +683,7 @@ Game.Monster = function() {
     this.xp = 20;
     this.hitDie = "1d6";
     this.gold = 10;
-    this.isFighting = false;
-    this.setPosition(10, 10);
+    this.setPosition(Game.Utils.die("1d10"), Game.Utils.die("1d10"));
 };
 
 Game.Monster.prototype = Object.create(Game.MapObject.prototype);
@@ -674,7 +695,10 @@ Game.Monster.prototype.seekParty = function() {
     var party = Game.playState.party;
     console.log("Game.Monster: checking", "monster", this.x, this.y, "party", party.x, party.y);
     // If not near, forget it
-    if (Math.abs(party.x - this.x) < 3 && Math.abs(party.y - this.y) < 3) {
+    if (Math.abs(party.x - this.x) <= 3 && Math.abs(party.y - this.y) <= 3) {
+        // Backup coords.
+        var oldX = this.x;
+        var oldY = this.y;
         // If angle is horizontal, try to match vertical coordinate first, and viceversa
         var first = "x", second = "y";
         if (party.obj.angle === 0 || party.obj.angle === -180) {
@@ -693,13 +717,18 @@ Game.Monster.prototype.seekParty = function() {
                 this[second]--;
             }
         }
-        this.setPosition(this.x, this.y);
         // TAG...if monster reachs party, push to the queue.
-        if (this.x === party.x && this.y === party.y && !this.isFighting) {
-            console.log("Game.Monster: Monster added to the queue", this);
-            this.isFighting = true;
-            Game.playState.combat.add(this);
-            Game.playState.gameStatus = Game.FIGHTING;
+        if (this.samePos(party)) {
+            if (Game.playState.combat.add(this)) {
+                console.log("Game.Monster: Monster added to combat queue", this);
+                Game.playState.gameStatus = Game.FIGHTING;
+                this.setPosition(this.x, this.y);
+            } else {
+                this.x = oldX;
+                this.y = oldY;
+            }
+        } else {
+            this.setPosition(this.x, this.y);
         }
     }
 };
@@ -907,8 +936,15 @@ Game.Message.prototype.showConfirm = function(message) {
     }));
 };
 
-// Closes message and reset confirm status
-Game.Message.prototype.close = function() {
+// Closes message setting confirm status in case of need. Returns to Script mode
+Game.Message.prototype.close = function(key) {
+    console.log("Game.Message: closing message, returning to script mode");
+    Game.playState.gameStatus = Game.SCRIPT;
+    if (this.isConfirm) {
+        this.lastConfirm = key === "KeyY";
+    } else {
+        this.lastConfirm = null;
+    }
     this.group.removeAll();
 };
 
