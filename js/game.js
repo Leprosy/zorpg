@@ -281,12 +281,12 @@ Game.Combat.prototype.attack = function() {
         // it's a monster, attack a character
         // Damage someone on the party
         Game.Log("Monster " + attacker + " attacks");
-        console.log("Game.Combat: monster attacks", attacker);
+        console.log("Game.Combat: monster attacks " + attacker);
         party.damageN(1, attacker.hitDie);
     } else {
         // it's a character, attacks target monster
         Game.Log("Character " + attacker + " attacks");
-        console.log("Game.Combat: character attacks", attacker);
+        console.log("Game.Combat: character attacks " + attacker);
         var damage = Game.Utils.die(attacker.hitDie);
         var target = this.monsters[this.target];
         target.hp -= damage;
@@ -340,12 +340,13 @@ Game.Combat.prototype.next = function() {
     }
     this.index++;
     console.log("Game.Combat: Advancing queue", this.index);
-    console.log("Game.Combat: " + this.get() + " turn...");
-    Game.Log(this.get() + " turn...");
     if (this.index >= this.queue.length) {
         console.log("Game.Combat: End of queue, round needs reset");
         this.index = -1;
         this.next();
+    } else {
+        console.log("Game.Combat: " + this.get() + " turn...");
+        Game.Log(this.get() + " turn...");
     }
 };
 
