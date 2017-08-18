@@ -222,6 +222,7 @@ Game.playState = {
         // MONSTERS: Monsters seek the party if they are not engaging it already. Remove dead ones.
         for (i = 0; i < this.monsters.length; ++i) {
             if (this.monsters[i].hp <= 0) {
+                this.monsters[i].die();
                 this.monsters.splice(i, 1);
             } else {
                 if (!this.monsters[i].samePos(this.party)) {
@@ -297,6 +298,7 @@ Game.Combat.prototype.attack = function() {
         // All killed?
         if (this.monsters.length === 0) {
             this.init();
+            console.log("Game.Combat: combat finished");
             Game.playState.gameStatus = Game.PLAYING;
         }
     }
@@ -732,6 +734,12 @@ Game.Monster.prototype.seekParty = function() {
             this.setPosition(this.x, this.y);
         }
     }
+};
+
+// Kills a monster
+Game.Monster.prototype.die = function() {
+    // Remove from game world
+    this.obj.kill();
 };
 
 Game.Monster.prototype.toString = function() {

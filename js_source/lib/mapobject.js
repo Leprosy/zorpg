@@ -149,7 +149,11 @@ Game.Monster.prototype.seekParty = function() {
         }
     }
 }
-
+// Kills a monster
+Game.Monster.prototype.die = function() {
+    // Remove from game world
+    this.obj.kill();
+}
 Game.Monster.prototype.toString = function() {
     return this.name + "(hp:" + this.hp + "-spd:" + this.speed + ")";
 }

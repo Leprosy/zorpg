@@ -40,6 +40,7 @@ Game.Combat.prototype.attack = function() {
         // All killed?
         if (this.monsters.length === 0) {
             this.init();
+            console.log("Game.Combat: combat finished")
             Game.playState.gameStatus = Game.PLAYING;
         }
     }

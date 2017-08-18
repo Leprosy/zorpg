@@ -171,6 +171,7 @@ Game.playState = {
         // MONSTERS: Monsters seek the party if they are not engaging it already. Remove dead ones.
         for (i = 0; i < this.monsters.length; ++i) {
             if (this.monsters[i].hp <= 0) {
+                this.monsters[i].die();
                 this.monsters.splice(i, 1);
             } else {
                 if (!this.monsters[i].samePos(this.party)) {
