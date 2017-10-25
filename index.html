@@ -16,38 +16,66 @@
     <body>
         <div class="container">
             <h4>_zorpg</h4>
-
-            <div class="row">
-                <div class="col-md-8">
-                    3dview
-                    <div id="game"></div>
-                </div>
-                <div class="col-md-4">
-                    map:
-                    <hr/>
-                    commands:
-                    <hr />
-                    console:
-                    <div>
-                        <textarea rows="20" id="console"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-12">
-                    <div id="roster">
-                        <textarea id="debug" rows="15"></textarea>
-                    </div>
-                </div>
-            </div>
+            <div id="game"></div>
+            <hr />
+            <canvas id="3d"></canvas>
         </div>
-
-
 
         <script src="js/jquery.js"></script>
         <script src="js/bootflat.js"></script>
-        <script src="js/phaser.js"></script>
+        <script src="js/babylon.js"></script>
         <script type="text/javascript" src="js/game.js"></script>
+
+        <script>
+// Demo code
+ZORPG.State.add("first", {
+    taldo: "OAW",
+    init: function() {
+        console.log("init first state");
+    },
+    destroy: function() {
+        console.log("destroy first state");
+    }
+});
+
+ZORPG.State.add("empty", {});
+
+ZORPG.State.add("second", {
+    foo: "bar",
+    init: function() {
+        console.log("init second state");
+    },
+    destroy: function() {
+        console.log("destroy second state");
+    }
+});
+
+ZORPG.State.set("first");
+
+
+
+        // Init
+        /* var canvas = document.getElementById("3d");
+        var engine = new BABYLON.Engine(canvas, true);
+        var scene = new BABYLON.Scene(engine);
+
+        // Camera
+        var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), scene);
+        camera.setTarget(BABYLON.Vector3.Zero());
+        camera.attachControl(canvas, true);
+
+        // Light
+        var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
+        light.intensity = 0.7;
+
+        // Setup content
+        var sphere = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, scene);
+        sphere.position.y = 1;
+        var ground = BABYLON.Mesh.CreateGround("ground1", 6, 6, 2, scene);
+
+        engine.runRenderLoop(function () {
+            scene.render();
+        }); */
+        </script>
     </body>
 </html>
