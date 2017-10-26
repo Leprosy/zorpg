@@ -28,13 +28,16 @@
         <script type="text/javascript" src="js/game.js"></script>
 
         <script>
-document.addEventListener('keydown', function(event) {
-    console.log(event)
-    if (event.code == 'KeyZ' && (event.ctrlKey || event.metaKey)) {
-      alert('Undo!')
-    }
-});
 
+        ZORPG.Key.addEvent("KeyA", function(ev) {
+            console.log("Key A pressed", ev)
+        });
+        ZORPG.Key.addEvent("KeyS", function(ev) {
+            console.log("Key S pressed")
+        });
+        ZORPG.Key.addEvent("KeyD", function(ev) {
+            console.log("Key D pressed")
+        });
 
         // Init
         /* var canvas = document.getElementById("3d");
