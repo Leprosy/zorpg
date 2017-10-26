@@ -33,3 +33,33 @@ ZORPG.State = {
         }
     }
 }
+
+
+
+/**
+ * Example code for state definition
+
+ZORPG.State.add("first", {
+    taldo: "OAW",
+    init: function() {
+        console.log("init first state");
+    },
+    destroy: function() {
+        console.log("destroy first state");
+    }
+});
+
+ZORPG.State.add("empty", {});
+
+ZORPG.State.add("second", {
+    foo: "bar",
+    init: function() {
+        console.log("init second state");
+    },
+    destroy: function() {
+        console.log("destroy second state");
+    }
+});
+
+ZORPG.State.set("first");
+*/
