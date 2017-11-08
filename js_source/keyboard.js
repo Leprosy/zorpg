@@ -12,3 +12,17 @@ ZORPG.Key = {
         });
     }
 }
+
+/**
+Example
+
+ZORPG.Key.addEvent("KeyA", function(ev) {
+    console.log("Key A pressed", ev)
+});
+ZORPG.Key.addEvent("KeyS", function(ev) {
+    console.log("Key S pressed")
+});
+ZORPG.Key.addEvent("KeyD", function(ev) {
+    console.log("Key D pressed")
+});
+*/

@@ -3,36 +3,51 @@ var ZORPG = ZORPG || {};
 /**
  * State manager
  */
-ZORPG.State = {
-    _states: {},
-    currentState: null,
+ZORPG.State = (function() {
+    var states = {};
+    var currentState = null;
 
-    // Adds a state. obj needs to have a structure?
-    add: function(key, obj) {
-        if (ZORPG.Utils.isObj(obj)) {
-            this._states[key] = obj;
-        } else {
-            throw Error("ZORPG.State: Adding invalid state object.");
-        }
-    },
-
-    // Switches the active state
-    set: function(key) {
-        if (typeof this._states[key] !== "undefined") {
-            if (ZORPG.Utils.isObj(this.currentState) && typeof this.currentState.destroy === "function") {
-                this.currentState.destroy();
+    return {
+        // Adds a state. obj needs to have a structure?
+        add: function(key, obj) {
+            if (ZORPG.Utils.isObj(obj)) {
+                states[key] = obj;
+            } else {
+                throw Error("ZORPG.State: Adding invalid state object.");
             }
+        },
 
-            this.currentState = this._states[key];
+        // Switches the active state
+        set: function(key) {
+            if (typeof states[key] !== "undefined") {
+                if (ZORPG.Utils.isObj(currentState) && typeof currentState.destroy === "function") {
+                    currentState.destroy();
+                }
 
-            if (typeof this.currentState.init === "function") {
-                this.currentState.init();
+                currentState = states[key];
+
+                if (typeof currentState.init === "function") {
+                    currentState.init();
+                }
+            } else {
+                throw Error("ZORPG.State: That state object isn't registered.");
             }
-        } else {
-            throw Error("ZORPG.State: That state object isn't registered.");
+        },
+
+        // Return current state object
+        get: function(key) {
+            if (typeof key !== "undefined") {
+                if (typeof states[key] !== "undefined") {
+                    return states[key];
+                } else {
+                    throw Error("ZORPG.State: That state object isn't registered.");
+                }
+            } else {
+                return currentState;
+            }
         }
     }
-}
+})();
 
 
 
