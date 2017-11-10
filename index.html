@@ -23,8 +23,8 @@
 
         <script src="js/jquery.js"></script>
         <script src="js/bootflat.js"></script>
-        <script src="js/babylon.js"></script>
-        <script src="js/babylon-gui.js"></script>
+        <script src="js/babylon31.js"></script>
+        <!-- <script src="js/babylon-gui.js"></script> -->
         <script type="text/javascript" src="js/game.js"></script>
 
         <script>
@@ -32,41 +32,30 @@
         // Init states
         ZORPG.State.add("load", {
             init: function() {
-                console.log("Loading...");
+                console.log("ZORPG.State: Loading...");
+                ZORPG.Canvas.init();
+
+                ZORPG.Loader.addTextFileTask("map", "maps/map1.json");
+                ZORPG.Loader.addImageTask("splash", "img/splash.png");
+                ZORPG.Loader.addImageTask("npc", "img/npc.png");
+                ZORPG.Loader.onTasksDoneObservable.add(function() {
+                    ZORPG.State.set("main_menu");
+                })
+                ZORPG.Loader.load();
+
             },
             destroy: function() {
-                console.log("Loading finished.");
+                console.log("ZORPG.State: Loading finished.");
             }
         });
 
         ZORPG.State.add("main_menu", {
-            name: "MAin MEnu",
+            name: "Main Menu",
 
             init: function() {
-                console.log("Main menu.");
+                console.log("ZORPG.State: Main menu.");
 
-                var canvas = document.getElementById("3d");
-                var engine = new BABYLON.Engine(canvas, true);
-                ZORPG.scene = new BABYLON.Scene(engine);
-
-                // Camera
-                var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), ZORPG.scene);
-                camera.setTarget(BABYLON.Vector3.Zero());
-                camera.attachControl(canvas, true);
-
-                // Light
-                var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), ZORPG.scene);
-                light.intensity = 0.7;
-
-                // Setup content
-                var sphere = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, ZORPG.scene);
-                sphere.position.y = 1;
-                //var ground = BABYLON.Mesh.CreateGround("ground1", 6, 6, 2, scene);
-
-                // GUI
-                ZORPG.GUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
                 var splash = new BABYLON.GUI.Image("splash", "img/splash.png");
-
                 var button1 = BABYLON.GUI.Button.CreateSimpleButton("but1", "Click to Start");
                 button1.width = "150px"
                 button1.height = "40px";
@@ -74,19 +63,13 @@
                 button1.cornerRadius = 20;
                 button1.background = "green";
                 button1.onPointerUpObservable.add(function() {
-                    ZORPG.GUI.removeControl(button1);
-                    ZORPG.GUI.removeControl(splash);
+                    ZORPG.Canvas.GUI.removeControl(button1);
+                    ZORPG.Canvas.GUI.removeControl(splash);
                     ZORPG.State.set("play");
                 });
 
-                ZORPG.GUI.addControl(splash);
-                ZORPG.GUI.addControl(button1);
-
-
-                // Rendering loop
-                engine.runRenderLoop(function () {
-                    ZORPG.scene.render();
-                });
+                ZORPG.Canvas.GUI.addControl(splash);
+                ZORPG.Canvas.GUI.addControl(button1);
             },
 
             destroy: function() {}
@@ -103,7 +86,7 @@
             destroy: function() {}
         });
         // Start
-        ZORPG.State.set("main_menu");
+        ZORPG.State.set("load");
         </script>
     </body>
 </html>

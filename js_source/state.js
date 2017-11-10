@@ -11,6 +11,7 @@ ZORPG.State = (function() {
         // Adds a state. obj needs to have a structure?
         add: function(key, obj) {
             if (ZORPG.Utils.isObj(obj)) {
+                obj._id = key;
                 states[key] = obj;
             } else {
                 throw Error("ZORPG.State: Adding invalid state object.");
