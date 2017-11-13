@@ -10,5 +10,9 @@ ZORPG.Utils = {
     // Checks if a var is an object
     isObj: function(thing) {
         return thing instanceof Object && thing.constructor === Object;
+    },
+
+    isEmptyObj: function(thing) {
+        return this.isObj(thing) && Object.keys(thing).length === 0;
     }
 };
