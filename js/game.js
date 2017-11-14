@@ -71,11 +71,12 @@ ZORPG.Canvas = function() {
             console.log("Rendering", map);
             for (y = 0; y < map.floor.length; ++y) {
                 for (x = 0; x < map.floor[y].length; ++x) {
-                    var mesh = BABYLON.Mesh.CreateBox("floor" + x + "-" + y, tileSize, ZORPG.Canvas.scene);
+                    var mesh = BABYLON.Mesh.CreateBox("floor" + x + "-" + y, this.tileSize, ZORPG.Canvas.scene);
                     //var mesh = BABYLON.Mesh.CreateBox(txt + item.x + "x" + item.y, size, Game.scene);
-                    mesh.position.x = x * Game.size;
-                    mesh.position.z = y * Game.size;
+                    mesh.position.x = x * this.tileSize;
+                    mesh.position.z = y * this.tileSize;
                     mesh.position.y = 0;
+                    mesh.scaling.y = .1;
                 }
             }
         }
