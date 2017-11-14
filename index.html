@@ -80,10 +80,22 @@
 
             init: function() {
                 console.log("ZORPG.State: Playing.");
+                // Render content
                 var ground = BABYLON.Mesh.CreateGround("ground1", 6, 6, 2, ZORPG.Canvas.scene);
                 var sphere = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, ZORPG.Canvas.scene);
                 sphere.position.y = 1;
 
+                // ??? code. An Entity and a Map
+                ZORPG.E = new ZORPG.Ent("taldo", ["pos", "actor"])
+                                   //.pos({x: 0, y: 0})
+                                   //.actor({name: "Taldo", hp: 60});
+/*                                   .addCmp("pos")
+                                   .addCmp("actor")*/
+
+                ZORPG.Map.load(JSON.parse(ZORPG.Loader.tasks[0].text));
+                ZORPG.Canvas.renderMap(ZORPG.Map.data());
+
+                // Set key handlers
                 ZORPG.Key.add("Escape", function(ev) {
                     ZORPG.Canvas.clear();
                     ZORPG.Key.remove("Escape");

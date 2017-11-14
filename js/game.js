@@ -26,10 +26,12 @@ var ZORPG = ZORPG || {};
  */
 ZORPG.Canvas = function() {
     return {
+        tileSize: 50,
         engine: null,
         scene: null,
         camera: null,
         GUI: null,
+        // Init everything
         init: function() {
             var canvas = document.getElementById("3d");
             this.engine = new BABYLON.Engine(canvas, true);
@@ -58,9 +60,23 @@ ZORPG.Canvas = function() {
                 ZORPG.Canvas.scene.render();
             });
         },
+        // Clear the 3d canvas
         clear: function() {
             while (this.scene.meshes.length > 0) {
                 this.scene.meshes[0].dispose();
+            }
+        },
+        // Render a map
+        renderMap: function(map) {
+            console.log("Rendering", map);
+            for (y = 0; y < map.floor.length; ++y) {
+                for (x = 0; x < map.floor[y].length; ++x) {
+                    var mesh = BABYLON.Mesh.CreateBox("floor" + x + "-" + y, tileSize, ZORPG.Canvas.scene);
+                    //var mesh = BABYLON.Mesh.CreateBox(txt + item.x + "x" + item.y, size, Game.scene);
+                    mesh.position.x = x * Game.size;
+                    mesh.position.z = y * Game.size;
+                    mesh.position.y = 0;
+                }
             }
         }
     };
@@ -78,20 +94,28 @@ var ZORPG = ZORPG || {};
  *  group: the ent group that holds this ent, if any
  */
 ZORPG.Ent = function(name, cmp) {
+    // Setup
     this.id = new Date().getTime().toString(16);
     this.name = name;
     this.tags = [];
-    this.data = {};
-    this.manager = null;
+    // Add components, if any
+    if (ZORPG.Utils.isArray(cmp)) {
+        for (i = 0; i < cmp.length; ++i) {
+            this.addCmp(cmp[i]);
+        }
+    }
+    // Chain API
+    return this;
 };
 
 // Adds a component to the entity
 ZORPG.Ent.prototype.addCmp = function(key) {
-    this[key] = {
-        component: key,
-        data: []
-    };
-    return this;
+    if (ZORPG.Components.hasOwnProperty(key)) {
+        this[key] = ZORPG.Components[key];
+        return this;
+    } else {
+        throw Error("ZORPG.Ent: Component not found.", key);
+    }
 };
 
 // Removes a component to the entity
@@ -160,6 +184,27 @@ ZORPG.EntGroup.prototype.remove = function(ent) {};
 ZORPG.EntGroup.prototype.queryTags = function(tagList, fn) {};
 
 ZORPG.EntGroup.prototype.queryCmp = function(cmpList) {};
+
+/**
+ * Base components
+ */
+ZORPG.Components = {
+    pos: {
+        x: 0,
+        y: 0,
+        toString: function() {
+            return this.x + "-" + this.y;
+        }
+    },
+    actor: {
+        hp: 0,
+        name: "",
+        speed: 0,
+        toString: function() {
+            return this.name + ":" + this.hp + "hp";
+        }
+    }
+};
 
 var ZORPG = ZORPG || {};
 
@@ -293,12 +338,15 @@ var ZORPG = ZORPG || {};
 ZORPG.Utils = {
     // The basic variable of all leprosystems software artifacts
     taldo: "OAW",
-    // Checks if a var is an object
+    // Several type checks
     isObj: function(thing) {
         return thing instanceof Object && thing.constructor === Object;
     },
     isEmptyObj: function(thing) {
         return this.isObj(thing) && Object.keys(thing).length === 0;
+    },
+    isArray: function(thing) {
+        return Object.prototype.toString.call(thing) === "[object Array]";
     }
 };
 

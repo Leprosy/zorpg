@@ -8,11 +8,13 @@ var ZORPG = ZORPG || {};
 
 ZORPG.Canvas = (function() {
     return {
+        tileSize: 50,
         engine: null,
         scene: null,
         camera: null,
         GUI: null,
 
+        // Init everything
         init: function() {
             var canvas = document.getElementById("3d");
             this.engine = new BABYLON.Engine(canvas, true);
@@ -47,9 +49,25 @@ ZORPG.Canvas = (function() {
             });
         },
 
+        // Clear the 3d canvas
         clear: function() {
             while (this.scene.meshes.length > 0) {
                 this.scene.meshes[0].dispose();
+            }
+        },
+
+        // Render a map
+        renderMap: function(map) {
+            console.log("Rendering", map)
+
+            for (y = 0; y < map.floor.length; ++y) {
+                for (x = 0; x < map.floor[y].length; ++x) {
+                    var mesh = BABYLON.Mesh.CreateBox("floor" + x + "-" + y, tileSize, ZORPG.Canvas.scene);
+                    //var mesh = BABYLON.Mesh.CreateBox(txt + item.x + "x" + item.y, size, Game.scene);
+                    mesh.position.x = x * Game.size;
+                    mesh.position.z = y * Game.size;
+                    mesh.position.y = 0;
+                }
             }
         }
         /*load: function(obj) {
