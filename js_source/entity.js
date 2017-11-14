@@ -10,17 +10,30 @@ var ZORPG = ZORPG || {};
  *  group: the ent group that holds this ent, if any
  */
 ZORPG.Ent = function(name, cmp) {
+    // Setup
     this.id = new Date().getTime().toString(16);
     this.name = name;
     this.tags = [];
-    this.data = {};
-    this.manager = null;
+
+    // Add components, if any
+    if (ZORPG.Utils.isArray(cmp)) {
+        for (i = 0; i < cmp.length; ++i) {
+            this.addCmp(cmp[i]);
+        }
+    }
+
+    // Chain API
+    return this;
 };
 
 // Adds a component to the entity
 ZORPG.Ent.prototype.addCmp = function(key) {
-    this[key] = { component: key, data: []};
-    return this;
+    if (ZORPG.Components.hasOwnProperty(key)) {
+        this[key] = ZORPG.Components[key];
+        return this;
+    } else {
+        throw Error("ZORPG.Ent: Component not found.", key);
+    }
 };
 // Removes a component to the entity
 ZORPG.Ent.prototype.removeCmp = function(key) {
@@ -89,3 +102,53 @@ ZORPG.EntGroup.prototype.queryTags = function(tagList, fn) {
 };
 ZORPG.EntGroup.prototype.queryCmp = function(cmpList) {};
 
+
+/**
+ * Base components
+ */
+ZORPG.Components = {
+    "pos": {
+        x: 0,
+        y: 0,
+
+        toString: function() {
+            return this.x + "-" + this.y;
+        }
+    },
+
+    "actor": {
+        hp: 0,
+        name: "",
+        speed: 0,
+
+        toString: function() {
+            return this.name + ":" + this.hp + "hp";
+        }
+    }
+}
+
+
+/*
+}
+
+//Demo
+var E = new ZORPG.Ent("taldo");
+E.addCmp('cmp1');
+E.addCmp('cmp2');
+E.addCmp('cmp3');
+console.log(JSON.stringify(E));
+
+E.removeCmp('cmp2');
+E.removeCmp('none');
+console.log(JSON.stringify(E));
+
+E.addTag("tag1");
+E.addTag("tag2");
+console.log(JSON.stringify(E));
+
+E.removeTag("tag1");
+E.removeTag("none");
+console.log(JSON.stringify(E));
+
+EG = new ZORPG.EntGroup();
+EG.add(); */
