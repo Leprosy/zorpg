@@ -10,7 +10,8 @@ ZORPG.Map = (function() {
         floor: [],
         ceiling: [],
         object: [],
-        walls: []
+        walls: [],
+        properties: {}
     };
 
     return {
@@ -19,7 +20,9 @@ ZORPG.Map = (function() {
         },
 
         load: function(data) {
-            // Parse data
+            console.log("ZORPG.Map: Loading and parsing", data)
+
+            // Parse tile data
             for (i = 0; i < data.layers.length; ++i) {
                 var layer = data.layers[i];
 
@@ -33,6 +36,9 @@ ZORPG.Map = (function() {
                     mapData[layer.name].push(row);
                 }
             }
+
+            // Properties
+            mapData.properties = data.properties;
         },
 
         about: function() {

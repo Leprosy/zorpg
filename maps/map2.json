@@ -26,11 +26,15 @@
  "orientation":"orthogonal",
  "properties":
     {
-     "script":"{\"10x1\": {\"script\": [\n{\"action\": \"ifConfirm\", \"args\": {\"msg\": \"Do you want to return to the other side?\", \"onTrue\": 1, \"onFalse\": 6}},\n{\"action\": \"changeMap\", \"args\": {\"map\": \"map1\", \"x\": 12, \"y\": 12}}\n],\"properties\": {}}\n}\n"
+     "script":"{\"10x1\": {\"script\": [\n{\"action\": \"ifConfirm\", \"args\": {\"msg\": \"Do you want to return to the other side?\", \"onTrue\": 1, \"onFalse\": 6}},\n{\"action\": \"changeMap\", \"args\": {\"map\": \"map1\", \"x\": 12, \"y\": 12}}\n],\"properties\": {}}\n}\n",
+     "startX":4,
+     "startY":4
     },
  "propertytypes":
     {
-     "script":"string"
+     "script":"string",
+     "startX":"int",
+     "startY":"int"
     },
  "renderorder":"right-down",
  "tileheight":32,

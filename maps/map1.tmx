@@ -26,6 +26,8 @@
 {&quot;action&quot;: &quot;changeMap&quot;, &quot;args&quot;: {&quot;map&quot;: &quot;map2&quot;, &quot;x&quot;: 1, &quot;y&quot;: 1}}
 ],&quot;properties&quot;: {}}
 }</property>
+  <property name="startX" type="int" value="2"/>
+  <property name="startY" type="int" value="2"/>
  </properties>
  <tileset firstgid="1" name="floor" tilewidth="32" tileheight="32" tilecount="100" columns="10">
   <image source="../img/floor.png" width="320" height="320"/>

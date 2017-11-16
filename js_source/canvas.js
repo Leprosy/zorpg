@@ -8,7 +8,7 @@ var ZORPG = ZORPG || {};
 
 ZORPG.Canvas = (function() {
     return {
-        tileSize: 50,
+        tileSize: 5,
         engine: null,
         scene: null,
         camera: null,
@@ -32,7 +32,7 @@ ZORPG.Canvas = (function() {
             });
 
             // Camera
-            this.camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), this.scene);
+            this.camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 0, 0), this.scene);
             this.camera.setTarget(BABYLON.Vector3.Zero());
             this.camera.attachControl(canvas, true);
 
@@ -58,18 +58,34 @@ ZORPG.Canvas = (function() {
 
         // Render a map
         renderMap: function(map) {
-            console.log("Rendering", map)
+            console.log("ZORPG.Canvas: Rendering map", map)
 
+            // Mats
+            var materials = [];
+
+            for (i = 0; i < 10; ++i) {
+                var mat = new BABYLON.StandardMaterial("txt" + i, this.scene);
+                mat.diffuseColor = new BABYLON.Color3(i / 10, i / 10, i / 10);
+                materials.push(mat);
+            }
+
+            // Floors
             for (y = 0; y < map.floor.length; ++y) {
                 for (x = 0; x < map.floor[y].length; ++x) {
                     var mesh = BABYLON.Mesh.CreateBox("floor" + x + "-" + y, this.tileSize, ZORPG.Canvas.scene);
-                    //var mesh = BABYLON.Mesh.CreateBox(txt + item.x + "x" + item.y, size, Game.scene);
+
                     mesh.position.x = x * this.tileSize;
                     mesh.position.z = y * this.tileSize;
                     mesh.position.y = 0;
                     mesh.scaling.y = 0.1;
+                    mesh.material = materials[map.floor[y][x]];
                 }
             }
+
+            // Put camera/player
+            this.camera.position.x = map.properties.startX * this.tileSize;
+            this.camera.position.z = map.properties.startY * this.tileSize;
+            this.camera.position.y = this.tileSize;
         }
         /*load: function(obj) {
             if typeof()

@@ -7,6 +7,8 @@
 ],&quot;properties&quot;: {}}
 }
 </property>
+  <property name="startX" type="int" value="4"/>
+  <property name="startY" type="int" value="4"/>
  </properties>
  <tileset firstgid="1" name="floor" tilewidth="32" tileheight="32" tilecount="100" columns="10">
   <image source="../img/floor.png" width="320" height="320"/>
