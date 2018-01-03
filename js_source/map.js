@@ -19,7 +19,7 @@ ZORPG.Map = (function() {
             };
         },
 
-        data: function() {
+        getData: function() {
             return mapData;
         },
 
@@ -45,6 +45,7 @@ ZORPG.Map = (function() {
 
             // Properties
             mapData.properties = data.properties;
+            this.properties = data.properties;
         },
 
         about: function() {
