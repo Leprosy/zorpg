@@ -91,6 +91,18 @@ ZORPG.Canvas = function() {
             this.camera.position.x = map.properties.startX * this.tileSize;
             this.camera.position.z = map.properties.startY * this.tileSize;
             this.camera.position.y = this.tileSize / 4;
+            this.camera.rotation.x = 0;
+            this.camera.rotation.z = 0;
+            this.camera.rotation.y = 0;
+        },
+        // Updates camera to reflect player position
+        updateCamera: function(player) {
+            this.camera.position.x = player.x * this.tileSize;
+            this.camera.position.z = player.y * this.tileSize;
+            this.camera.position.y = this.tileSize / 4;
+            this.camera.rotation.x = 0;
+            this.camera.rotation.z = 0;
+            this.camera.rotation.y = player.ang;
         }
     };
 }();
@@ -218,16 +230,16 @@ ZORPG.Components = {
             this.ang = (this.ang - Math.PI / 2) % (Math.PI * 2);
         },
         getFwd: function() {
-            var x = Math.round(this.x + Math.cos(this.ang));
-            var y = Math.round(this.y + Math.sin(this.ang));
+            var x = Math.round(this.x + Math.sin(this.ang));
+            var y = Math.round(this.y + Math.cos(this.ang));
             return {
                 x: x,
                 y: y
             };
         },
         getBck: function() {
-            var x = Math.round(this.x - Math.cos(this.ang));
-            var y = Math.round(this.y - Math.sin(this.ang));
+            var x = Math.round(this.x - Math.sin(this.ang));
+            var y = Math.round(this.y - Math.cos(this.ang));
             return {
                 x: x,
                 y: y
@@ -486,16 +498,27 @@ ZORPG.State.add("play", {
         });
         ZORPG.Key.add("KeyW", function(ev) {
             console.log("up");
+            ZORPG.Player.pos.moveFwd();
+            ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("KeyS", function(ev) {
             console.log("down");
+            ZORPG.Player.pos.moveBck();
+            ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("KeyA", function(ev) {
             console.log("left");
+            ZORPG.Player.pos.rotL();
+            ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("KeyD", function(ev) {
             console.log("right");
+            ZORPG.Player.pos.rotR();
+            ZORPG.State.get().updatePlayer();
         });
+    },
+    updatePlayer: function() {
+        ZORPG.Canvas.updateCamera(ZORPG.Player.pos);
     },
     destroy: function() {}
 });

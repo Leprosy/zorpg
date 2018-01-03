@@ -26,17 +26,28 @@ ZORPG.State.add("play", {
         });
         ZORPG.Key.add("KeyW", function(ev) {
             console.log("up")
-            //ZORPG.Player.
+            ZORPG.Player.pos.moveFwd()
+            ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("KeyS", function(ev) {
             console.log("down")
+            ZORPG.Player.pos.moveBck();
+            ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("KeyA", function(ev) {
             console.log("left")
+            ZORPG.Player.pos.rotL()
+            ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("KeyD", function(ev) {
             console.log("right")
+            ZORPG.Player.pos.rotR()
+            ZORPG.State.get().updatePlayer();
         });
+    },
+
+    updatePlayer: function() {
+        ZORPG.Canvas.updateCamera(ZORPG.Player.pos);
     },
 
     destroy: function() {}

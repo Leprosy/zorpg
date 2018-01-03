@@ -124,14 +124,14 @@ ZORPG.Components = {
             this.ang = (this.ang - Math.PI / 2) % (Math.PI * 2);
         },
         getFwd: function() {
-            var x = Math.round(this.x + Math.cos(this.ang));
-            var y = Math.round(this.y + Math.sin(this.ang));
+            var x = Math.round(this.x + Math.sin(this.ang));
+            var y = Math.round(this.y + Math.cos(this.ang));
 
             return { x: x, y : y};
         },
         getBck: function() {
-            var x = Math.round(this.x - Math.cos(this.ang));
-            var y = Math.round(this.y - Math.sin(this.ang));
+            var x = Math.round(this.x - Math.sin(this.ang));
+            var y = Math.round(this.y - Math.cos(this.ang));
 
             return { x: x, y : y};
         },

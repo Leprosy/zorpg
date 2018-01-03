@@ -86,6 +86,19 @@ ZORPG.Canvas = (function() {
             this.camera.position.x = map.properties.startX * this.tileSize;
             this.camera.position.z = map.properties.startY * this.tileSize;
             this.camera.position.y = this.tileSize / 4;
+            this.camera.rotation.x = 0;
+            this.camera.rotation.z = 0;
+            this.camera.rotation.y = 0;
+        },
+
+        // Updates camera to reflect player position
+        updateCamera: function(player) {
+            this.camera.position.x = player.x * this.tileSize;
+            this.camera.position.z = player.y * this.tileSize;
+            this.camera.position.y = this.tileSize / 4;
+            this.camera.rotation.x = 0;
+            this.camera.rotation.z = 0;
+            this.camera.rotation.y = player.ang;
         },
 
         // Movement
