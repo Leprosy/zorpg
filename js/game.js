@@ -240,9 +240,9 @@ ZORPG.Key = function() {
             }
             if (ZORPG.Utils.isEmptyObj(keys)) {
                 document.addEventListener("keydown", listener);
-                console.log("ZORPG.Key: Listener registered.");
+                console.log("ZORPG.Key: Listener registered. Adding the key too.");
             } else {
-                console.log("ZORPG.Key: Already registered the listener.");
+                console.log("ZORPG.Key: Already registered the listener, just adding the key.");
             }
             keys[code] = handler;
         },
@@ -278,7 +278,7 @@ ZORPG.Map = function() {
                 properties: {}
             };
         },
-        data: function() {
+        getData: function() {
             return mapData;
         },
         load: function(data) {
@@ -298,6 +298,7 @@ ZORPG.Map = function() {
             }
             // Properties
             mapData.properties = data.properties;
+            this.properties = data.properties;
         },
         about: function() {
             return "About";
@@ -380,3 +381,80 @@ var ZORPG = ZORPG || {};
 ZORPG.__version__ = .01;
 
 ZORPG.__name__ = "ZORPG demo";
+
+// Loading state...preloader and resource management
+ZORPG.State.add("load", {
+    init: function() {
+        console.log("ZORPG.State: Loading...");
+        ZORPG.Canvas.init();
+        ZORPG.Loader.addTextFileTask("map", "maps/map1.json");
+        ZORPG.Loader.addImageTask("splash", "img/splash.png");
+        ZORPG.Loader.addImageTask("npc", "img/npc.png");
+        ZORPG.Loader.onTasksDoneObservable.add(function() {
+            //ZORPG.State.set("main_menu");
+            ZORPG.State.set("play");
+        });
+        ZORPG.Loader.load();
+    },
+    destroy: function() {
+        console.log("ZORPG.State: Loading finished.");
+    }
+});
+
+// Main menu state.
+ZORPG.State.add("main_menu", {
+    name: "Main Menu",
+    init: function() {
+        console.log("ZORPG.State: Main menu.");
+        var splash = new BABYLON.GUI.Image("splash", "img/splash.png");
+        var button1 = BABYLON.GUI.Button.CreateSimpleButton("but1", "Click to Start");
+        button1.width = "150px";
+        button1.height = "40px";
+        button1.color = "white";
+        button1.cornerRadius = 20;
+        button1.background = "green";
+        button1.onPointerUpObservable.add(function() {
+            ZORPG.Canvas.GUI.removeControl(button1);
+            ZORPG.Canvas.GUI.removeControl(splash);
+            ZORPG.State.set("play");
+        });
+        ZORPG.Canvas.GUI.addControl(splash);
+        ZORPG.Canvas.GUI.addControl(button1);
+    },
+    destroy: function() {}
+});
+
+// Play loop state
+ZORPG.State.add("play", {
+    name: "Playing",
+    init: function() {
+        console.log("ZORPG.State: Playing.");
+        // ??? code. An Entity and a Map
+        ZORPG.Map.load(JSON.parse(ZORPG.Loader.tasks[0].text));
+        ZORPG.Player = new ZORPG.Ent("player", [ "pos", "actor" ]);
+        ZORPG.Player.pos.x = ZORPG.Map.properties.startX;
+        ZORPG.Player.pos.y = ZORPG.Map.properties.startY;
+        ZORPG.Player.actor.name = "SirTaldo";
+        ZORPG.Player.actor.hp = 30;
+        ZORPG.Canvas.renderMap(ZORPG.Map.getData());
+        // Set key handlers
+        ZORPG.Key.add("Escape", function(ev) {
+            ZORPG.Canvas.clear();
+            ZORPG.Key.remove("Escape");
+            ZORPG.State.set("main_menu");
+        });
+        ZORPG.Key.add("KeyW", function(ev) {
+            console.log("up");
+        });
+        ZORPG.Key.add("KeyS", function(ev) {
+            console.log("down");
+        });
+        ZORPG.Key.add("KeyA", function(ev) {
+            console.log("left");
+        });
+        ZORPG.Key.add("KeyD", function(ev) {
+            console.log("right");
+        });
+    },
+    destroy: function() {}
+});
