@@ -26,6 +26,7 @@ ZORPG.State.add("play", {
         });
         ZORPG.Key.add("KeyW", function(ev) {
             console.log("up")
+            //ZORPG.Player.
         });
         ZORPG.Key.add("KeyS", function(ev) {
             console.log("down")
