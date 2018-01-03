@@ -6,21 +6,27 @@ var ZORPG = ZORPG || {};
  *  name: unique name of the map
  */
 ZORPG.Map = (function() {
-    var mapData = {
-        floor: [],
-        ceiling: [],
-        object: [],
-        walls: [],
-        properties: {}
-    };
+    var mapData = {};
 
     return {
+        clear: function() {
+            mapData = {
+                floor: [],
+                ceiling: [],
+                object: [],
+                walls: [],
+                properties: {}
+            };
+        },
+
         data: function() {
             return mapData;
         },
 
         load: function(data) {
             console.log("ZORPG.Map: Loading and parsing", data)
+            // Clear
+            this.clear();
 
             // Parse tile data
             for (i = 0; i < data.layers.length; ++i) {

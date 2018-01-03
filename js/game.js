@@ -26,7 +26,7 @@ var ZORPG = ZORPG || {};
  */
 ZORPG.Canvas = function() {
     return {
-        tileSize: 5,
+        tileSize: 10,
         engine: null,
         scene: null,
         camera: null,
@@ -90,7 +90,7 @@ ZORPG.Canvas = function() {
             // Put camera/player
             this.camera.position.x = map.properties.startX * this.tileSize;
             this.camera.position.z = map.properties.startY * this.tileSize;
-            this.camera.position.y = this.tileSize;
+            this.camera.position.y = this.tileSize / 4;
         }
     };
 }();
@@ -127,7 +127,7 @@ ZORPG.Ent.prototype.addCmp = function(key) {
         this[key] = ZORPG.Components[key];
         return this;
     } else {
-        throw Error("ZORPG.Ent: Component not found.", key);
+        throw Error("ZORPG.Ent: Component '" + key + "' not found");
     }
 };
 
@@ -267,19 +267,24 @@ var ZORPG = ZORPG || {};
  *  name: unique name of the map
  */
 ZORPG.Map = function() {
-    var mapData = {
-        floor: [],
-        ceiling: [],
-        object: [],
-        walls: [],
-        properties: {}
-    };
+    var mapData = {};
     return {
+        clear: function() {
+            mapData = {
+                floor: [],
+                ceiling: [],
+                object: [],
+                walls: [],
+                properties: {}
+            };
+        },
         data: function() {
             return mapData;
         },
         load: function(data) {
             console.log("ZORPG.Map: Loading and parsing", data);
+            // Clear
+            this.clear();
             // Parse tile data
             for (i = 0; i < data.layers.length; ++i) {
                 var layer = data.layers[i];

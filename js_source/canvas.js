@@ -8,7 +8,7 @@ var ZORPG = ZORPG || {};
 
 ZORPG.Canvas = (function() {
     return {
-        tileSize: 5,
+        tileSize: 10,
         engine: null,
         scene: null,
         camera: null,
@@ -85,11 +85,76 @@ ZORPG.Canvas = (function() {
             // Put camera/player
             this.camera.position.x = map.properties.startX * this.tileSize;
             this.camera.position.z = map.properties.startY * this.tileSize;
-            this.camera.position.y = this.tileSize;
-        }
-        /*load: function(obj) {
-            if typeof()
-        } */
+            this.camera.position.y = this.tileSize / 4;
+        },
+
+        // Movement
+        /*forward: function() { _move(1); },
+        backward: function() { _move(-1); },
+        _move: function(d) {
+
+            var x = this.camera.position.x;
+            var z = this.camera.position.z;
+            var vert = Math.round(Math.cos(this.camera.rotation.y));
+            var horz = Math.round(Math.sin(this.camera.rotation.y));
+            var newx = x + d * horz * this.tileSize;
+            var newz = z + d * vert * this.tileSize;
+
+                var newPx = this.camera.x + d * horz;
+                var newPy = this.camera.y + d * vert;
+
+                if (Game.checkCollision(newPx, newPy)) {;
+                    return;
+                } else {
+                    Game.isMoving = true;
+                    Game.player.x = newPx;
+                    Game.player.y = newPy;
+                    Game.map2dPoint.x = newPx * Game.map2dSize;
+                    Game.map2dPoint.y = newPy * Game.map2dSize;
+
+                    //Animation
+                    var anix = new BABYLON.Animation("move", "position.x", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT);
+                    var aniz = new BABYLON.Animation("move", "position.z", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT);
+                    var keyx = [{frame: 0, value: Game.camera.position.x}, {frame: 15, value: newx}];
+                    var keyz = [{frame: 0, value: Game.camera.position.z}, {frame: 15, value: newz}];
+                    anix.setKeys(keyx);
+                    aniz.setKeys(keyz);
+                    Game.camera.animations.push(anix);
+                    Game.camera.animations.push(aniz);
+                    Game.scene.beginAnimation(Game.camera, 0, 30, false, 1, function() {
+                        Game.isMoving = false; //EVENTPLZ
+                        Game.camera.animations = [];
+
+                        // A turn was spent
+                        //Game.tick();
+                    });
+                }
+        }, */
+
+        // Rotations
+        /*Game.rotateRight = function() { Game._rotate(1); };
+        Game.rotateLeft = function() { Game._rotate(-1); };
+        Game._rotate = function(d) {
+            if (!Game.isMoving) {
+                Game.isMoving = true;
+                var y = Game.camera.rotation.y + d * (Math.PI / 2);
+
+                //Game.camera.rotation.y = y + d * (Math.PI / 2);
+                //Game.isMoving = false;
+                //Animation
+                var ani = new BABYLON.Animation("rotate", "rotation.y", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT);
+                var key = [{frame: 0, value: Game.camera.rotation.y}, {frame: 15, value: y}];
+                ani.setKeys(key);
+                Game.camera.animations.push(ani);
+                Game.scene.beginAnimation(Game.camera, 0, 30, false, 1 , function() {
+                    Game.isMoving = false; //EVENTPLZ
+                    Game.camera.animations = [];
+
+                    // A turn was spent
+                    Game.tick();
+                });
+            }
+        }*/
     }
 })();
 

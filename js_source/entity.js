@@ -32,7 +32,7 @@ ZORPG.Ent.prototype.addCmp = function(key) {
         this[key] = ZORPG.Components[key];
         return this;
     } else {
-        throw Error("ZORPG.Ent: Component not found.", key);
+        throw Error("ZORPG.Ent: Component '" + key + "' not found");
     }
 };
 // Removes a component to the entity
