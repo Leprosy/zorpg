@@ -3,7 +3,7 @@ ZORPG.State.add("main_menu", {
     name: "Main Menu",
 
     init: function() {
-        console.log("ZORPG.State: Main menu.");
+        console.log("ZORPG.State.main: Main menu.");
 
         var splash = new BABYLON.GUI.Image("splash", "img/splash.png");
         var button1 = BABYLON.GUI.Button.CreateSimpleButton("but1", "Click to Start");
