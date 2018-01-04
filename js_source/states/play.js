@@ -19,6 +19,10 @@ ZORPG.State.add("play", {
 
 
         // Set key handlers
+        ZORPG.Key.setPre(function(ev) {
+            return (!ZORPG.Canvas.isUpdating);
+        });
+
         ZORPG.Key.add("Escape", function(ev) {
             ZORPG.Canvas.clear();
             ZORPG.Key.remove("Escape");
