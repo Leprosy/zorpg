@@ -36,15 +36,14 @@ ZORPG.Key = (function() {
 
     return {
         setPre: function(f) {
-            if (typeof f !== "function") throw Error("ZORPG.Key: Invalid pre-call function provided.");
             pre = f;
         },
 
         setPost: function(f) {
-            if (typeof f !== "function") throw Error("ZORPG.Key: Invalid post-call function provided.");
             post = f;
         },
 
+        // Adds a key handler to the register
         add: function(code, handler) {
             if (typeof handler !== "function") {
                 throw Error("ZORPG.Key: Invalid listener function provided.");
@@ -60,15 +59,26 @@ ZORPG.Key = (function() {
             keys[code] = handler;
         },
 
+        // Remove key handlers
         remove: function(code) {
+            console.log("ZORPG.Key: Removing handler", code)
             if (keys.hasOwnProperty(code) >= 0) {
                 delete keys[code];
 
                 if (ZORPG.Utils.isEmptyObj(keys)) {
+                    console.log("ZORPG.Key: No more handlers, removing listener.");
                     document.removeEventListener("keydown", listener);
                 }
             } else {
                 throw Error("ZORPG.Key: Code doesn't have an event attached.", code);
+            }
+        },
+        removeAll: function() {
+            this.setPre(null);
+            this.setPost(null);
+
+            for (key in keys) {
+                this.remove(key);
             }
         }
     }
