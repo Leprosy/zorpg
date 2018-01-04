@@ -46,6 +46,10 @@ ZORPG.Map = (function() {
                 }
             }
 
+            // DEBUG - script
+            data.properties.startX = 12;
+            data.properties.startY = 12;
+
             // Properties
             mapData.properties = data.properties;
             mapData.script = JSON.parse(data.properties.script);

@@ -344,13 +344,12 @@ ZORPG.Key = function() {
     };
     return {
         setPre: function(f) {
-            if (typeof f !== "function") throw Error("ZORPG.Key: Invalid pre-call function provided.");
             pre = f;
         },
         setPost: function(f) {
-            if (typeof f !== "function") throw Error("ZORPG.Key: Invalid post-call function provided.");
             post = f;
         },
+        // Adds a key handler to the register
         add: function(code, handler) {
             if (typeof handler !== "function") {
                 throw Error("ZORPG.Key: Invalid listener function provided.");
@@ -363,14 +362,24 @@ ZORPG.Key = function() {
             }
             keys[code] = handler;
         },
+        // Remove key handlers
         remove: function(code) {
+            console.log("ZORPG.Key: Removing handler", code);
             if (keys.hasOwnProperty(code) >= 0) {
                 delete keys[code];
                 if (ZORPG.Utils.isEmptyObj(keys)) {
+                    console.log("ZORPG.Key: No more handlers, removing listener.");
                     document.removeEventListener("keydown", listener);
                 }
             } else {
                 throw Error("ZORPG.Key: Code doesn't have an event attached.", code);
+            }
+        },
+        removeAll: function() {
+            this.setPre(null);
+            this.setPost(null);
+            for (key in keys) {
+                this.remove(key);
             }
         }
     };
@@ -404,7 +413,6 @@ ZORPG.Map = function() {
         // Loads a new map
         load: function(data) {
             console.log("ZORPG.Map: Loading and parsing", data);
-            // Clear
             this.clear();
             // Parse tile data
             for (i = 0; i < data.layers.length; ++i) {
@@ -417,6 +425,9 @@ ZORPG.Map = function() {
                     mapData[layer.name].push(row);
                 }
             }
+            // DEBUG - script
+            data.properties.startX = 12;
+            data.properties.startY = 12;
             // Properties
             mapData.properties = data.properties;
             mapData.script = JSON.parse(data.properties.script);
@@ -456,13 +467,15 @@ ZORPG.State = function() {
             }
         },
         // Switches the active state
-        set: function(key) {
+        set: function(key, scope) {
             if (typeof states[key] !== "undefined") {
                 if (ZORPG.Utils.isObj(currentState) && typeof currentState.destroy === "function") {
                     currentState.destroy();
                 }
                 currentState = states[key];
                 if (typeof currentState.init === "function") {
+                    currentState.scope = scope;
+                    // allows to pass objects and varibles to the State
                     currentState.init();
                 }
             } else {
@@ -516,7 +529,7 @@ ZORPG.__name__ = "ZORPG demo";
 // Loading state...preloader and resource management
 ZORPG.State.add("load", {
     init: function() {
-        console.log("ZORPG.State: Loading...");
+        console.log("ZORPG.State.load: Loading...");
         ZORPG.Canvas.init();
         ZORPG.Loader.addTextFileTask("map", "maps/map1.json");
         ZORPG.Loader.addImageTask("splash", "img/splash.png");
@@ -528,7 +541,7 @@ ZORPG.State.add("load", {
         ZORPG.Loader.load();
     },
     destroy: function() {
-        console.log("ZORPG.State: Loading finished.");
+        console.log("ZORPG.State.load: Loading finished.");
     }
 });
 
@@ -536,7 +549,7 @@ ZORPG.State.add("load", {
 ZORPG.State.add("main_menu", {
     name: "Main Menu",
     init: function() {
-        console.log("ZORPG.State: Main menu.");
+        console.log("ZORPG.State.main: Main menu.");
         var splash = new BABYLON.GUI.Image("splash", "img/splash.png");
         var button1 = BABYLON.GUI.Button.CreateSimpleButton("but1", "Click to Start");
         button1.width = "150px";
@@ -559,8 +572,9 @@ ZORPG.State.add("main_menu", {
 ZORPG.State.add("play", {
     name: "Playing",
     init: function() {
-        console.log("ZORPG.State: Playing.");
-        // ??? code. An Entity and a Map
+        console.log("ZORPG.State.play: Playing state init.");
+        // ??? code. An Entity and a Map - THIS IS HACKY
+        // Player should be stored somewhere else?(idea: build a singleton containing entities[actors])
         ZORPG.Map.load(JSON.parse(ZORPG.Loader.tasks[0].text));
         ZORPG.Player = new ZORPG.Ent("player", [ "pos", "actor" ]);
         ZORPG.Player.pos.x = ZORPG.Map.properties.startX;
@@ -574,7 +588,7 @@ ZORPG.State.add("play", {
         });
         ZORPG.Key.add("Escape", function(ev) {
             ZORPG.Canvas.clear();
-            ZORPG.Key.remove("Escape");
+            ZORPG.Key.removeAll();
             ZORPG.State.set("main_menu");
         });
         ZORPG.Key.add("KeyW", function(ev) {
@@ -599,11 +613,52 @@ ZORPG.State.add("play", {
         });
         ZORPG.Key.add("Space", function(ev) {
             console.log("run script");
-            console.log(ZORPG.Map.getScript(ZORPG.Player.pos.x, ZORPG.Player.pos.y));
+            var script = ZORPG.Map.getScript(ZORPG.Player.pos.x, ZORPG.Player.pos.y);
+            if (script) {
+                ZORPG.State.set("script", {
+                    script: script
+                });
+            }
         });
     },
     updatePlayer: function() {
         ZORPG.Canvas.updateCamera(ZORPG.Player.pos);
+    },
+    destroy: function() {
+        ZORPG.Key.removeAll();
+    }
+});
+
+// Refactor this, pronto
+ZORPG.State.add("script", {
+    name: "script",
+    init: function() {
+        console.log("ZORPG.State.script: Running script", this.scope.script);
+        // Init vars
+        var _this = this;
+        this.script = this.scope.script.script;
+        this.line = 0;
+        // Setup handlers
+        ZORPG.Key.add("Escape", function(ev) {
+            ZORPG.Canvas.clear();
+            ZORPG.Key.removeAll();
+            ZORPG.State.set("main_menu");
+        });
+        ZORPG.Key.add("Space", function(ev) {
+            _this.next();
+        });
+        // Run first line
+        this.next();
+    },
+    next: function() {
+        if (this.line < this.script.length) {
+            console.log("ZORPG.State.script: Running script line", this.line, this.script[this.line]);
+            this.line++;
+        } else {
+            // Script ended
+            ZORPG.Key.removeAll();
+            ZORPG.State.set("play");
+        }
     },
     destroy: function() {}
 });
