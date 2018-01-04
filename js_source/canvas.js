@@ -94,8 +94,8 @@ ZORPG.Canvas = (function() {
 
         // Updates camera to reflect player position
         updateCamera: function(player) {
-            console.log("OAW", player, this.camera);
             var _this = this;
+            var turnSpent = player.ang === this.camera.rotation.y;
             this.isUpdating = true;
 
             // Useful while debugging: reset camera rotation & y-axis position
@@ -117,6 +117,9 @@ ZORPG.Canvas = (function() {
                 _this.isUpdating = false; //EVENTPLZ <- ????
                 _this.camera.animations = [];
                 // TODO: Check if a turn was spent
+                if (turnSpent) {
+                    console.log("ZORPG.Canvas: Turn spent")
+                }
             });
 
             // Old update code - maybe an oldschool movement mode? XD
