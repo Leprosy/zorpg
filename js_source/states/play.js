@@ -48,6 +48,10 @@ ZORPG.State.add("play", {
             ZORPG.Player.pos.rotR()
             ZORPG.State.get().updatePlayer();
         });
+        ZORPG.Key.add("Space", function(ev) {
+            console.log("run script")
+            console.log(ZORPG.Map.getScript(ZORPG.Player.pos.x, ZORPG.Player.pos.y));
+        });
     },
 
     updatePlayer: function() {

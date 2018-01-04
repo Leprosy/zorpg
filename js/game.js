@@ -98,8 +98,8 @@ ZORPG.Canvas = function() {
         },
         // Updates camera to reflect player position
         updateCamera: function(player) {
-            console.log("OAW", player, this.camera);
             var _this = this;
+            var turnSpent = player.ang === this.camera.rotation.y;
             this.isUpdating = true;
             // Useful while debugging: reset camera rotation & y-axis position
             this.camera.rotation.x = 0;
@@ -137,6 +137,10 @@ ZORPG.Canvas = function() {
                 _this.isUpdating = false;
                 //EVENTPLZ <- ????
                 _this.camera.animations = [];
+                // TODO: Check if a turn was spent
+                if (turnSpent) {
+                    console.log("ZORPG.Canvas: Turn spent");
+                }
             });
         }
     };
@@ -318,6 +322,7 @@ ZORPG.Key = function() {
     var post = null;
     var listener = function(event) {
         console.log("ZORPG.Key: Event fired.", event);
+        // Pre call
         if (typeof pre === "function") {
             console.log("ZORPG.Key: Pre-call method.");
             var result = pre(event);
@@ -326,10 +331,12 @@ ZORPG.Key = function() {
                 return;
             }
         }
+        // Run registered key handlers
         if (keys.hasOwnProperty(event.code)) {
             console.log("ZORPG.Key: Registered key pressed", event);
             keys[event.code]();
         }
+        // Post call
         if (typeof post === "function") {
             console.log("ZORPG.Key: Post-call method.");
             post(event);
@@ -379,18 +386,22 @@ var ZORPG = ZORPG || {};
 ZORPG.Map = function() {
     var mapData = {};
     return {
+        // Clear old map data
         clear: function() {
             mapData = {
                 floor: [],
                 ceiling: [],
                 object: [],
                 walls: [],
-                properties: {}
+                properties: {},
+                script: {}
             };
         },
+        // DEBUG only, delete this asap - Get the data dict
         getData: function() {
             return mapData;
         },
+        // Loads a new map
         load: function(data) {
             console.log("ZORPG.Map: Loading and parsing", data);
             // Clear
@@ -408,8 +419,18 @@ ZORPG.Map = function() {
             }
             // Properties
             mapData.properties = data.properties;
+            mapData.script = JSON.parse(data.properties.script);
             this.properties = data.properties;
         },
+        // Gets the script code in the position x-y or false if ther is no script
+        getScript: function(x, y) {
+            if (mapData.script.hasOwnProperty(x + "x" + y)) {
+                return mapData.script[x + "x" + y];
+            } else {
+                return false;
+            }
+        },
+        // WTH?
         about: function() {
             return "About";
         }
@@ -575,6 +596,10 @@ ZORPG.State.add("play", {
             console.log("right");
             ZORPG.Player.pos.rotR();
             ZORPG.State.get().updatePlayer();
+        });
+        ZORPG.Key.add("Space", function(ev) {
+            console.log("run script");
+            console.log(ZORPG.Map.getScript(ZORPG.Player.pos.x, ZORPG.Player.pos.y));
         });
     },
     updatePlayer: function() {
