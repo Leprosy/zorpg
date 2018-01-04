@@ -8,6 +8,7 @@ var ZORPG = ZORPG || {};
 
 ZORPG.Canvas = (function() {
     return {
+        isUpdating: false,
         tileSize: 10,
         engine: null,
         scene: null,
@@ -93,81 +94,39 @@ ZORPG.Canvas = (function() {
 
         // Updates camera to reflect player position
         updateCamera: function(player) {
-            this.camera.position.x = player.x * this.tileSize;
+            console.log("OAW", player, this.camera);
+            var _this = this;
+            this.isUpdating = true;
+
+            // Useful while debugging: reset camera rotation & y-axis position
+            this.camera.rotation.x = 0;
+            this.camera.rotation.z = 0;
+            this.camera.position.y = this.tileSize / 4;
+
+            // Set animation and run
+            var aniRot = new BABYLON.Animation("rotate", "rotation.y", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT);
+            var aniX = new BABYLON.Animation("move", "position.x", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT);
+            var aniZ = new BABYLON.Animation("move", "position.z", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT);
+            aniX.setKeys([{frame: 0, value: this.camera.position.x}, {frame: 15, value: player.x * this.tileSize}]);
+            aniZ.setKeys([{frame: 0, value: this.camera.position.z}, {frame: 15, value: player.y * this.tileSize}]);
+            aniRot.setKeys([{frame: 0, value: this.camera.rotation.y}, {frame: 15, value: player.ang}]);
+            this.camera.animations.push(aniX);
+            this.camera.animations.push(aniZ);
+            this.camera.animations.push(aniRot);
+            this.scene.beginAnimation(this.camera, 0, 30, false, 1 , function() {
+                _this.isUpdating = false; //EVENTPLZ <- ????
+                _this.camera.animations = [];
+                // TODO: Check if a turn was spent
+            });
+
+            // Old update code - maybe an oldschool movement mode? XD
+            /*this.camera.position.x = player.x * this.tileSize;
             this.camera.position.z = player.y * this.tileSize;
             this.camera.position.y = this.tileSize / 4;
             this.camera.rotation.x = 0;
             this.camera.rotation.z = 0;
-            this.camera.rotation.y = player.ang;
-        },
-
-        // Movement
-        /*forward: function() { _move(1); },
-        backward: function() { _move(-1); },
-        _move: function(d) {
-
-            var x = this.camera.position.x;
-            var z = this.camera.position.z;
-            var vert = Math.round(Math.cos(this.camera.rotation.y));
-            var horz = Math.round(Math.sin(this.camera.rotation.y));
-            var newx = x + d * horz * this.tileSize;
-            var newz = z + d * vert * this.tileSize;
-
-                var newPx = this.camera.x + d * horz;
-                var newPy = this.camera.y + d * vert;
-
-                if (Game.checkCollision(newPx, newPy)) {;
-                    return;
-                } else {
-                    Game.isMoving = true;
-                    Game.player.x = newPx;
-                    Game.player.y = newPy;
-                    Game.map2dPoint.x = newPx * Game.map2dSize;
-                    Game.map2dPoint.y = newPy * Game.map2dSize;
-
-                    //Animation
-                    var anix = new BABYLON.Animation("move", "position.x", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT);
-                    var aniz = new BABYLON.Animation("move", "position.z", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT);
-                    var keyx = [{frame: 0, value: Game.camera.position.x}, {frame: 15, value: newx}];
-                    var keyz = [{frame: 0, value: Game.camera.position.z}, {frame: 15, value: newz}];
-                    anix.setKeys(keyx);
-                    aniz.setKeys(keyz);
-                    Game.camera.animations.push(anix);
-                    Game.camera.animations.push(aniz);
-                    Game.scene.beginAnimation(Game.camera, 0, 30, false, 1, function() {
-                        Game.isMoving = false; //EVENTPLZ
-                        Game.camera.animations = [];
-
-                        // A turn was spent
-                        //Game.tick();
-                    });
-                }
-        }, */
-
-        // Rotations
-        /*Game.rotateRight = function() { Game._rotate(1); };
-        Game.rotateLeft = function() { Game._rotate(-1); };
-        Game._rotate = function(d) {
-            if (!Game.isMoving) {
-                Game.isMoving = true;
-                var y = Game.camera.rotation.y + d * (Math.PI / 2);
-
-                //Game.camera.rotation.y = y + d * (Math.PI / 2);
-                //Game.isMoving = false;
-                //Animation
-                var ani = new BABYLON.Animation("rotate", "rotation.y", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT);
-                var key = [{frame: 0, value: Game.camera.rotation.y}, {frame: 15, value: y}];
-                ani.setKeys(key);
-                Game.camera.animations.push(ani);
-                Game.scene.beginAnimation(Game.camera, 0, 30, false, 1 , function() {
-                    Game.isMoving = false; //EVENTPLZ
-                    Game.camera.animations = [];
-
-                    // A turn was spent
-                    Game.tick();
-                });
-            }
-        }*/
+            this.camera.rotation.y = player.ang;*/
+        }
     }
 })();
 
