@@ -9,23 +9,26 @@ ZORPG.Map = (function() {
     var mapData = {};
 
     return {
+        // Clear old map data
         clear: function() {
             mapData = {
                 floor: [],
                 ceiling: [],
                 object: [],
                 walls: [],
-                properties: {}
+                properties: {},
+                script: {}
             };
         },
 
+        // DEBUG only, delete this asap - Get the data dict
         getData: function() {
             return mapData;
         },
 
+        // Loads a new map
         load: function(data) {
             console.log("ZORPG.Map: Loading and parsing", data)
-            // Clear
             this.clear();
 
             // Parse tile data
@@ -45,9 +48,20 @@ ZORPG.Map = (function() {
 
             // Properties
             mapData.properties = data.properties;
+            mapData.script = JSON.parse(data.properties.script);
             this.properties = data.properties;
         },
 
+        // Gets the script code in the position x-y or false if ther is no script
+        getScript: function(x, y) {
+            if (mapData.script.hasOwnProperty(x + "x" + y)) {
+                return mapData.script[x + "x" + y];
+            } else {
+                return false;
+            }
+        },
+
+        // WTH?
         about: function() {
             return "About";
         }
