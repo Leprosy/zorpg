@@ -22,6 +22,7 @@ ZORPG.State = (function() {
         set: function(key, scope) {
             if (typeof states[key] !== "undefined") {
                 if (ZORPG.Utils.isObj(currentState) && typeof currentState.destroy === "function") {
+                    console.log("%cZORPG.State." + currentState._id + " ended", "font-weight: bold");
                     currentState.destroy();
                 }
 
@@ -29,6 +30,7 @@ ZORPG.State = (function() {
 
                 if (typeof currentState.init === "function") {
                     currentState.scope = scope; // allows to pass objects and varibles to the State
+                    console.log("%cZORPG.State." + key + " started", "font-weight: bold");
                     currentState.init();
                 }
             } else {

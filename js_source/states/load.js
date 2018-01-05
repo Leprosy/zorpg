@@ -1,7 +1,7 @@
 // Loading state...preloader and resource management
 ZORPG.State.add("load", {
+    name: "Loading...",
     init: function() {
-        console.log("ZORPG.State.load: Loading...");
         ZORPG.Canvas.init();
 
         ZORPG.Loader.addTextFileTask("map", "maps/map1.json");
@@ -14,7 +14,5 @@ ZORPG.State.add("load", {
         ZORPG.Loader.load();
 
     },
-    destroy: function() {
-        console.log("ZORPG.State.load: Loading finished.");
-    }
+    destroy: function() {}
 });

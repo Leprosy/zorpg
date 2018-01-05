@@ -3,8 +3,8 @@ ZORPG.State.add("main_menu", {
     name: "Main Menu",
 
     init: function() {
-        console.log("ZORPG.State.main: Main menu.");
-
+        // Build menu GUI
+        // TODO: Refactor this in a class/module/obj?
         var splash = new BABYLON.GUI.Image("splash", "img/splash.png");
         var button1 = BABYLON.GUI.Button.CreateSimpleButton("but1", "Click to Start");
         button1.width = "150px"
