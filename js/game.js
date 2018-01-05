@@ -616,10 +616,10 @@ ZORPG.State.add("play", {
         });
         ZORPG.Key.add("Space", function(ev) {
             console.log("run script");
-            var script = ZORPG.Map.getScript(ZORPG.Player.pos.x, ZORPG.Player.pos.y);
-            if (script) {
+            var data = ZORPG.Map.getScript(ZORPG.Player.pos.x, ZORPG.Player.pos.y);
+            if (data) {
                 ZORPG.State.set("script", {
-                    script: script
+                    script: data
                 });
             }
         });
@@ -638,8 +638,10 @@ ZORPG.State.add("script", {
     init: function() {
         // Init vars
         var _this = this;
-        this.script = this.scope.script.script;
-        this.line = 0;
+        // If loading a script...else, keep running the stored one
+        if (typeof this.scope.script !== "undefined") {
+            ZORPG.Script.load(this.scope.script);
+        }
         // Setup handlers
         ZORPG.Key.add("Escape", function(ev) {
             ZORPG.Canvas.clear();
@@ -653,16 +655,9 @@ ZORPG.State.add("script", {
         this.next();
     },
     next: function() {
-        if (this.line < this.script.length) {
-            console.log("ZORPG.State.script: Running script line", this.line, this.script[this.line]);
-            this.line++;
-            // Check line
-            ZORPG.State.set("message", {
-                title: "TITLE",
-                content: "THIS IS A MESSAGE"
-            });
+        if (!ZORPG.Script.isComplete()) {
+            ZORPG.Script.run();
         } else {
-            // Script ended
             ZORPG.Key.removeAll();
             ZORPG.State.set("play");
         }
@@ -687,9 +682,36 @@ ZORPG.State.add("message", {
         button1.onPointerUpObservable.add(function() {
             ZORPG.Canvas.GUI.removeControl(text1);
             ZORPG.Canvas.GUI.removeControl(button1);
-            ZORPG.State.set("play");
+            ZORPG.State.set("script");
         });
         ZORPG.Canvas.GUI.addControl(text1);
         ZORPG.Canvas.GUI.addControl(button1);
     }
 });
+
+// Scripting module
+ZORPG.Script = function() {
+    var lineNumber = 0;
+    var script = null;
+    var properties = null;
+    return {
+        // Inits a new script
+        load: function(data) {
+            lineNumber = 0;
+            script = data.script;
+            properties = data.properties;
+        },
+        // Runs a line
+        run: function() {
+            console.log("ZORPG.Script: running line", lineNumber, script[lineNumber]);
+            lineNumber++;
+        },
+        // Ended?
+        isComplete: function() {
+            return lineNumber >= script.length;
+        },
+        taldo: function(args) {
+            return "oaw";
+        }
+    };
+}();

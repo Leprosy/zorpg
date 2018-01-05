@@ -52,10 +52,10 @@ ZORPG.State.add("play", {
         });
         ZORPG.Key.add("Space", function(ev) {
             console.log("run script")
-            var script = ZORPG.Map.getScript(ZORPG.Player.pos.x, ZORPG.Player.pos.y);
+            var data = ZORPG.Map.getScript(ZORPG.Player.pos.x, ZORPG.Player.pos.y);
 
-            if (script) {
-                ZORPG.State.set("script", {script: script});
+            if (data) {
+                ZORPG.State.set("script", {script: data});
             }
         });
     },
@@ -80,8 +80,11 @@ ZORPG.State.add("script", {
     init: function() {
         // Init vars
         var _this = this;
-        this.script = this.scope.script.script;
-        this.line = 0;
+
+        // If loading a script...else, keep running the stored one
+        if (typeof this.scope.script !== "undefined") {
+            ZORPG.Script.load(this.scope.script);
+        }
 
         // Setup handlers
         ZORPG.Key.add("Escape", function(ev) {
@@ -98,7 +101,14 @@ ZORPG.State.add("script", {
     },
 
     next: function() {
-        if (this.line < this.script.length) {
+
+        if (!ZORPG.Script.isComplete()) {
+            ZORPG.Script.run();
+        } else {
+            ZORPG.Key.removeAll();
+            ZORPG.State.set("play");
+        }
+        /*if (this.line < this.script.length) {
             console.log("ZORPG.State.script: Running script line", this.line, this.script[this.line]);
             this.line++;
 
@@ -107,7 +117,7 @@ ZORPG.State.add("script", {
         } else { // Script ended
             ZORPG.Key.removeAll();
             ZORPG.State.set("play");
-        }
+        } */
     },
 
     destroy: function() {}
@@ -134,7 +144,7 @@ ZORPG.State.add("message", {
         button1.onPointerUpObservable.add(function() {
             ZORPG.Canvas.GUI.removeControl(text1);
             ZORPG.Canvas.GUI.removeControl(button1);
-            ZORPG.State.set("play");
+            ZORPG.State.set("script");
         });
 
         ZORPG.Canvas.GUI.addControl(text1);
