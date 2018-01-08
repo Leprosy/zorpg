@@ -21,6 +21,7 @@ ZORPG.State.add("play", {
 
 
         // Set key handlers
+        // TODO: add a post handler to update everything?
         ZORPG.Key.setPre(function(ev) {
             return (!ZORPG.Canvas.isUpdating);
         });
@@ -61,6 +62,7 @@ ZORPG.State.add("play", {
     },
 
     updatePlayer: function() {
+        $("#console").html("Player pos:" + ZORPG.Player.pos.x + "-" + ZORPG.Player.pos.y)
         ZORPG.Canvas.updateCamera(ZORPG.Player.pos);
     },
 

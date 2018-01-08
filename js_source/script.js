@@ -45,11 +45,18 @@ ZORPG.Script = (function() {
             lineNumber = args.onFalse;
             this.run();
         },
+        giveQuest: function(args) {
+            console.log("QUEST GIVEN", args);
+            this.run();
+        },
+        giveGold: function(args) {
+            ZORPG.State.set("message", {mode: "show", msg: "Party found: " + args + " gold"});
+        },
         showDialog: function(args) {
-            console.log("SHOWDIALOG", args)
+            ZORPG.State.set("message", {mode: "showDialog", name: args.name, msg: args.msg});
         },
         show: function(args) {
-            console.log("SHOW", args)
+            ZORPG.State.set("message", {mode: "show", msg: args});
         },
 
         // Seriously?
