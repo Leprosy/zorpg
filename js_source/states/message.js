@@ -1,3 +1,4 @@
+// TODO: Refactor the dialog code into something that one can see...
 ZORPG.State.add("message", {
     name: "message",
 

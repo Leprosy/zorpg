@@ -175,7 +175,7 @@ ZORPG.Ent = function(name, cmp) {
 // Adds a component to the entity
 ZORPG.Ent.prototype.addCmp = function(key) {
     if (ZORPG.Components.hasOwnProperty(key)) {
-        this[key] = ZORPG.Components[key];
+        this[key] = Object.assign({}, ZORPG.Components[key]);
         return this;
     } else {
         throw Error("ZORPG.Ent: Component '" + key + "' not found");
@@ -296,6 +296,37 @@ ZORPG.Components = {
         },
         toString: function() {
             return this.x + "-" + this.y;
+        }
+    },
+    /**
+     * party: Attributes of a party. Quests, awards, list of actors, etc.
+     */
+    party: {
+        gold: 1e3,
+        gems: 50,
+        food: 24,
+        quests: {},
+        awards: {},
+        questItems: {},
+        actors: [],
+        hasQuest: function(key) {
+            return this.quests.hasOwnProperty(key);
+        },
+        giveQuest: function(args) {
+            if (!this.hasQuest(args.questId)) {
+                this.quests[args.questId] = args.desc;
+            }
+        },
+        removeQuest: function(key) {
+            delete this.quests[key];
+        },
+        hasAward: function(key) {
+            return this.awards.hasOwnProperty(key);
+        },
+        giveAward: function(args) {
+            if (!this.hasAward(args.awardId)) {
+                this.awards[args.awardId] = args.desc;
+            }
         }
     },
     /**
@@ -479,12 +510,12 @@ ZORPG.Script = function() {
         },
         // SCRIPTING COMMANDS
         ifAward: function(args) {
-            // if ZORPG.Player.hasAward(args.awardId) { lineNumber = args.onTrue} else
+            // if ZORPG.Party.hasAward(args.awardId) { lineNumber = args.onTrue} else
             lineNumber = args.onFalse;
             this.run();
         },
         ifQuest: function(args) {
-            // if ZORPG.Player.hasQuest(args.awardId) { lineNumber = args.onTrue} else
+            // if ZORPG.Party.hasQuest(args.awardId) { lineNumber = args.onTrue} else
             lineNumber = args.onFalse;
             this.run();
         },
@@ -639,6 +670,7 @@ ZORPG.State.add("main_menu", {
     destroy: function() {}
 });
 
+// TODO: Refactor the dialog code into something that one can see...
 ZORPG.State.add("message", {
     name: "message",
     init: function() {
@@ -672,7 +704,7 @@ ZORPG.State.add("message", {
         button1.cornerRadius = 20;
         button1.background = "green";
         var text1 = new BABYLON.GUI.TextBlock();
-        text1.text = this.scope.name + " says:" + this.scope.msg;
+        text1.text = this.scope.name + " says:\n" + this.scope.msg;
         text1.color = "white";
         text1.top = -100;
         text1.fontSize = 24;
@@ -693,13 +725,11 @@ ZORPG.State.add("play", {
         // ??? code. An Entity and a Map - THIS IS HACKY
         // TODO: Player should be stored somewhere else?(idea: build a singleton containing entities[actors])
         // TODO: Add check for create Player/Map/anytghin
-        if (typeof ZORPG.Player === "undefined") {
+        if (typeof ZORPG.Party === "undefined") {
             ZORPG.Map.load(JSON.parse(ZORPG.Loader.tasks[0].text));
-            ZORPG.Player = new ZORPG.Ent("player", [ "pos", "actor" ]);
-            ZORPG.Player.pos.x = ZORPG.Map.properties.startX;
-            ZORPG.Player.pos.y = ZORPG.Map.properties.startY;
-            ZORPG.Player.actor.name = "SirTaldo";
-            ZORPG.Player.actor.hp = 30;
+            ZORPG.Party = new ZORPG.Ent("player", [ "pos", "party" ]);
+            ZORPG.Party.pos.x = ZORPG.Map.properties.startX;
+            ZORPG.Party.pos.y = ZORPG.Map.properties.startY;
             ZORPG.Canvas.renderMap(ZORPG.Map.getData());
         }
         // Set key handlers
@@ -714,27 +744,27 @@ ZORPG.State.add("play", {
         });
         ZORPG.Key.add("KeyW", function(ev) {
             console.log("up");
-            ZORPG.Player.pos.moveFwd();
+            ZORPG.Party.pos.moveFwd();
             ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("KeyS", function(ev) {
             console.log("down");
-            ZORPG.Player.pos.moveBck();
+            ZORPG.Party.pos.moveBck();
             ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("KeyA", function(ev) {
             console.log("left");
-            ZORPG.Player.pos.rotL();
+            ZORPG.Party.pos.rotL();
             ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("KeyD", function(ev) {
             console.log("right");
-            ZORPG.Player.pos.rotR();
+            ZORPG.Party.pos.rotR();
             ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("Space", function(ev) {
             console.log("run script");
-            var data = ZORPG.Map.getScript(ZORPG.Player.pos.x, ZORPG.Player.pos.y);
+            var data = ZORPG.Map.getScript(ZORPG.Party.pos.x, ZORPG.Party.pos.y);
             if (data) {
                 ZORPG.State.set("script", {
                     script: data
@@ -743,8 +773,8 @@ ZORPG.State.add("play", {
         });
     },
     updatePlayer: function() {
-        $("#console").html("Player pos:" + ZORPG.Player.pos.x + "-" + ZORPG.Player.pos.y);
-        ZORPG.Canvas.updateCamera(ZORPG.Player.pos);
+        $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Party.party) + "\npos:" + JSON.stringify(ZORPG.Party.pos));
+        ZORPG.Canvas.updateCamera(ZORPG.Party.pos);
     },
     destroy: function() {
         ZORPG.Key.removeAll();

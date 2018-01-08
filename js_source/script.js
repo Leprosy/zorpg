@@ -36,12 +36,12 @@ ZORPG.Script = (function() {
 
         // SCRIPTING COMMANDS
         ifAward: function(args) {
-            // if ZORPG.Player.hasAward(args.awardId) { lineNumber = args.onTrue} else
+            // if ZORPG.Party.hasAward(args.awardId) { lineNumber = args.onTrue} else
             lineNumber = args.onFalse;
             this.run();
         },
         ifQuest: function(args) {
-            // if ZORPG.Player.hasQuest(args.awardId) { lineNumber = args.onTrue} else
+            // if ZORPG.Party.hasQuest(args.awardId) { lineNumber = args.onTrue} else
             lineNumber = args.onFalse;
             this.run();
         },
