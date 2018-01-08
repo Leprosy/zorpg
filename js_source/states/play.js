@@ -6,11 +6,11 @@ ZORPG.State.add("play", {
         // ??? code. An Entity and a Map - THIS IS HACKY
         // TODO: Player should be stored somewhere else?(idea: build a singleton containing entities[actors])
         // TODO: Add check for create Player/Map/anytghin
-        if (typeof ZORPG.Party === "undefined") {
+        if (typeof ZORPG.Player === "undefined") {
             ZORPG.Map.load(JSON.parse(ZORPG.Loader.tasks[0].text));
-            ZORPG.Party = new ZORPG.Ent("player", ["pos", "party"]);
-            ZORPG.Party.pos.x = ZORPG.Map.properties.startX;
-            ZORPG.Party.pos.y = ZORPG.Map.properties.startY;
+            ZORPG.Player = new ZORPG.Ent("player", ["pos", "party"]);
+            ZORPG.Player.pos.x = ZORPG.Map.properties.startX;
+            ZORPG.Player.pos.y = ZORPG.Map.properties.startY;
             ZORPG.Canvas.renderMap(ZORPG.Map.getData());
         }
 
@@ -30,27 +30,27 @@ ZORPG.State.add("play", {
         });
         ZORPG.Key.add("KeyW", function(ev) {
             console.log("up")
-            ZORPG.Party.pos.moveFwd()
+            ZORPG.Player.pos.moveFwd()
             ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("KeyS", function(ev) {
             console.log("down")
-            ZORPG.Party.pos.moveBck();
+            ZORPG.Player.pos.moveBck();
             ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("KeyA", function(ev) {
             console.log("left")
-            ZORPG.Party.pos.rotL()
+            ZORPG.Player.pos.rotL()
             ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("KeyD", function(ev) {
             console.log("right")
-            ZORPG.Party.pos.rotR()
+            ZORPG.Player.pos.rotR()
             ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("Space", function(ev) {
             console.log("run script")
-            var data = ZORPG.Map.getScript(ZORPG.Party.pos.x, ZORPG.Party.pos.y);
+            var data = ZORPG.Map.getScript(ZORPG.Player.pos.x, ZORPG.Player.pos.y);
 
             if (data) {
                 ZORPG.State.set("script", {script: data});
@@ -59,8 +59,8 @@ ZORPG.State.add("play", {
     },
 
     updatePlayer: function() {
-        $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Party.party) + "\npos:" + JSON.stringify(ZORPG.Party.pos));
-        ZORPG.Canvas.updateCamera(ZORPG.Party.pos);
+        $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
+        ZORPG.Canvas.updateCamera(ZORPG.Player.pos);
     },
 
     destroy: function() {

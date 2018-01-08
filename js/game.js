@@ -484,12 +484,23 @@ ZORPG.Script = function() {
     var lineNumber = 0;
     var script = null;
     var properties = null;
+    var lastConfirm = null;
     return {
         // Inits a new script
         load: function(data) {
             lineNumber = 0;
             script = data.script;
             properties = data.properties;
+        },
+        // Last confirm
+        lastConfirm: function() {
+            return lastConfirm;
+        },
+        setConfirm: function(bol) {
+            lastConfirm = bol;
+        },
+        clearConfirm: function() {
+            lastConfirm = null;
         },
         // Runs a line
         run: function() {
@@ -509,21 +520,55 @@ ZORPG.Script = function() {
             return lineNumber >= script.length;
         },
         // SCRIPTING COMMANDS
+        ifConfirm: function(args) {
+            if (lastConfirm === null) {
+                lineNumber--;
+                // We will process this command twice
+                ZORPG.State.set("message", {
+                    mode: "showConfirm",
+                    name: "",
+                    msg: "COnfirm this"
+                });
+            } else {
+                if (lastConfirm) {
+                    console.log("yes");
+                    lineNumber = args.onTrue;
+                } else {
+                    console.log("no");
+                    lineNumber = args.onFalse;
+                }
+                lastConfirm = null;
+                this.run();
+            }
+        },
         ifAward: function(args) {
-            // if ZORPG.Party.hasAward(args.awardId) { lineNumber = args.onTrue} else
-            lineNumber = args.onFalse;
+            if (ZORPG.Player.party.hasAward(args.awardId)) {
+                lineNumber = args.onTrue;
+            } else {
+                lineNumber = args.onFalse;
+            }
             this.run();
         },
         ifQuest: function(args) {
-            // if ZORPG.Party.hasQuest(args.awardId) { lineNumber = args.onTrue} else
-            lineNumber = args.onFalse;
+            if (ZORPG.Player.party.hasQuest(args.questId)) {
+                lineNumber = args.onTrue;
+            } else {
+                lineNumber = args.onFalse;
+            }
             this.run();
         },
         giveQuest: function(args) {
             console.log("QUEST GIVEN", args);
+            ZORPG.Player.party.giveQuest(args);
+            this.run();
+        },
+        giveAward: function(args) {
+            console.log("AWARD GIVEN", args);
+            ZORPG.Player.party.giveAward(args);
             this.run();
         },
         giveGold: function(args) {
+            ZORPG.Player.party.gold += args;
             ZORPG.State.set("message", {
                 mode: "show",
                 msg: "Party found: " + args + " gold"
@@ -715,6 +760,44 @@ ZORPG.State.add("message", {
         });
         ZORPG.Canvas.GUI.addControl(text1);
         ZORPG.Canvas.GUI.addControl(button1);
+    },
+    showConfirm: function() {
+        var button1 = BABYLON.GUI.Button.CreateSimpleButton("but1", "Yes");
+        var button2 = BABYLON.GUI.Button.CreateSimpleButton("but2", "No");
+        button1.width = "150px";
+        button1.height = "40px";
+        button1.left = "-100px";
+        button1.color = "white";
+        button1.cornerRadius = 20;
+        button1.background = "green";
+        button2.width = "150px";
+        button2.height = "40px";
+        button2.left = "100px";
+        button2.color = "white";
+        button2.cornerRadius = 20;
+        button2.background = "green";
+        var text1 = new BABYLON.GUI.TextBlock();
+        text1.text = this.scope.name + " says:\n" + this.scope.msg;
+        text1.color = "white";
+        text1.top = -100;
+        text1.fontSize = 24;
+        button1.onPointerUpObservable.add(function() {
+            ZORPG.Canvas.GUI.removeControl(text1);
+            ZORPG.Canvas.GUI.removeControl(button1);
+            ZORPG.Canvas.GUI.removeControl(button2);
+            ZORPG.Script.setConfirm(true);
+            ZORPG.State.set("script");
+        });
+        button2.onPointerUpObservable.add(function() {
+            ZORPG.Canvas.GUI.removeControl(text1);
+            ZORPG.Canvas.GUI.removeControl(button1);
+            ZORPG.Canvas.GUI.removeControl(button2);
+            ZORPG.Script.setConfirm(false);
+            ZORPG.State.set("script");
+        });
+        ZORPG.Canvas.GUI.addControl(text1);
+        ZORPG.Canvas.GUI.addControl(button1);
+        ZORPG.Canvas.GUI.addControl(button2);
     }
 });
 
@@ -725,11 +808,11 @@ ZORPG.State.add("play", {
         // ??? code. An Entity and a Map - THIS IS HACKY
         // TODO: Player should be stored somewhere else?(idea: build a singleton containing entities[actors])
         // TODO: Add check for create Player/Map/anytghin
-        if (typeof ZORPG.Party === "undefined") {
+        if (typeof ZORPG.Player === "undefined") {
             ZORPG.Map.load(JSON.parse(ZORPG.Loader.tasks[0].text));
-            ZORPG.Party = new ZORPG.Ent("player", [ "pos", "party" ]);
-            ZORPG.Party.pos.x = ZORPG.Map.properties.startX;
-            ZORPG.Party.pos.y = ZORPG.Map.properties.startY;
+            ZORPG.Player = new ZORPG.Ent("player", [ "pos", "party" ]);
+            ZORPG.Player.pos.x = ZORPG.Map.properties.startX;
+            ZORPG.Player.pos.y = ZORPG.Map.properties.startY;
             ZORPG.Canvas.renderMap(ZORPG.Map.getData());
         }
         // Set key handlers
@@ -744,27 +827,27 @@ ZORPG.State.add("play", {
         });
         ZORPG.Key.add("KeyW", function(ev) {
             console.log("up");
-            ZORPG.Party.pos.moveFwd();
+            ZORPG.Player.pos.moveFwd();
             ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("KeyS", function(ev) {
             console.log("down");
-            ZORPG.Party.pos.moveBck();
+            ZORPG.Player.pos.moveBck();
             ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("KeyA", function(ev) {
             console.log("left");
-            ZORPG.Party.pos.rotL();
+            ZORPG.Player.pos.rotL();
             ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("KeyD", function(ev) {
             console.log("right");
-            ZORPG.Party.pos.rotR();
+            ZORPG.Player.pos.rotR();
             ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("Space", function(ev) {
             console.log("run script");
-            var data = ZORPG.Map.getScript(ZORPG.Party.pos.x, ZORPG.Party.pos.y);
+            var data = ZORPG.Map.getScript(ZORPG.Player.pos.x, ZORPG.Player.pos.y);
             if (data) {
                 ZORPG.State.set("script", {
                     script: data
@@ -773,8 +856,8 @@ ZORPG.State.add("play", {
         });
     },
     updatePlayer: function() {
-        $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Party.party) + "\npos:" + JSON.stringify(ZORPG.Party.pos));
-        ZORPG.Canvas.updateCamera(ZORPG.Party.pos);
+        $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
+        ZORPG.Canvas.updateCamera(ZORPG.Player.pos);
     },
     destroy: function() {
         ZORPG.Key.removeAll();
