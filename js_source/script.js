@@ -36,7 +36,8 @@ ZORPG.Script = (function() {
                 this[action](args);
 
             } else {
-                throw Error("ZORPG.Script: Script already completed.");
+                console.log("ZORPG.Script: Script is completed.");
+                ZORPG.State.set("play");
             }
         },
 
@@ -83,6 +84,11 @@ ZORPG.Script = (function() {
             this.run();
         },
 
+        exit: function(args) {
+            lineNumber = script.length;
+            this.run();
+        },
+
         giveQuest: function(args) {
             console.log("QUEST GIVEN", args);
             ZORPG.Player.party.giveQuest(args);
@@ -96,6 +102,11 @@ ZORPG.Script = (function() {
         giveGold: function(args) {
             ZORPG.Player.party.gold += args;
             ZORPG.State.set("message", {mode: "show", msg: "Party found: " + args + " gold"});
+        },
+        removeQuest: function(args) {
+            console.log("QUEST FINISHED", args);
+            ZORPG.Player.party.removeQuest(args);
+            this.run();
         },
 
         showDialog: function(args) {

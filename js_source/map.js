@@ -32,13 +32,13 @@ ZORPG.Map = (function() {
             this.clear();
 
             // Parse tile data
-            for (i = 0; i < data.layers.length; ++i) {
+            for (var i = 0; i < data.layers.length; ++i) {
                 var layer = data.layers[i];
 
-                for (j = 0; j < layer.height; ++j) {
+                for (var j = 0; j < layer.height; ++j) {
                     var row = [];
 
-                    for (k = 0 + j * layer.width; k < (j + 1) * layer.width; ++k) {
+                    for (var k = 0 + j * layer.width; k < (j + 1) * layer.width; ++k) {
                         row.push(layer.data[k]);
                     }
 

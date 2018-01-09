@@ -54,6 +54,8 @@ ZORPG.Canvas = function() {
             // Light
             var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), this.scene);
             light.intensity = .7;
+            // Skybox
+            //this.skyBox = this.scene.createDefaultSkybox(new BABYLON.Texture("img/sky1.png", this.scene), true, 10);
             // GUI
             this.GUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
             // Rendering loop
@@ -68,25 +70,50 @@ ZORPG.Canvas = function() {
             }
         },
         // Render a map
-        renderMap: function(map) {
+        renderMap: function() {
+            var map = ZORPG.Map.getData();
             console.log("ZORPG.Canvas: Rendering map", map);
             // Mats
             var materials = [];
-            for (i = 0; i < 10; ++i) {
+            for (var i = 0; i < 10; ++i) {
                 var mat = new BABYLON.StandardMaterial("txt" + i, this.scene);
                 mat.diffuseColor = new BABYLON.Color3(i / 10, i / 10, i / 10);
                 materials.push(mat);
             }
-            // Floors
-            for (y = 0; y < map.floor.length; ++y) {
-                for (x = 0; x < map.floor[y].length; ++x) {
-                    var mesh = BABYLON.Mesh.CreateBox("floor" + x + "-" + y, this.tileSize, ZORPG.Canvas.scene);
-                    mesh.position.x = x * this.tileSize;
-                    mesh.position.z = y * this.tileSize;
-                    mesh.position.y = 0;
-                    mesh.scaling.y = .1;
-                    mesh.material = materials[map.floor[y][x]];
+            var monsterMaterial = new BABYLON.StandardMaterial("txtmon", this.scene);
+            monsterMaterial.diffuseColor = new BABYLON.Color3(100, 0, 0);
+            var objMaterial = new BABYLON.StandardMaterial("txtobj", this.scene);
+            objMaterial.diffuseColor = new BABYLON.Color3(0, 0, 20);
+            // Floors & Objects
+            for (var y = 0; y < map.floor.length; ++y) {
+                for (var x = 0; x < map.floor[y].length; ++x) {
+                    var meshf = BABYLON.Mesh.CreateBox("floor" + x + "-" + y, this.tileSize, this.scene);
+                    meshf.position.x = x * this.tileSize;
+                    meshf.position.z = y * this.tileSize;
+                    meshf.position.y = 0;
+                    meshf.scaling.y = .1;
+                    meshf.material = materials[map.floor[y][x]];
+                    if (map.object[y][x] != 0) {
+                        var mesho = BABYLON.Mesh.CreateBox("object" + x + "-" + y, this.tileSize / 2, this.scene);
+                        mesho.position.x = x * this.tileSize;
+                        mesho.position.z = y * this.tileSize;
+                        mesho.position.y = this.tileSize / 4;
+                        mesho.material = objMaterial;
+                    }
                 }
+            }
+            // Monsters
+            for (var i = 0; i < ZORPG.Monsters.length; ++i) {
+                var monster = ZORPG.Monsters[i];
+                console.log(monster);
+                var mesh = BABYLON.MeshBuilder.CreateSphere("monster" + i, {
+                    diameter: this.tileSize * .4
+                }, this.scene);
+                //var mesh = BABYLON.Mesh.CreateBox("monster" + i, this.tileSize, this.scene);
+                mesh.position.x = monster.pos.x * this.tileSize;
+                mesh.position.z = monster.pos.y * this.tileSize;
+                mesh.position.y = this.tileSize / 4;
+                mesh.material = monsterMaterial;
             }
             // Put camera/player
             this.camera.position.x = map.properties.startX * this.tileSize;
@@ -96,8 +123,8 @@ ZORPG.Canvas = function() {
             this.camera.rotation.z = 0;
             this.camera.rotation.y = 0;
         },
-        // Updates camera to reflect player position
-        updateCamera: function(player) {
+        // Updates canvas objects; positions, etc.
+        update: function(player) {
             var _this = this;
             var turnSpent = player.ang === this.camera.rotation.y;
             this.isUpdating = true;
@@ -164,7 +191,7 @@ ZORPG.Ent = function(name, cmp) {
     this.tags = [];
     // Add components, if any
     if (ZORPG.Utils.isArray(cmp)) {
-        for (i = 0; i < cmp.length; ++i) {
+        for (var i = 0; i < cmp.length; ++i) {
             this.addCmp(cmp[i]);
         }
     }
@@ -206,7 +233,7 @@ ZORPG.Ent.prototype.hasTag = function(tag) {
 };
 
 ZORPG.Ent.prototype.hasAllTags = function(tagList) {
-    for (i = 0; i < tagList.length; ++i) {
+    for (var i = 0; i < tagList.length; ++i) {
         if (!this.hasTag(tagList[i])) {
             return false;
         }
@@ -219,7 +246,7 @@ ZORPG.Ent.prototype.hasCmp = function(cmp) {
 };
 
 ZORPG.Ent.prototype.hasAllCmp = function(cmpList) {
-    for (i in cmpList) {
+    for (var i in cmpList) {
         if (!this.hasCmp(cmpList[i])) {
             return false;
         }
@@ -252,95 +279,7 @@ ZORPG.EntGroup.prototype.queryCmp = function(cmpList) {};
 /**
  * Base components
  */
-ZORPG.Components = {
-    /**
-     * pos : Component that provides position, facing angle and methods
-     *       to calculate movement coordinates, in order to perform checks on 
-     *       a map object and movement.
-     */
-    pos: {
-        x: 0,
-        y: 0,
-        ang: 0,
-        rotR: function() {
-            this.ang = (this.ang + Math.PI / 2) % (Math.PI * 2);
-        },
-        rotL: function() {
-            this.ang = (this.ang - Math.PI / 2) % (Math.PI * 2);
-        },
-        getFwd: function() {
-            var x = Math.round(this.x + Math.sin(this.ang));
-            var y = Math.round(this.y + Math.cos(this.ang));
-            return {
-                x: x,
-                y: y
-            };
-        },
-        getBck: function() {
-            var x = Math.round(this.x - Math.sin(this.ang));
-            var y = Math.round(this.y - Math.cos(this.ang));
-            return {
-                x: x,
-                y: y
-            };
-        },
-        moveFwd: function() {
-            var pos = this.getFwd();
-            this.x = pos.x;
-            this.y = pos.y;
-        },
-        moveBck: function() {
-            var pos = this.getBck();
-            this.x = pos.x;
-            this.y = pos.y;
-        },
-        toString: function() {
-            return this.x + "-" + this.y;
-        }
-    },
-    /**
-     * party: Attributes of a party. Quests, awards, list of actors, etc.
-     */
-    party: {
-        gold: 1e3,
-        gems: 50,
-        food: 24,
-        quests: {},
-        awards: {},
-        questItems: {},
-        actors: [],
-        hasQuest: function(key) {
-            return this.quests.hasOwnProperty(key);
-        },
-        giveQuest: function(args) {
-            if (!this.hasQuest(args.questId)) {
-                this.quests[args.questId] = args.desc;
-            }
-        },
-        removeQuest: function(key) {
-            delete this.quests[key];
-        },
-        hasAward: function(key) {
-            return this.awards.hasOwnProperty(key);
-        },
-        giveAward: function(args) {
-            if (!this.hasAward(args.awardId)) {
-                this.awards[args.awardId] = args.desc;
-            }
-        }
-    },
-    /**
-     * actor: Component that provides actor attributes, like HPs, character stats, etc.
-     */
-    actor: {
-        hp: 0,
-        name: "",
-        speed: 0,
-        toString: function() {
-            return this.name + ":" + this.hp + "hp";
-        }
-    }
-};
+ZORPG.Components = {};
 
 var ZORPG = ZORPG || {};
 
@@ -409,7 +348,7 @@ ZORPG.Key = function() {
         removeAll: function() {
             this.setPre(null);
             this.setPost(null);
-            for (key in keys) {
+            for (var key in keys) {
                 this.remove(key);
             }
         }
@@ -446,11 +385,11 @@ ZORPG.Map = function() {
             console.log("ZORPG.Map: Loading and parsing", data);
             this.clear();
             // Parse tile data
-            for (i = 0; i < data.layers.length; ++i) {
+            for (var i = 0; i < data.layers.length; ++i) {
                 var layer = data.layers[i];
-                for (j = 0; j < layer.height; ++j) {
+                for (var j = 0; j < layer.height; ++j) {
                     var row = [];
-                    for (k = 0 + j * layer.width; k < (j + 1) * layer.width; ++k) {
+                    for (var k = 0 + j * layer.width; k < (j + 1) * layer.width; ++k) {
                         row.push(layer.data[k]);
                     }
                     mapData[layer.name].push(row);
@@ -512,7 +451,8 @@ ZORPG.Script = function() {
                 lineNumber++;
                 this[action](args);
             } else {
-                throw Error("ZORPG.Script: Script already completed.");
+                console.log("ZORPG.Script: Script is completed.");
+                ZORPG.State.set("play");
             }
         },
         // Check if script has ended
@@ -557,6 +497,10 @@ ZORPG.Script = function() {
             }
             this.run();
         },
+        exit: function(args) {
+            lineNumber = script.length;
+            this.run();
+        },
         giveQuest: function(args) {
             console.log("QUEST GIVEN", args);
             ZORPG.Player.party.giveQuest(args);
@@ -573,6 +517,11 @@ ZORPG.Script = function() {
                 mode: "show",
                 msg: "Party found: " + args + " gold"
             });
+        },
+        removeQuest: function(args) {
+            console.log("QUEST FINISHED", args);
+            ZORPG.Player.party.removeQuest(args);
+            this.run();
         },
         showDialog: function(args) {
             ZORPG.State.set("message", {
@@ -662,6 +611,21 @@ ZORPG.Utils = {
     },
     isArray: function(thing) {
         return Object.prototype.toString.call(thing) === "[object Array]";
+    },
+    die: function(str) {
+        try {
+            //xdy+z => x dices of y faces, ie (random(y) * x) + z
+            var plus = str.split("+");
+            var die = plus[0];
+            plus = 1 * plus[1] || 0;
+            die = die.split("d");
+            var factor = 1 * die[0];
+            var faces = 1 * die[1];
+            return plus + Math.round(Math.random() * faces) * factor;
+        } catch (e) {
+            console.error("Game.Utils.die: Bad die string", str);
+            return false;
+        }
     }
 };
 
@@ -805,15 +769,24 @@ ZORPG.State.add("message", {
 ZORPG.State.add("play", {
     name: "Playing",
     init: function() {
-        // ??? code. An Entity and a Map - THIS IS HACKY
-        // TODO: Player should be stored somewhere else?(idea: build a singleton containing entities[actors])
+        // Test code. Player, Monsters and Map - THIS IS HACKY, I know
+        // TODO: Player, monsters should be stored somewhere else?(idea: build a singleton containing entities[actors])
         // TODO: Add check for create Player/Map/anytghin
         if (typeof ZORPG.Player === "undefined") {
             ZORPG.Map.load(JSON.parse(ZORPG.Loader.tasks[0].text));
             ZORPG.Player = new ZORPG.Ent("player", [ "pos", "party" ]);
             ZORPG.Player.pos.x = ZORPG.Map.properties.startX;
             ZORPG.Player.pos.y = ZORPG.Map.properties.startY;
-            ZORPG.Canvas.renderMap(ZORPG.Map.getData());
+            ZORPG.Monsters = [];
+            for (var i = 0; i < 3; ++i) {
+                var ent = new ZORPG.Ent("monster" + i, [ "pos", "actor" ]);
+                ent.pos.x = ZORPG.Utils.die("1d15");
+                ent.pos.y = ZORPG.Utils.die("1d15");
+                ent.actor.name = "Monster " + i;
+                ent.actor.hp = 30;
+                ZORPG.Monsters.push(ent);
+            }
+            ZORPG.Canvas.renderMap();
         }
         // Set key handlers
         // TODO: add a post handler to update everything?
@@ -826,27 +799,22 @@ ZORPG.State.add("play", {
             ZORPG.State.set("main_menu");
         });
         ZORPG.Key.add("KeyW", function(ev) {
-            console.log("up");
             ZORPG.Player.pos.moveFwd();
             ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("KeyS", function(ev) {
-            console.log("down");
             ZORPG.Player.pos.moveBck();
             ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("KeyA", function(ev) {
-            console.log("left");
             ZORPG.Player.pos.rotL();
             ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("KeyD", function(ev) {
-            console.log("right");
             ZORPG.Player.pos.rotR();
             ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("Space", function(ev) {
-            console.log("run script");
             var data = ZORPG.Map.getScript(ZORPG.Player.pos.x, ZORPG.Player.pos.y);
             if (data) {
                 ZORPG.State.set("script", {
@@ -854,10 +822,12 @@ ZORPG.State.add("play", {
                 });
             }
         });
+        // Update
+        this.updatePlayer();
     },
     updatePlayer: function() {
         $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
-        ZORPG.Canvas.updateCamera(ZORPG.Player.pos);
+        ZORPG.Canvas.update(ZORPG.Player.pos);
     },
     destroy: function() {
         ZORPG.Key.removeAll();
@@ -899,3 +869,99 @@ ZORPG.State.add("script", {
     },
     destroy: function() {}
 });
+
+/**
+ * actor: Component that provides actor attributes, like HPs, character stats, etc.
+ */
+ZORPG.Components.actor = {
+    hp: 0,
+    xp: 0,
+    level: 1,
+    name: "",
+    speed: 0,
+    str: 1,
+    spd: 1,
+    con: 1,
+    ac: 0,
+    toString: function() {
+        return this.name + ":" + this.hp + "hp";
+    }
+};
+
+/**
+ * party: Attributes of a party. Quests, awards, list of actors, etc.
+ */
+ZORPG.Components.party = {
+    gold: 1e3,
+    gems: 50,
+    food: 24,
+    quests: {},
+    awards: {},
+    questItems: {},
+    actors: [],
+    hasQuest: function(key) {
+        return this.quests.hasOwnProperty(key);
+    },
+    giveQuest: function(args) {
+        if (!this.hasQuest(args.questId)) {
+            this.quests[args.questId] = args.desc;
+        }
+    },
+    removeQuest: function(key) {
+        delete this.quests[key];
+    },
+    hasAward: function(key) {
+        return this.awards.hasOwnProperty(key);
+    },
+    giveAward: function(args) {
+        if (!this.hasAward(args.awardId)) {
+            this.awards[args.awardId] = args.desc;
+        }
+    }
+};
+
+/**
+ * pos : Component that provides position, facing angle and methods
+ *       to calculate movement coordinates, in order to perform checks on 
+ *       a map object and movement.
+ */
+ZORPG.Components.pos = {
+    x: 0,
+    y: 0,
+    ang: 0,
+    rotR: function() {
+        this.ang = this.ang + Math.PI / 2;
+    },
+    rotL: function() {
+        this.ang = this.ang - Math.PI / 2;
+    },
+    getFwd: function() {
+        var x = Math.round(this.x + Math.sin(this.ang));
+        var y = Math.round(this.y + Math.cos(this.ang));
+        return {
+            x: x,
+            y: y
+        };
+    },
+    getBck: function() {
+        var x = Math.round(this.x - Math.sin(this.ang));
+        var y = Math.round(this.y - Math.cos(this.ang));
+        return {
+            x: x,
+            y: y
+        };
+    },
+    moveFwd: function() {
+        var pos = this.getFwd();
+        this.x = pos.x;
+        this.y = pos.y;
+    },
+    moveBck: function() {
+        var pos = this.getBck();
+        this.x = pos.x;
+        this.y = pos.y;
+    },
+    toString: function() {
+        return this.x + "-" + this.y;
+    }
+};

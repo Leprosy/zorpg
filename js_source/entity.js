@@ -17,7 +17,7 @@ ZORPG.Ent = function(name, cmp) {
 
     // Add components, if any
     if (ZORPG.Utils.isArray(cmp)) {
-        for (i = 0; i < cmp.length; ++i) {
+        for (var i = 0; i < cmp.length; ++i) {
             this.addCmp(cmp[i]);
         }
     }
@@ -55,7 +55,7 @@ ZORPG.Ent.prototype.hasTag = function(tag) {
     return this.tags.indexOf(tag) > -1;
 };
 ZORPG.Ent.prototype.hasAllTags = function(tagList) {
-    for (i = 0; i < tagList.length; ++i) {
+    for (var i = 0; i < tagList.length; ++i) {
         if (!this.hasTag(tagList[i])) {
             return false;
         }
@@ -67,7 +67,7 @@ ZORPG.Ent.prototype.hasCmp = function(cmp) {
     return this.hasOwnProperty(cmp);
 };
 ZORPG.Ent.prototype.hasAllCmp = function(cmpList) {
-    for (i in cmpList) {
+    for (var i in cmpList) {
         if (!this.hasCmp(cmpList[i])) {
             return false;
         }
@@ -106,120 +106,4 @@ ZORPG.EntGroup.prototype.queryCmp = function(cmpList) {};
 /**
  * Base components
  */
-ZORPG.Components = {
-    /**
-     * pos : Component that provides position, facing angle and methods
-     *       to calculate movement coordinates, in order to perform checks on 
-     *       a map object and movement.
-     */
-    "pos": {
-        x: 0,
-        y: 0,
-        ang: 0,
-
-        rotR: function() {
-            this.ang = (this.ang + Math.PI / 2) % (Math.PI * 2);
-        },
-        rotL: function() {
-            this.ang = (this.ang - Math.PI / 2) % (Math.PI * 2);
-        },
-        getFwd: function() {
-            var x = Math.round(this.x + Math.sin(this.ang));
-            var y = Math.round(this.y + Math.cos(this.ang));
-
-            return { x: x, y : y};
-        },
-        getBck: function() {
-            var x = Math.round(this.x - Math.sin(this.ang));
-            var y = Math.round(this.y - Math.cos(this.ang));
-
-            return { x: x, y : y};
-        },
-        moveFwd: function() {
-            var pos = this.getFwd();
-            this.x = pos.x;
-            this.y = pos.y;
-        },
-        moveBck: function() {
-            var pos = this.getBck();
-            this.x = pos.x;
-            this.y = pos.y;
-        },
-
-        toString: function() {
-            return this.x + "-" + this.y;
-        }
-    },
-
-    /**
-     * party: Attributes of a party. Quests, awards, list of actors, etc.
-     */
-    "party": {
-        gold: 1000,
-        gems: 50,
-        food: 24,
-        quests: {},
-        awards: {},
-        questItems: {},
-        actors: [],
-
-        hasQuest: function(key) {
-            return this.quests.hasOwnProperty(key);
-        },
-        giveQuest: function(args) {
-            if (!this.hasQuest(args.questId)) {
-                this.quests[args.questId] = args.desc;
-            }
-        },
-        removeQuest: function(key) {
-            delete this.quests[key];
-        },
-        hasAward: function(key) {
-            return this.awards.hasOwnProperty(key);
-        },
-        giveAward: function(args) {
-            if (!this.hasAward(args.awardId)) {
-                this.awards[args.awardId] = args.desc;
-            }
-        }
-    },
-
-    /**
-     * actor: Component that provides actor attributes, like HPs, character stats, etc.
-     */
-    "actor": {
-        hp: 0,
-        name: "",
-        speed: 0,
-
-        toString: function() {
-            return this.name + ":" + this.hp + "hp";
-        }
-    }
-}
-
-
-/*
-}
-
-//Demo
-var E = new ZORPG.Ent("taldo");
-E.addCmp('cmp1');
-E.addCmp('cmp2');
-E.addCmp('cmp3');
-console.log(JSON.stringify(E));
-
-E.removeCmp('cmp2');
-E.removeCmp('none');
-console.log(JSON.stringify(E));
-
-E.addTag("tag1");
-E.addTag("tag2");
-console.log(JSON.stringify(E));
-
-E.removeTag("tag1");
-E.removeTag("none");
-console.log(JSON.stringify(E));
-
-EG = new ZORPG.EntGroup();
-EG.add(); */
+ZORPG.Components = {};

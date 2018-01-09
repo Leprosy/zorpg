@@ -77,7 +77,7 @@ ZORPG.Key = (function() {
             this.setPre(null);
             this.setPost(null);
 
-            for (key in keys) {
+            for (var key in keys) {
                 this.remove(key);
             }
         }

@@ -41,6 +41,9 @@ ZORPG.Canvas = (function() {
             var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), this.scene);
             light.intensity = 0.7;
 
+            // Skybox
+            //this.skyBox = this.scene.createDefaultSkybox(new BABYLON.Texture("img/sky1.png", this.scene), true, 10);
+
             // GUI
             this.GUI = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
@@ -58,29 +61,53 @@ ZORPG.Canvas = (function() {
         },
 
         // Render a map
-        renderMap: function(map) {
+        renderMap: function() {
+            var map = ZORPG.Map.getData();
             console.log("ZORPG.Canvas: Rendering map", map)
 
             // Mats
             var materials = [];
 
-            for (i = 0; i < 10; ++i) {
+            for (var i = 0; i < 10; ++i) {
                 var mat = new BABYLON.StandardMaterial("txt" + i, this.scene);
                 mat.diffuseColor = new BABYLON.Color3(i / 10, i / 10, i / 10);
                 materials.push(mat);
             }
+            var monsterMaterial = new BABYLON.StandardMaterial("txtmon", this.scene);
+            monsterMaterial.diffuseColor = new BABYLON.Color3(100, 0, 0);
+            var objMaterial = new BABYLON.StandardMaterial("txtobj", this.scene);
+            objMaterial.diffuseColor = new BABYLON.Color3(0, 0, 20);
 
-            // Floors
-            for (y = 0; y < map.floor.length; ++y) {
-                for (x = 0; x < map.floor[y].length; ++x) {
-                    var mesh = BABYLON.Mesh.CreateBox("floor" + x + "-" + y, this.tileSize, ZORPG.Canvas.scene);
+            // Floors & Objects
+            for (var y = 0; y < map.floor.length; ++y) {
+                for (var x = 0; x < map.floor[y].length; ++x) {
+                    var meshf = BABYLON.Mesh.CreateBox("floor" + x + "-" + y, this.tileSize, this.scene);
+                    meshf.position.x = x * this.tileSize;
+                    meshf.position.z = y * this.tileSize;
+                    meshf.position.y = 0;
+                    meshf.scaling.y = 0.1;
+                    meshf.material = materials[map.floor[y][x]];
 
-                    mesh.position.x = x * this.tileSize;
-                    mesh.position.z = y * this.tileSize;
-                    mesh.position.y = 0;
-                    mesh.scaling.y = 0.1;
-                    mesh.material = materials[map.floor[y][x]];
+                    if (map.object[y][x] != 0) {
+                        var mesho = BABYLON.Mesh.CreateBox("object" + x + "-" + y, this.tileSize / 2, this.scene);
+                        mesho.position.x = x * this.tileSize;
+                        mesho.position.z = y * this.tileSize;
+                        mesho.position.y = this.tileSize / 4;
+                        mesho.material = objMaterial;
+                    }
                 }
+            }
+
+            // Monsters
+            for (var i = 0; i < ZORPG.Monsters.length; ++i) {
+                var monster = ZORPG.Monsters[i];
+                console.log(monster)
+                var mesh = BABYLON.MeshBuilder.CreateSphere("monster" + i, {diameter: this.tileSize * 0.4}, this.scene);
+                //var mesh = BABYLON.Mesh.CreateBox("monster" + i, this.tileSize, this.scene);
+                mesh.position.x = monster.pos.x * this.tileSize;
+                mesh.position.z = monster.pos.y * this.tileSize;
+                mesh.position.y = this.tileSize / 4;
+                mesh.material = monsterMaterial;
             }
 
             // Put camera/player
@@ -92,8 +119,8 @@ ZORPG.Canvas = (function() {
             this.camera.rotation.y = 0;
         },
 
-        // Updates camera to reflect player position
-        updateCamera: function(player) {
+        // Updates canvas objects; positions, etc.
+        update: function(player) {
             var _this = this;
             var turnSpent = player.ang === this.camera.rotation.y;
             this.isUpdating = true;
