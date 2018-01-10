@@ -28,8 +28,16 @@ ZORPG.State.add("play", {
 
         // Set key handlers
         // TODO: add a post handler to update everything?
+        var _this = this;
         ZORPG.Key.setPre(function(ev) {
             return (!ZORPG.Canvas.isUpdating);
+        });
+        ZORPG.Key.setPost(function(ev) {
+            if (ev.code!== "Escape") {
+                _this.updatePlayer();
+            } else {
+                console.log("ESC pressed")
+            }
         });
 
         ZORPG.Key.add("Escape", function(ev) {
@@ -39,34 +47,43 @@ ZORPG.State.add("play", {
         });
         ZORPG.Key.add("KeyW", function(ev) {
             ZORPG.Player.pos.moveFwd()
-            ZORPG.State.get().updatePlayer();
+            _this.updateMonsters();
         });
         ZORPG.Key.add("KeyS", function(ev) {
             ZORPG.Player.pos.moveBck();
-            ZORPG.State.get().updatePlayer();
+            _this.updateMonsters();
         });
         ZORPG.Key.add("KeyA", function(ev) {
             ZORPG.Player.pos.rotL()
-            ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("KeyD", function(ev) {
             ZORPG.Player.pos.rotR()
-            ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("Space", function(ev) {
             var data = ZORPG.Map.getScript(ZORPG.Player.pos.x, ZORPG.Player.pos.y);
 
             if (data) {
                 ZORPG.State.set("script", {script: data});
+            } else {
+                _this.updateMonsters();
             }
         });
 
-        // Update
         this.updatePlayer();
     },
 
+    updateMonsters: function() {
+        // Monsters
+        for (var i = 0; i < 3; ++i) {
+            ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos);
+        }
+    },
+
     updatePlayer: function() {
+        // Update HUD
         $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
+
+        // Update Canvas
         ZORPG.Canvas.update(ZORPG.Player.pos);
     },
 

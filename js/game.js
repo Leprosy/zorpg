@@ -125,6 +125,14 @@ ZORPG.Canvas = function() {
         },
         // Updates canvas objects; positions, etc.
         update: function(player) {
+            // Monsters
+            // TODO: animated translation
+            for (var i = 0; i < ZORPG.Monsters.length; ++i) {
+                var monster = ZORPG.Canvas.scene.getMeshByID("monster" + i);
+                monster.position.x = ZORPG.Monsters[i].pos.x * this.tileSize;
+                monster.position.z = ZORPG.Monsters[i].pos.y * this.tileSize;
+            }
+            // Party
             var _this = this;
             var turnSpent = player.ang === this.camera.rotation.y;
             this.isUpdating = true;
@@ -164,7 +172,7 @@ ZORPG.Canvas = function() {
                 _this.isUpdating = false;
                 //EVENTPLZ <- ????
                 _this.camera.animations = [];
-                // TODO: Check if a turn was spent
+                // TODO: Check if a turn was spent doesn't belong here
                 if (turnSpent) {
                     console.log("ZORPG.Canvas: Turn spent");
                 }
@@ -790,8 +798,16 @@ ZORPG.State.add("play", {
         }
         // Set key handlers
         // TODO: add a post handler to update everything?
+        var _this = this;
         ZORPG.Key.setPre(function(ev) {
             return !ZORPG.Canvas.isUpdating;
+        });
+        ZORPG.Key.setPost(function(ev) {
+            if (ev.code !== "Escape") {
+                _this.updatePlayer();
+            } else {
+                console.log("ESC pressed");
+            }
         });
         ZORPG.Key.add("Escape", function(ev) {
             ZORPG.Canvas.clear();
@@ -800,19 +816,17 @@ ZORPG.State.add("play", {
         });
         ZORPG.Key.add("KeyW", function(ev) {
             ZORPG.Player.pos.moveFwd();
-            ZORPG.State.get().updatePlayer();
+            _this.updateMonsters();
         });
         ZORPG.Key.add("KeyS", function(ev) {
             ZORPG.Player.pos.moveBck();
-            ZORPG.State.get().updatePlayer();
+            _this.updateMonsters();
         });
         ZORPG.Key.add("KeyA", function(ev) {
             ZORPG.Player.pos.rotL();
-            ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("KeyD", function(ev) {
             ZORPG.Player.pos.rotR();
-            ZORPG.State.get().updatePlayer();
         });
         ZORPG.Key.add("Space", function(ev) {
             var data = ZORPG.Map.getScript(ZORPG.Player.pos.x, ZORPG.Player.pos.y);
@@ -820,13 +834,22 @@ ZORPG.State.add("play", {
                 ZORPG.State.set("script", {
                     script: data
                 });
+            } else {
+                _this.updateMonsters();
             }
         });
-        // Update
         this.updatePlayer();
     },
+    updateMonsters: function() {
+        // Monsters
+        for (var i = 0; i < 3; ++i) {
+            ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos);
+        }
+    },
     updatePlayer: function() {
+        // Update HUD
         $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
+        // Update Canvas
         ZORPG.Canvas.update(ZORPG.Player.pos);
     },
     destroy: function() {
@@ -963,5 +986,35 @@ ZORPG.Components.pos = {
     },
     toString: function() {
         return this.x + "-" + this.y;
+    },
+    seek: function(pos) {
+        var angle = pos.angle % Math.PI / 2;
+        var threshold = 3;
+        // Basic seek algorithm
+        console.log("SEEK, checking", "monster", this.x, this.y, "position", pos.x, pos.y);
+        // If not near, forget it
+        if (Math.abs(pos.x - this.x) <= threshold && Math.abs(pos.y - this.y) <= threshold) {
+            // Backup coords.
+            var oldX = this.x;
+            var oldY = this.y;
+            // If angle is horizontal, try to match vertical coordinate first, and viceversa
+            var first = "y", second = "x";
+            if (angle === 0 || angle === -Math.PI / 2) {
+                first = "x";
+                second = "y";
+            }
+            // Try to match first coordinate, then the second one
+            if (pos[first] > this[first]) {
+                this[first]++;
+            } else if (pos[first] < this[first]) {
+                this[first]--;
+            } else {
+                if (pos[second] > this[second]) {
+                    this[second]++;
+                } else if (pos[second] < this[second]) {
+                    this[second]--;
+                }
+            }
+        }
     }
 };

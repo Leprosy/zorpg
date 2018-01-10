@@ -121,6 +121,15 @@ ZORPG.Canvas = (function() {
 
         // Updates canvas objects; positions, etc.
         update: function(player) {
+            // Monsters
+            // TODO: animated translation
+            for (var i = 0; i < ZORPG.Monsters.length; ++i) {
+                var monster = ZORPG.Canvas.scene.getMeshByID("monster" + i);
+                monster.position.x = ZORPG.Monsters[i].pos.x * this.tileSize;
+                monster.position.z = ZORPG.Monsters[i].pos.y * this.tileSize;
+            }
+
+            // Party
             var _this = this;
             var turnSpent = player.ang === this.camera.rotation.y;
             this.isUpdating = true;
@@ -143,7 +152,7 @@ ZORPG.Canvas = (function() {
             this.scene.beginAnimation(this.camera, 0, 30, false, 1 , function() {
                 _this.isUpdating = false; //EVENTPLZ <- ????
                 _this.camera.animations = [];
-                // TODO: Check if a turn was spent
+                // TODO: Check if a turn was spent doesn't belong here
                 if (turnSpent) {
                     console.log("ZORPG.Canvas: Turn spent")
                 }
