@@ -295,24 +295,24 @@ ZORPG.Key = function() {
     var post = null;
     var listener = function(event) {
         console.log("ZORPG.Key: Event fired.", event);
-        // Pre call
-        if (typeof pre === "function") {
-            console.log("ZORPG.Key: Pre-call method.");
-            var result = pre(event);
-            if (!result) {
-                console.log("ZORPG.Key: Handler aborted by the pre-call method.");
-                return;
-            }
-        }
-        // Run registered key handlers
         if (keys.hasOwnProperty(event.code)) {
+            // Pre call
+            if (typeof pre === "function") {
+                console.log("ZORPG.Key: Pre-call method.");
+                var result = pre(event);
+                if (!result) {
+                    console.log("ZORPG.Key: Handler aborted by the pre-call method.");
+                    return;
+                }
+            }
+            // Run registered key handlers
             console.log("ZORPG.Key: Registered key pressed", event);
             keys[event.code]();
-        }
-        // Post call
-        if (typeof post === "function") {
-            console.log("ZORPG.Key: Post-call method.");
-            post(event);
+            // Post call
+            if (typeof post === "function") {
+                console.log("ZORPG.Key: Post-call method.");
+                post(event);
+            }
         }
     };
     return {
@@ -641,6 +641,56 @@ ZORPG.__version__ = .01;
 
 ZORPG.__name__ = "ZORPG demo";
 
+// Play loop state
+ZORPG.State.add("combat", {
+    name: "Combating",
+    turnPass: false,
+    monsterQueue: [],
+    init: function() {
+        // Set key handlers
+        var _this = this;
+        ZORPG.Key.setPre(function(ev) {
+            return !ZORPG.Canvas.isUpdating;
+        });
+        ZORPG.Key.setPost(function(ev) {
+            if (ev.code !== "Escape" && ev.code.indexOf("Arrow") < 0) {
+                _this.update();
+            }
+        });
+        ZORPG.Key.add("Escape", function(ev) {
+            ZORPG.Canvas.clear();
+            ZORPG.State.set("main_menu");
+        });
+        ZORPG.Key.add("KeyA", function(ev) {
+            ZORPG.Player.pos.rotL();
+        });
+        ZORPG.Key.add("KeyD", function(ev) {
+            ZORPG.Player.pos.rotR();
+        });
+        ZORPG.Key.add("Space", function(ev) {
+            console.log("ATTACK!");
+            _this.turnPass = true;
+        });
+        // Init monster queue
+        this.monsterQueue.push(this.scope.monster);
+        this.update();
+    },
+    update: function() {
+        console.log("ZORPG.State.combat: UPDATE");
+        // If a turn pass, calculate world entities
+        if (this.turnPass) {
+            console.log("ZORPG.State.combat: Turn pass.");
+            this.turnPass = false;
+        }
+        // Render
+        ZORPG.Canvas.update(ZORPG.Player.pos);
+        $("#console").html("Combat:\nmonsters: " + JSON.stringify(this.monsterQueue) + "\nParty:" + JSON.stringify(ZORPG.Player));
+    },
+    destroy: function() {
+        ZORPG.Key.removeAll();
+    }
+});
+
 // Loading state...preloader and resource management
 ZORPG.State.add("load", {
     name: "Loading...",
@@ -793,7 +843,6 @@ ZORPG.State.add("play", {
             ZORPG.Canvas.renderMap();
         }
         // Set key handlers
-        // TODO: add a post handler to update everything?
         var _this = this;
         ZORPG.Key.setPre(function(ev) {
             return !ZORPG.Canvas.isUpdating;
@@ -805,7 +854,6 @@ ZORPG.State.add("play", {
         });
         ZORPG.Key.add("Escape", function(ev) {
             ZORPG.Canvas.clear();
-            ZORPG.Key.removeAll();
             ZORPG.State.set("main_menu");
         });
         ZORPG.Key.add("KeyW", function(ev) {
@@ -837,18 +885,30 @@ ZORPG.State.add("play", {
         this.update();
     },
     update: function() {
-        // If a turn pass, calculate world entities
+        console.log("ZORPG.State.play: UPDATE");
+        // If a turn pass, calculate world entities, check if combat
+        var combat = false;
+        var monster;
         if (this.turnPass) {
             console.log("ZORPG.State.play: Turn pass.");
             this.turnPass = false;
             // Monsters
             for (var i = 0; i < 3; ++i) {
-                ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos);
+                if (ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos)) {
+                    combat = true;
+                    monster = ZORPG.Monsters[i];
+                }
             }
         }
-        // Render
+        // Render and go to combat if needed
         ZORPG.Canvas.update(ZORPG.Player.pos);
-        $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
+        if (combat) {
+            ZORPG.State.set("combat", {
+                monster: ZORPG.Monsters[i]
+            });
+        } else {
+            $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
+        }
     },
     destroy: function() {
         ZORPG.Key.removeAll();
@@ -985,8 +1045,12 @@ ZORPG.Components.pos = {
     toString: function() {
         return this.x + "-" + this.y;
     },
+    samePos: function(pos) {
+        return this.x === pos.x && this.y === pos.y;
+    },
     seek: function(pos) {
         // Basic seek algorithm for monsters
+        // TODO: add blocks for monsters(can swim? can enter certain tiles?)
         var angle = pos.ang % Math.PI / 2;
         var threshold = 3;
         console.log("ZORPG.Component.pos: Seeking from", this.x, this.y, " to ", pos.x, pos.y, "angle", angle);
@@ -1013,6 +1077,12 @@ ZORPG.Components.pos = {
                 } else if (pos[second] < this[second]) {
                     this[second]--;
                 }
+            }
+            // TAG...if monster reachs party.
+            if (this.samePos(pos)) {
+                return true;
+            } else {
+                return false;
             }
         }
     }

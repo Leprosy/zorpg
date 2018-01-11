@@ -76,6 +76,7 @@ ZORPG.State.add("play", {
 
         // If a turn pass, calculate world entities, check if combat
         var combat = false;
+        var monster;
 
         if (this.turnPass) {
             console.log("ZORPG.State.play: Turn pass.");
@@ -83,7 +84,10 @@ ZORPG.State.add("play", {
 
             // Monsters
             for (var i = 0; i < 3; ++i) {
-                if (ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos)) combat = true;
+                if (ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos)) {
+                    combat = true;
+                    monster = ZORPG.Monsters[i];
+                }
             }
         }
 
