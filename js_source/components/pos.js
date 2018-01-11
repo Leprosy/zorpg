@@ -42,14 +42,14 @@ ZORPG.Components.pos = {
     },
 
     seek: function(pos) {
+        // Basic seek algorithm for monsters
         var angle = pos.angle % Math.PI / 2;
-
         var threshold = 3;
-        // Basic seek algorithm
-        console.log("SEEK, checking", "monster", this.x, this.y, "position", pos.x, pos.y)
+        console.log("ZORPG.Component.pos: Seeking from", this.x, this.y, " to ", pos.x, pos.y, "angle", angle)
 
        // If not near, forget it
        if (Math.abs(pos.x - this.x) <= threshold && Math.abs(pos.y - this.y) <= threshold) {
+           console.log("ZORPG.Component.pos: position near, start chasing.")
            // Backup coords.
            var oldX = this.x;
            var oldY = this.y;

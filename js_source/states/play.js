@@ -1,6 +1,7 @@
 // Play loop state
 ZORPG.State.add("play", {
     name: "Playing",
+    turnPass: false,
 
     init: function() {
         // Test code. Player, Monsters and Map - THIS IS HACKY, I know
@@ -33,10 +34,8 @@ ZORPG.State.add("play", {
             return (!ZORPG.Canvas.isUpdating);
         });
         ZORPG.Key.setPost(function(ev) {
-            if (ev.code!== "Escape") {
-                _this.updatePlayer();
-            } else {
-                console.log("ESC pressed")
+            if (ev.code!== "Escape" && ev.code.indexOf("Arrow") < 0) {
+                _this.update();
             }
         });
 
@@ -47,11 +46,11 @@ ZORPG.State.add("play", {
         });
         ZORPG.Key.add("KeyW", function(ev) {
             ZORPG.Player.pos.moveFwd()
-            _this.updateMonsters();
+            _this.turnPass = true;
         });
         ZORPG.Key.add("KeyS", function(ev) {
             ZORPG.Player.pos.moveBck();
-            _this.updateMonsters();
+            _this.turnPass = true;
         });
         ZORPG.Key.add("KeyA", function(ev) {
             ZORPG.Player.pos.rotL()
@@ -65,26 +64,30 @@ ZORPG.State.add("play", {
             if (data) {
                 ZORPG.State.set("script", {script: data});
             } else {
-                _this.updateMonsters();
+                _this.turnPass = true;
             }
         });
 
-        this.updatePlayer();
+        // First activation of play state, pass a turn
+        this.turnPass = true;
+        this.update();
     },
 
-    updateMonsters: function() {
-        // Monsters
-        for (var i = 0; i < 3; ++i) {
-            ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos);
+    update: function() {
+        // If a turn pass, calculate world entities
+        if (this.turnPass) {
+            console.log("ZORPG.State.play: Turn pass.");
+            this.turnPass = false;
+
+            // Monsters
+            for (var i = 0; i < 3; ++i) {
+                ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos);
+            }
         }
-    },
 
-    updatePlayer: function() {
-        // Update HUD
-        $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
-
-        // Update Canvas
+        // Render
         ZORPG.Canvas.update(ZORPG.Player.pos);
+        $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
     },
 
     destroy: function() {

@@ -101,9 +101,7 @@ ZORPG.Canvas = (function() {
             // Monsters
             for (var i = 0; i < ZORPG.Monsters.length; ++i) {
                 var monster = ZORPG.Monsters[i];
-                console.log(monster)
                 var mesh = BABYLON.MeshBuilder.CreateSphere("monster" + i, {diameter: this.tileSize * 0.4}, this.scene);
-                //var mesh = BABYLON.Mesh.CreateBox("monster" + i, this.tileSize, this.scene);
                 mesh.position.x = monster.pos.x * this.tileSize;
                 mesh.position.z = monster.pos.y * this.tileSize;
                 mesh.position.y = this.tileSize / 4;
@@ -121,17 +119,9 @@ ZORPG.Canvas = (function() {
 
         // Updates canvas objects; positions, etc.
         update: function(player) {
-            // Monsters
-            // TODO: animated translation
-            for (var i = 0; i < ZORPG.Monsters.length; ++i) {
-                var monster = ZORPG.Canvas.scene.getMeshByID("monster" + i);
-                monster.position.x = ZORPG.Monsters[i].pos.x * this.tileSize;
-                monster.position.z = ZORPG.Monsters[i].pos.y * this.tileSize;
-            }
-
             // Party
             var _this = this;
-            var turnSpent = player.ang === this.camera.rotation.y;
+            var turnSpent = player.ang === this.camera.rotation.y; // TODO: IS THIS USEFUL?
             this.isUpdating = true;
 
             // Useful while debugging: reset camera rotation & y-axis position
@@ -152,9 +142,13 @@ ZORPG.Canvas = (function() {
             this.scene.beginAnimation(this.camera, 0, 30, false, 1 , function() {
                 _this.isUpdating = false; //EVENTPLZ <- ????
                 _this.camera.animations = [];
-                // TODO: Check if a turn was spent doesn't belong here
-                if (turnSpent) {
-                    console.log("ZORPG.Canvas: Turn spent")
+
+                // Update rest of the world after player animation ends.
+                // Monsters (TODO: animated translation)
+                for (var i = 0; i < ZORPG.Monsters.length; ++i) {
+                    var monster = ZORPG.Canvas.scene.getMeshByID("monster" + i);
+                    monster.position.x = ZORPG.Monsters[i].pos.x * _this.tileSize;
+                    monster.position.z = ZORPG.Monsters[i].pos.y * _this.tileSize;
                 }
             });
 

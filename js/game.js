@@ -105,11 +105,9 @@ ZORPG.Canvas = function() {
             // Monsters
             for (var i = 0; i < ZORPG.Monsters.length; ++i) {
                 var monster = ZORPG.Monsters[i];
-                console.log(monster);
                 var mesh = BABYLON.MeshBuilder.CreateSphere("monster" + i, {
                     diameter: this.tileSize * .4
                 }, this.scene);
-                //var mesh = BABYLON.Mesh.CreateBox("monster" + i, this.tileSize, this.scene);
                 mesh.position.x = monster.pos.x * this.tileSize;
                 mesh.position.z = monster.pos.y * this.tileSize;
                 mesh.position.y = this.tileSize / 4;
@@ -125,16 +123,10 @@ ZORPG.Canvas = function() {
         },
         // Updates canvas objects; positions, etc.
         update: function(player) {
-            // Monsters
-            // TODO: animated translation
-            for (var i = 0; i < ZORPG.Monsters.length; ++i) {
-                var monster = ZORPG.Canvas.scene.getMeshByID("monster" + i);
-                monster.position.x = ZORPG.Monsters[i].pos.x * this.tileSize;
-                monster.position.z = ZORPG.Monsters[i].pos.y * this.tileSize;
-            }
             // Party
             var _this = this;
             var turnSpent = player.ang === this.camera.rotation.y;
+            // TODO: IS THIS USEFUL?
             this.isUpdating = true;
             // Useful while debugging: reset camera rotation & y-axis position
             this.camera.rotation.x = 0;
@@ -172,9 +164,12 @@ ZORPG.Canvas = function() {
                 _this.isUpdating = false;
                 //EVENTPLZ <- ????
                 _this.camera.animations = [];
-                // TODO: Check if a turn was spent doesn't belong here
-                if (turnSpent) {
-                    console.log("ZORPG.Canvas: Turn spent");
+                // Update rest of the world after player animation ends.
+                // Monsters (TODO: animated translation)
+                for (var i = 0; i < ZORPG.Monsters.length; ++i) {
+                    var monster = ZORPG.Canvas.scene.getMeshByID("monster" + i);
+                    monster.position.x = ZORPG.Monsters[i].pos.x * _this.tileSize;
+                    monster.position.z = ZORPG.Monsters[i].pos.y * _this.tileSize;
                 }
             });
         }
@@ -334,9 +329,9 @@ ZORPG.Key = function() {
             }
             if (ZORPG.Utils.isEmptyObj(keys)) {
                 document.addEventListener("keydown", listener);
-                console.log("ZORPG.Key: Listener registered. Adding the key too.");
+                console.log("ZORPG.Key: Listener registered. Adding the key too.", code);
             } else {
-                console.log("ZORPG.Key: Already registered the listener, just adding the key.");
+                console.log("ZORPG.Key: Already registered the listener, just adding the key.", code);
             }
             keys[code] = handler;
         },
@@ -776,6 +771,7 @@ ZORPG.State.add("message", {
 // Play loop state
 ZORPG.State.add("play", {
     name: "Playing",
+    turnPass: false,
     init: function() {
         // Test code. Player, Monsters and Map - THIS IS HACKY, I know
         // TODO: Player, monsters should be stored somewhere else?(idea: build a singleton containing entities[actors])
@@ -803,10 +799,8 @@ ZORPG.State.add("play", {
             return !ZORPG.Canvas.isUpdating;
         });
         ZORPG.Key.setPost(function(ev) {
-            if (ev.code !== "Escape") {
-                _this.updatePlayer();
-            } else {
-                console.log("ESC pressed");
+            if (ev.code !== "Escape" && ev.code.indexOf("Arrow") < 0) {
+                _this.update();
             }
         });
         ZORPG.Key.add("Escape", function(ev) {
@@ -816,11 +810,11 @@ ZORPG.State.add("play", {
         });
         ZORPG.Key.add("KeyW", function(ev) {
             ZORPG.Player.pos.moveFwd();
-            _this.updateMonsters();
+            _this.turnPass = true;
         });
         ZORPG.Key.add("KeyS", function(ev) {
             ZORPG.Player.pos.moveBck();
-            _this.updateMonsters();
+            _this.turnPass = true;
         });
         ZORPG.Key.add("KeyA", function(ev) {
             ZORPG.Player.pos.rotL();
@@ -835,22 +829,26 @@ ZORPG.State.add("play", {
                     script: data
                 });
             } else {
-                _this.updateMonsters();
+                _this.turnPass = true;
             }
         });
-        this.updatePlayer();
+        // First activation of play state, pass a turn
+        this.turnPass = true;
+        this.update();
     },
-    updateMonsters: function() {
-        // Monsters
-        for (var i = 0; i < 3; ++i) {
-            ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos);
+    update: function() {
+        // If a turn pass, calculate world entities
+        if (this.turnPass) {
+            console.log("ZORPG.State.play: Turn pass.");
+            this.turnPass = false;
+            // Monsters
+            for (var i = 0; i < 3; ++i) {
+                ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos);
+            }
         }
-    },
-    updatePlayer: function() {
-        // Update HUD
-        $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
-        // Update Canvas
+        // Render
         ZORPG.Canvas.update(ZORPG.Player.pos);
+        $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
     },
     destroy: function() {
         ZORPG.Key.removeAll();
@@ -988,12 +986,13 @@ ZORPG.Components.pos = {
         return this.x + "-" + this.y;
     },
     seek: function(pos) {
+        // Basic seek algorithm for monsters
         var angle = pos.angle % Math.PI / 2;
         var threshold = 3;
-        // Basic seek algorithm
-        console.log("SEEK, checking", "monster", this.x, this.y, "position", pos.x, pos.y);
+        console.log("ZORPG.Component.pos: Seeking from", this.x, this.y, " to ", pos.x, pos.y, "angle", angle);
         // If not near, forget it
         if (Math.abs(pos.x - this.x) <= threshold && Math.abs(pos.y - this.y) <= threshold) {
+            console.log("ZORPG.Component.pos: position near, start chasing.");
             // Backup coords.
             var oldX = this.x;
             var oldY = this.y;

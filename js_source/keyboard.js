@@ -51,9 +51,9 @@ ZORPG.Key = (function() {
 
             if (ZORPG.Utils.isEmptyObj(keys)) {
                 document.addEventListener("keydown", listener);
-                console.log("ZORPG.Key: Listener registered. Adding the key too.")
+                console.log("ZORPG.Key: Listener registered. Adding the key too.", code)
             } else {
-                console.log("ZORPG.Key: Already registered the listener, just adding the key.")
+                console.log("ZORPG.Key: Already registered the listener, just adding the key.", code)
             }
 
             keys[code] = handler;
