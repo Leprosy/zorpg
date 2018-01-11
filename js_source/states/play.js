@@ -28,7 +28,6 @@ ZORPG.State.add("play", {
 
 
         // Set key handlers
-        // TODO: add a post handler to update everything?
         var _this = this;
         ZORPG.Key.setPre(function(ev) {
             return (!ZORPG.Canvas.isUpdating);
@@ -41,7 +40,6 @@ ZORPG.State.add("play", {
 
         ZORPG.Key.add("Escape", function(ev) {
             ZORPG.Canvas.clear();
-            ZORPG.Key.removeAll();
             ZORPG.State.set("main_menu");
         });
         ZORPG.Key.add("KeyW", function(ev) {
@@ -74,20 +72,28 @@ ZORPG.State.add("play", {
     },
 
     update: function() {
-        // If a turn pass, calculate world entities
+        console.log("ZORPG.State.play: UPDATE")
+
+        // If a turn pass, calculate world entities, check if combat
+        var combat = false;
+
         if (this.turnPass) {
             console.log("ZORPG.State.play: Turn pass.");
             this.turnPass = false;
 
             // Monsters
             for (var i = 0; i < 3; ++i) {
-                ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos);
+                if (ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos)) combat = true;
             }
         }
 
-        // Render
+        // Render and go to combat if needed
         ZORPG.Canvas.update(ZORPG.Player.pos);
-        $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
+        if (combat) {
+            ZORPG.State.set("combat", {monster: ZORPG.Monsters[i]});
+        } else {
+            $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
+        }
     },
 
     destroy: function() {

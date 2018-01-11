@@ -41,8 +41,13 @@ ZORPG.Components.pos = {
         return this.x + "-" + this.y;
     },
 
+    samePos: function(pos) {
+        return this.x === pos.x && this.y === pos.y;
+    },
+
     seek: function(pos) {
         // Basic seek algorithm for monsters
+        // TODO: add blocks for monsters(can swim? can enter certain tiles?)
         var angle = pos.ang % Math.PI / 2;
         var threshold = 3;
         console.log("ZORPG.Component.pos: Seeking from", this.x, this.y, " to ", pos.x, pos.y, "angle", angle)
@@ -74,19 +79,12 @@ ZORPG.Components.pos = {
                }
            }
 
-           // TAG...if monster reachs party, push to the queue.
-           /* if (this.samePos(party)) {
-               if (Game.playState.combat.add(this)) {
-                   console.log("Game.Monster: Monster added to combat queue", this)
-                   Game.playState.gameStatus = Game.FIGHTING;
-                   this.setPosition(this.x, this.y);
-               } else {
-                   this.x = oldX;
-                   this.y = oldY;
-               }
+           // TAG...if monster reachs party.
+           if (this.samePos(pos)) {
+               return true;
            } else {
-               this.setPosition(this.x, this.y);
-           } */
+               return false;
+           }
        }
     }
 }
