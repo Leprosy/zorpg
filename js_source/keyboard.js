@@ -10,27 +10,27 @@ ZORPG.Key = (function() {
     var listener = function(event) {
         console.log("ZORPG.Key: Event fired.", event);
 
-        // Pre call
-        if (typeof pre === "function") {
-            console.log("ZORPG.Key: Pre-call method.");
-            var result = pre(event);
-
-            if (!result) {
-                console.log("ZORPG.Key: Handler aborted by the pre-call method.");
-                return; // If pre-call returns false, the rest of the handler is not executed.
-            }
-        }
-
-        // Run registered key handlers
         if (keys.hasOwnProperty(event.code)) {
+            // Pre call
+            if (typeof pre === "function") {
+                console.log("ZORPG.Key: Pre-call method.");
+                var result = pre(event);
+
+                if (!result) {
+                    console.log("ZORPG.Key: Handler aborted by the pre-call method.");
+                    return; // If pre-call returns false, the rest of the handler is not executed.
+                }
+            }
+
+            // Run registered key handlers
             console.log("ZORPG.Key: Registered key pressed", event);
             keys[event.code]();
-        }
 
-        // Post call
-        if (typeof post === "function") {
-            console.log("ZORPG.Key: Post-call method.");
-            post(event);
+            // Post call
+            if (typeof post === "function") {
+                console.log("ZORPG.Key: Post-call method.");
+                post(event);
+            }
         }
     };
 
