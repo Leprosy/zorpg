@@ -72,7 +72,7 @@ ZORPG.State.add("play", {
     },
 
     update: function() {
-        console.log("ZORPG.State.play: UPDATE")
+        console.log("ZORPG.State.play: Updating")
 
         // If a turn pass, calculate world entities, check if combat
         var combat = false;
@@ -92,12 +92,15 @@ ZORPG.State.add("play", {
         }
 
         // Render and go to combat if needed
-        ZORPG.Canvas.update(ZORPG.Player.pos);
-        if (combat) {
-            ZORPG.State.set("combat", {monster: ZORPG.Monsters[i]});
-        } else {
-            $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
-        }
+        ZORPG.Canvas.update(function() {
+            console.log("ZORPG.State.play: update completed");
+
+            if (combat) {
+                ZORPG.State.set("combat", {monster: ZORPG.Monsters[i]});
+            } else {
+                $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
+            }
+        });
     },
 
     destroy: function() {

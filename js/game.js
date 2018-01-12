@@ -120,8 +120,9 @@ ZORPG.Canvas = function() {
             this.camera.beta = Math.PI / 2;
         },
         // Updates canvas objects; positions, etc.
-        update: function(player) {
+        update: function(call) {
             // Party
+            var player = ZORPG.Player.pos;
             var _this = this;
             var turnSpent = player.ang === this.camera.rotation.y;
             // TODO: IS THIS USEFUL?
@@ -168,6 +169,10 @@ ZORPG.Canvas = function() {
                     var monster = ZORPG.Canvas.scene.getMeshByID("monster" + i);
                     monster.position.x = ZORPG.Monsters[i].pos.x * _this.tileSize;
                     monster.position.z = ZORPG.Monsters[i].pos.y * _this.tileSize;
+                }
+                // After everything is done, callback
+                if (typeof call === "function") {
+                    call();
                 }
             });
         }
@@ -669,20 +674,22 @@ ZORPG.State.add("combat", {
             console.log("ATTACK!");
             _this.turnPass = true;
         });
-        // Init monster queue
+        // Init monster queue & draw
         this.monsterQueue.push(this.scope.monster);
         this.update();
     },
     update: function() {
-        console.log("ZORPG.State.combat: UPDATE");
+        console.log("ZORPG.State.combat: Updating");
         // If a turn pass, calculate world entities
         if (this.turnPass) {
             console.log("ZORPG.State.combat: Turn pass.");
             this.turnPass = false;
         }
         // Render
-        ZORPG.Canvas.update(ZORPG.Player.pos);
-        $("#console").html("Combat:\nmonsters: " + JSON.stringify(this.monsterQueue) + "\nParty:" + JSON.stringify(ZORPG.Player));
+        ZORPG.Canvas.update(function() {
+            console.log("ZORPG.State.combat: Update completed");
+            $("#console").html("Combat:\nmonsters: " + JSON.stringify(this.monsterQueue) + "\nParty:" + JSON.stringify(ZORPG.Player));
+        });
     },
     destroy: function() {
         ZORPG.Key.removeAll();
@@ -883,7 +890,7 @@ ZORPG.State.add("play", {
         this.update();
     },
     update: function() {
-        console.log("ZORPG.State.play: UPDATE");
+        console.log("ZORPG.State.play: Updating");
         // If a turn pass, calculate world entities, check if combat
         var combat = false;
         var monster;
@@ -899,14 +906,16 @@ ZORPG.State.add("play", {
             }
         }
         // Render and go to combat if needed
-        ZORPG.Canvas.update(ZORPG.Player.pos);
-        if (combat) {
-            ZORPG.State.set("combat", {
-                monster: ZORPG.Monsters[i]
-            });
-        } else {
-            $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
-        }
+        ZORPG.Canvas.update(function() {
+            console.log("ZORPG.State.play: update completed");
+            if (combat) {
+                ZORPG.State.set("combat", {
+                    monster: ZORPG.Monsters[i]
+                });
+            } else {
+                $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
+            }
+        });
     },
     destroy: function() {
         ZORPG.Key.removeAll();

@@ -31,13 +31,13 @@ ZORPG.State.add("combat", {
             _this.turnPass = true;
         });
 
-        // Init monster queue
+        // Init monster queue & draw
         this.monsterQueue.push(this.scope.monster);
         this.update();
     },
 
     update: function() {
-        console.log("ZORPG.State.combat: UPDATE")
+        console.log("ZORPG.State.combat: Updating")
 
         // If a turn pass, calculate world entities
         if (this.turnPass) {
@@ -55,8 +55,10 @@ ZORPG.State.add("combat", {
         }
 
         // Render
-        ZORPG.Canvas.update(ZORPG.Player.pos);
-        $("#console").html("Combat:\nmonsters: " + JSON.stringify(this.monsterQueue) + "\nParty:" + JSON.stringify(ZORPG.Player));
+        ZORPG.Canvas.update(function() {
+            console.log("ZORPG.State.combat: Update completed");
+            $("#console").html("Combat:\nmonsters: " + JSON.stringify(this.monsterQueue) + "\nParty:" + JSON.stringify(ZORPG.Player));
+        });
     },
 
     destroy: function() {

@@ -116,8 +116,9 @@ ZORPG.Canvas = (function() {
         },
 
         // Updates canvas objects; positions, etc.
-        update: function(player) {
+        update: function(call) {
             // Party
+            var player = ZORPG.Player.pos;
             var _this = this;
             var turnSpent = player.ang === this.camera.rotation.y; // TODO: IS THIS USEFUL?
             this.isUpdating = true;
@@ -146,6 +147,11 @@ ZORPG.Canvas = (function() {
                     var monster = ZORPG.Canvas.scene.getMeshByID("monster" + i);
                     monster.position.x = ZORPG.Monsters[i].pos.x * _this.tileSize;
                     monster.position.z = ZORPG.Monsters[i].pos.y * _this.tileSize;
+                }
+
+                // After everything is done, callback
+                if (typeof call === "function") {
+                    call();
                 }
             });
 
