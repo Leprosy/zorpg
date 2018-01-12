@@ -89,7 +89,7 @@ ZORPG.Canvas = (function() {
                     meshf.material = materials[map.floor[y][x]];
 
                     if (map.object[y][x] != 0) {
-                        var mesho = BABYLON.Mesh.CreateBox("object" + x + "-" + y, this.tileSize / 2, this.scene);
+                        var mesho = BABYLON.Mesh.CreateBox("object" + x + "-" + y, this.tileSize / 3, this.scene);
                         mesho.position.x = x * this.tileSize;
                         mesho.position.z = y * this.tileSize;
                         mesho.position.y = this.tileSize / 4;
