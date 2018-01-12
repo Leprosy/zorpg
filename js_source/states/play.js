@@ -22,11 +22,12 @@ ZORPG.State.add("play", {
 
             ZORPG.Monsters = [];
             for (var i = 0; i < 3; ++i) {
-                var ent = new ZORPG.Ent("monster" + i, ["pos", "actor"]);
+                var ent = new ZORPG.Ent("monster" + i, ["pos", "actor", "monster"]);
                 ent.pos.x = ZORPG.Utils.die("1d15")
                 ent.pos.y = ZORPG.Utils.die("1d15");
                 ent.actor.name = "Monster " + i;
                 ent.actor.roll();
+                ent.actor.spd += 5;
                 ZORPG.Monsters.push(ent);
             }
 

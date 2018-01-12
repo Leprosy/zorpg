@@ -26,3 +26,7 @@ ZORPG.Components.actor = {
         return this.name + ":" + this.hp + "hp";
     }
 }
+
+ZORPG.Components.monster = {
+    type: "undead"
+}
