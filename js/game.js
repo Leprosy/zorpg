@@ -32,6 +32,7 @@ ZORPG.Canvas = function() {
         scene: null,
         camera: null,
         GUI: null,
+        speed: 10,
         // Init everything
         init: function() {
             var canvas = document.getElementById("3d");
@@ -48,12 +49,11 @@ ZORPG.Canvas = function() {
                 ZORPG.Canvas.engine.loadingUIText = "Loading " + progress.remainingCount + "/" + progress.totalCount;
             });
             // Camera
-            this.camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 0, 0), this.scene);
-            this.camera.setTarget(BABYLON.Vector3.Zero());
+            this.camera = new BABYLON.ArcRotateCamera("camera1", 0, 0, this.tileSize * .8, new BABYLON.Vector3(0, 0, 0), this.scene);
             this.camera.attachControl(canvas, true);
             // Light
             var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), this.scene);
-            light.intensity = .7;
+            light.intensity = .5;
             // Skybox
             //this.skyBox = this.scene.createDefaultSkybox(new BABYLON.Texture("img/sky1.png", this.scene), true, 10);
             // GUI
@@ -114,12 +114,10 @@ ZORPG.Canvas = function() {
                 mesh.material = monsterMaterial;
             }
             // Put camera/player
-            this.camera.position.x = map.properties.startX * this.tileSize;
-            this.camera.position.z = map.properties.startY * this.tileSize;
-            this.camera.position.y = this.tileSize / 4;
-            this.camera.rotation.x = 0;
-            this.camera.rotation.z = 0;
-            this.camera.rotation.y = 0;
+            this.camera.target.x = map.properties.startX * this.tileSize;
+            this.camera.target.z = map.properties.startY * this.tileSize;
+            this.camera.target.y = this.tileSize / 4;
+            this.camera.beta = Math.PI / 2;
         },
         // Updates canvas objects; positions, etc.
         update: function(player) {
@@ -129,38 +127,38 @@ ZORPG.Canvas = function() {
             // TODO: IS THIS USEFUL?
             this.isUpdating = true;
             // Useful while debugging: reset camera rotation & y-axis position
-            this.camera.rotation.x = 0;
-            this.camera.rotation.z = 0;
+            this.camera.beta = Math.PI / 2;
             this.camera.position.y = this.tileSize / 4;
             // Set animation and run
-            var aniRot = new BABYLON.Animation("rotate", "rotation.y", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT);
-            var aniX = new BABYLON.Animation("move", "position.x", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT);
-            var aniZ = new BABYLON.Animation("move", "position.z", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT);
+            var aniRot = new BABYLON.Animation("rotate", "alpha", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT);
+            var aniX = new BABYLON.Animation("move", "target.x", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT);
+            var aniZ = new BABYLON.Animation("move", "target.z", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT);
             aniX.setKeys([ {
                 frame: 0,
-                value: this.camera.position.x
+                value: this.camera.target.x
             }, {
-                frame: 15,
+                frame: this.speed / 2,
                 value: player.x * this.tileSize
             } ]);
             aniZ.setKeys([ {
                 frame: 0,
-                value: this.camera.position.z
+                value: this.camera.target.z
             }, {
-                frame: 15,
+                frame: this.speed / 2,
                 value: player.y * this.tileSize
             } ]);
             aniRot.setKeys([ {
                 frame: 0,
-                value: this.camera.rotation.y
+                value: this.camera.alpha
             }, {
-                frame: 15,
-                value: player.ang
+                frame: this.speed / 2,
+                value: -player.ang - Math.PI / 2
             } ]);
+            // Little correction
             this.camera.animations.push(aniX);
             this.camera.animations.push(aniZ);
             this.camera.animations.push(aniRot);
-            this.scene.beginAnimation(this.camera, 0, 30, false, 1, function() {
+            this.scene.beginAnimation(this.camera, 0, this.speed, false, 1, function() {
                 _this.isUpdating = false;
                 //EVENTPLZ <- ????
                 _this.camera.animations = [];
