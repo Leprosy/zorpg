@@ -13,13 +13,20 @@ ZORPG.State.add("play", {
             ZORPG.Player.pos.x = ZORPG.Map.properties.startX;
             ZORPG.Player.pos.y = ZORPG.Map.properties.startY;
 
+            for (var i = 0; i < 3; ++i) {
+                var ent = new ZORPG.Ent("character" + i, ["actor"]);
+                ent.actor.name = "Character " + i;
+                ent.actor.roll();
+                ZORPG.Player.party.actors.push(ent);
+            }
+
             ZORPG.Monsters = [];
             for (var i = 0; i < 3; ++i) {
                 var ent = new ZORPG.Ent("monster" + i, ["pos", "actor"]);
                 ent.pos.x = ZORPG.Utils.die("1d15")
                 ent.pos.y = ZORPG.Utils.die("1d15");
                 ent.actor.name = "Monster " + i;
-                ent.actor.hp = 30;
+                ent.actor.roll();
                 ZORPG.Monsters.push(ent);
             }
 
@@ -96,7 +103,7 @@ ZORPG.State.add("play", {
             console.log("ZORPG.State.play: update completed");
 
             if (combat) {
-                ZORPG.State.set("combat", {monster: ZORPG.Monsters[i]});
+                ZORPG.State.set("combat");
             } else {
                 $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
             }

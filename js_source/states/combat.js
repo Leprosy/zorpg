@@ -2,7 +2,8 @@
 ZORPG.State.add("combat", {
     name: "Combating",
     turnPass: false,
-    monsterQueue: [],
+    monsters: [],
+    combatQ: [],
 
     init: function() {
         // Set key handlers
@@ -32,12 +33,21 @@ ZORPG.State.add("combat", {
         });
 
         // Init monster queue & draw
-        this.monsterQueue.push(this.scope.monster);
         this.update();
     },
 
     update: function() {
         console.log("ZORPG.State.combat: Updating")
+        var _this = this;
+
+        // Check which monsters are on the position and put them in queue
+        for (var i = 0; i < ZORPG.Monsters.length; ++i) {
+            var monster = ZORPG.Monsters[i];
+
+            if (monster.pos.equals(ZORPG.Player.pos) && !ZORPG.Utils.inArray(monster, this.monsters)) {
+                this.monsters.push(monster);
+            }
+        }
 
         // If a turn pass, calculate world entities
         if (this.turnPass) {
@@ -57,7 +67,7 @@ ZORPG.State.add("combat", {
         // Render
         ZORPG.Canvas.update(function() {
             console.log("ZORPG.State.combat: Update completed");
-            $("#console").html("Combat:\nmonsters: " + JSON.stringify(this.monsterQueue) + "\nParty:" + JSON.stringify(ZORPG.Player));
+            $("#console").html("Combat:\nmonsters: " + JSON.stringify(_this.monsters) + "\nParty:" + JSON.stringify(ZORPG.Player));
         });
     },
 

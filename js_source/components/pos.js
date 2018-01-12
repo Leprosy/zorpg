@@ -41,7 +41,7 @@ ZORPG.Components.pos = {
         return this.x + "-" + this.y;
     },
 
-    samePos: function(pos) {
+    equals: function(pos) {
         return this.x === pos.x && this.y === pos.y;
     },
 
@@ -80,7 +80,7 @@ ZORPG.Components.pos = {
            }
 
            // TAG...if monster reachs party.
-           if (this.samePos(pos)) {
+           if (this.equals(pos)) {
                return true;
            } else {
                return false;

@@ -7,7 +7,7 @@ ZORPG.Utils = {
     // The basic variable of all leprosystems software artifacts
     taldo: "OAW",
 
-    // Several type checks
+    // Several type checks & utils
     isObj: function(thing) {
         return thing instanceof Object && thing.constructor === Object;
     },
@@ -17,6 +17,15 @@ ZORPG.Utils = {
     isArray: function(thing) {
         return (Object.prototype.toString.call(thing) === '[object Array]')
     },
+    inArray: function(obj, list) {
+        for (var i = 0; i < list.length; ++i) {
+            if (list[i] === obj) return true;
+        }
+
+        return false;
+    },
+
+    // Dice
     die: function(str) {
         try {
             //xdy+z => x dices of y faces, ie (random(y) * x) + z

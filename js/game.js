@@ -94,7 +94,7 @@ ZORPG.Canvas = function() {
                     meshf.scaling.y = .1;
                     meshf.material = materials[map.floor[y][x]];
                     if (map.object[y][x] != 0) {
-                        var mesho = BABYLON.Mesh.CreateBox("object" + x + "-" + y, this.tileSize / 2, this.scene);
+                        var mesho = BABYLON.Mesh.CreateBox("object" + x + "-" + y, this.tileSize / 3, this.scene);
                         mesho.position.x = x * this.tileSize;
                         mesho.position.z = y * this.tileSize;
                         mesho.position.y = this.tileSize / 4;
@@ -608,7 +608,7 @@ var ZORPG = ZORPG || {};
 ZORPG.Utils = {
     // The basic variable of all leprosystems software artifacts
     taldo: "OAW",
-    // Several type checks
+    // Several type checks & utils
     isObj: function(thing) {
         return thing instanceof Object && thing.constructor === Object;
     },
@@ -618,6 +618,13 @@ ZORPG.Utils = {
     isArray: function(thing) {
         return Object.prototype.toString.call(thing) === "[object Array]";
     },
+    inArray: function(obj, list) {
+        for (var i = 0; i < list.length; ++i) {
+            if (list[i] === obj) return true;
+        }
+        return false;
+    },
+    // Dice
     die: function(str) {
         try {
             //xdy+z => x dices of y faces, ie (random(y) * x) + z
@@ -648,7 +655,8 @@ ZORPG.__name__ = "ZORPG demo";
 ZORPG.State.add("combat", {
     name: "Combating",
     turnPass: false,
-    monsterQueue: [],
+    monsters: [],
+    combatQ: [],
     init: function() {
         // Set key handlers
         var _this = this;
@@ -675,11 +683,18 @@ ZORPG.State.add("combat", {
             _this.turnPass = true;
         });
         // Init monster queue & draw
-        this.monsterQueue.push(this.scope.monster);
         this.update();
     },
     update: function() {
         console.log("ZORPG.State.combat: Updating");
+        var _this = this;
+        // Check which monsters are on the position and put them in queue
+        for (var i = 0; i < ZORPG.Monsters.length; ++i) {
+            var monster = ZORPG.Monsters[i];
+            if (monster.pos.equals(ZORPG.Player.pos) && !ZORPG.Utils.inArray(monster, this.monsters)) {
+                this.monsters.push(monster);
+            }
+        }
         // If a turn pass, calculate world entities
         if (this.turnPass) {
             console.log("ZORPG.State.combat: Turn pass.");
@@ -688,7 +703,7 @@ ZORPG.State.add("combat", {
         // Render
         ZORPG.Canvas.update(function() {
             console.log("ZORPG.State.combat: Update completed");
-            $("#console").html("Combat:\nmonsters: " + JSON.stringify(this.monsterQueue) + "\nParty:" + JSON.stringify(ZORPG.Player));
+            $("#console").html("Combat:\nmonsters: " + JSON.stringify(_this.monsters) + "\nParty:" + JSON.stringify(ZORPG.Player));
         });
     },
     destroy: function() {
@@ -836,13 +851,19 @@ ZORPG.State.add("play", {
             ZORPG.Player = new ZORPG.Ent("player", [ "pos", "party" ]);
             ZORPG.Player.pos.x = ZORPG.Map.properties.startX;
             ZORPG.Player.pos.y = ZORPG.Map.properties.startY;
+            for (var i = 0; i < 3; ++i) {
+                var ent = new ZORPG.Ent("character" + i, [ "actor" ]);
+                ent.actor.name = "Character " + i;
+                ent.actor.roll();
+                ZORPG.Player.party.actors.push(ent);
+            }
             ZORPG.Monsters = [];
             for (var i = 0; i < 3; ++i) {
                 var ent = new ZORPG.Ent("monster" + i, [ "pos", "actor" ]);
                 ent.pos.x = ZORPG.Utils.die("1d15");
                 ent.pos.y = ZORPG.Utils.die("1d15");
                 ent.actor.name = "Monster " + i;
-                ent.actor.hp = 30;
+                ent.actor.roll();
                 ZORPG.Monsters.push(ent);
             }
             ZORPG.Canvas.renderMap();
@@ -909,9 +930,7 @@ ZORPG.State.add("play", {
         ZORPG.Canvas.update(function() {
             console.log("ZORPG.State.play: update completed");
             if (combat) {
-                ZORPG.State.set("combat", {
-                    monster: ZORPG.Monsters[i]
-                });
+                ZORPG.State.set("combat");
             } else {
                 $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
             }
@@ -966,11 +985,19 @@ ZORPG.Components.actor = {
     xp: 0,
     level: 1,
     name: "",
-    speed: 0,
     str: 1,
     spd: 1,
     con: 1,
     ac: 0,
+    // Roll attributes - DEBUG only
+    roll: function() {
+        this.spd = ZORPG.Utils.die("1d10+4");
+        this.str = ZORPG.Utils.die("1d10+4");
+        this.con = ZORPG.Utils.die("1d10+4");
+        this.ac = ZORPG.Utils.die("1d10+4");
+        this.hp = ZORPG.Utils.die("1d30+10");
+        this.xp = ZORPG.Utils.die("1d50+10");
+    },
     toString: function() {
         return this.name + ":" + this.hp + "hp";
     }
@@ -1052,7 +1079,7 @@ ZORPG.Components.pos = {
     toString: function() {
         return this.x + "-" + this.y;
     },
-    samePos: function(pos) {
+    equals: function(pos) {
         return this.x === pos.x && this.y === pos.y;
     },
     seek: function(pos) {
@@ -1086,7 +1113,7 @@ ZORPG.Components.pos = {
                 }
             }
             // TAG...if monster reachs party.
-            if (this.samePos(pos)) {
+            if (this.equals(pos)) {
                 return true;
             } else {
                 return false;
