@@ -655,7 +655,6 @@ ZORPG.__name__ = "ZORPG demo";
 ZORPG.State.add("combat", {
     name: "Combating",
     turnPass: false,
-    monsters: [],
     combatQ: [],
     init: function() {
         // Set key handlers
@@ -680,30 +679,50 @@ ZORPG.State.add("combat", {
         });
         ZORPG.Key.add("Space", function(ev) {
             console.log("ATTACK!");
-            _this.turnPass = true;
         });
         // Init monster queue & draw
+        _this.turnPass = true;
         this.update();
     },
     update: function() {
         console.log("ZORPG.State.combat: Updating");
         var _this = this;
-        // Check which monsters are on the position and put them in queue
-        for (var i = 0; i < ZORPG.Monsters.length; ++i) {
-            var monster = ZORPG.Monsters[i];
-            if (monster.pos.equals(ZORPG.Player.pos) && !ZORPG.Utils.inArray(monster, this.monsters)) {
-                this.monsters.push(monster);
-            }
-        }
-        // If a turn pass, calculate world entities
+        // Begin turn
         if (this.turnPass) {
-            console.log("ZORPG.State.combat: Turn pass.");
             this.turnPass = false;
+            console.log("ZORPG.State.combat: Turn begins.");
+            // Move monsters
+            /* for (var i = 0; i < 3; ++i) {
+                var combat = ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos);
+
+                if (combat) {
+                    ZORPG.State.set("combat", {monster: ZORPG.Monsters[i]});
+                }
+            } */
+            // Build combat queue
+            for (var i = 0; i < ZORPG.Monsters.length; ++i) {
+                var monster = ZORPG.Monsters[i];
+                if (monster.pos.equals(ZORPG.Player.pos) && !ZORPG.Utils.inArray(monster, this.combatQ)) {
+                    this.combatQ.push(monster);
+                }
+            }
+            for (var i = 0; i < ZORPG.Player.party.actors.length; ++i) {
+                this.combatQ.push(ZORPG.Player.party.actors[i]);
+            }
+            this.combatQ.sort(function(a, b) {
+                if (a.actor.spd < b.actor.spd) {
+                    return 1;
+                }
+                if (a.actor.spd > b.actor.spd) {
+                    return -1;
+                }
+                return 0;
+            });
         }
         // Render
         ZORPG.Canvas.update(function() {
             console.log("ZORPG.State.combat: Update completed");
-            $("#console").html("Combat:\nmonsters: " + JSON.stringify(_this.monsters) + "\nParty:" + JSON.stringify(ZORPG.Player));
+            $("#console").html("Combating:\n: " + JSON.stringify(_this.combatQ));
         });
     },
     destroy: function() {
