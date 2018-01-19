@@ -149,6 +149,9 @@ ZORPG.Canvas = (function() {
                     monster.position.z = ZORPG.Monsters[i].pos.y * _this.tileSize;
                 }
 
+                // HUD
+                _this.updateChars();
+
                 // After everything is done, callback
                 if (typeof call === "function") {
                     call();
@@ -165,7 +168,7 @@ ZORPG.Canvas = (function() {
         },
 
         // Update roster
-        drawChars: function() {
+        updateChars: function() {
             $("#roster").html("");
 
             for (var i = 0; i < ZORPG.Player.party.actors.length; ++i) {

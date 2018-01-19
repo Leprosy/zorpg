@@ -170,6 +170,8 @@ ZORPG.Canvas = function() {
                     monster.position.x = ZORPG.Monsters[i].pos.x * _this.tileSize;
                     monster.position.z = ZORPG.Monsters[i].pos.y * _this.tileSize;
                 }
+                // HUD
+                _this.updateChars();
                 // After everything is done, callback
                 if (typeof call === "function") {
                     call();
@@ -177,7 +179,7 @@ ZORPG.Canvas = function() {
             });
         },
         // Update roster
-        drawChars: function() {
+        updateChars: function() {
             $("#roster").html("");
             for (var i = 0; i < ZORPG.Player.party.actors.length; ++i) {
                 var char = ZORPG.Player.party.actors[i];
@@ -1123,6 +1125,21 @@ ZORPG.Components.party = {
     giveAward: function(args) {
         if (!this.hasAward(args.awardId)) {
             this.awards[args.awardId] = args.desc;
+        }
+    },
+    // Damage & death
+    isDead: function() {
+        for (var i = 0; i < this.actors.length; ++i) {
+            if (this.actors[i].hp > 0) {
+                return true;
+            }
+        }
+        return false;
+    },
+    // Damage a number of chars
+    damage: function(chars, damage) {
+        for (var i = 0; i < chars; ++i) {
+            this.actors[Math.round(Math.random() * this.actors.length)].actor.hp -= damage;
         }
     }
 };

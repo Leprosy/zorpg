@@ -28,5 +28,23 @@ ZORPG.Components.party = {
         if (!this.hasAward(args.awardId)) {
             this.awards[args.awardId] = args.desc;
         }
+    },
+
+    // Damage & death
+    isDead: function() {
+        for (var i = 0; i < this.actors.length; ++i) {
+            if (this.actors[i].hp > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    },
+
+    // Damage a number of chars
+    damage: function(chars, damage) {
+        for (var i = 0; i < chars; ++i) {
+            this.actors[Math.round(Math.random() * this.actors.length)].actor.hp -= damage;
+        }
     }
 }
