@@ -11,7 +11,7 @@ ZORPG.Components.actor = {
     con: 1,
     ac: 0,
 
-    // Roll attributes - DEBUG only
+    // Roll attributes & get a random monster - DEBUG only?
     roll: function() {
         this.spd = ZORPG.Utils.die("1d10+4");
         this.str = ZORPG.Utils.die("1d10+4");

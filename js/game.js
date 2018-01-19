@@ -175,6 +175,62 @@ ZORPG.Canvas = function() {
                     call();
                 }
             });
+        },
+        // Update roster
+        drawChars: function() {
+            $("#roster").html("");
+            for (var i = 0; i < ZORPG.Player.party.actors.length; ++i) {
+                var char = ZORPG.Player.party.actors[i];
+                var div = $("<div>");
+                div.addClass("col-md-4");
+                div.html("<b>" + char.actor.name + "</b><br />HP:" + char.actor.hp);
+                $("#roster").append(div);
+            }
+        },
+        // Shakes the camera
+        shake: function(str, call) {
+            var speed = 10;
+            var str = str || .25;
+            var steps = 6;
+            var alpha = this.camera.alpha;
+            var beta = this.camera.beta;
+            var ani1 = new BABYLON.Animation("rotate", "alpha", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT);
+            var ani2 = new BABYLON.Animation("rotate", "beta", 60, BABYLON.Animation.ANIMATIONTYPE_FLOAT);
+            var keys = [ {
+                frame: 0,
+                value: alpha
+            } ];
+            for (var i = 1; i < steps; ++i) {
+                keys.push({
+                    frame: i * speed / steps,
+                    value: alpha + (Math.random() * str - str / 2)
+                });
+            }
+            keys.push({
+                frame: speed,
+                value: alpha
+            });
+            ani1.setKeys(keys);
+            keys = [ {
+                frame: 0,
+                value: beta
+            } ];
+            for (var i = 1; i < steps; ++i) {
+                keys.push({
+                    frame: i * speed / steps,
+                    value: beta + (Math.random() * str - str / 2)
+                });
+            }
+            keys.push({
+                frame: speed,
+                value: beta
+            });
+            ani2.setKeys(keys);
+            this.camera.animations.push(ani1);
+            this.camera.animations.push(ani2);
+            this.scene.beginAnimation(this.camera, 0, speed, false, 1, function() {
+                console.log("end shake!");
+            });
         }
     };
 }();
@@ -1021,7 +1077,7 @@ ZORPG.Components.actor = {
     spd: 1,
     con: 1,
     ac: 0,
-    // Roll attributes - DEBUG only
+    // Roll attributes & get a random monster - DEBUG only?
     roll: function() {
         this.spd = ZORPG.Utils.die("1d10+4");
         this.str = ZORPG.Utils.die("1d10+4");
