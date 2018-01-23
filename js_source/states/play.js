@@ -4,6 +4,8 @@ ZORPG.State.add("play", {
     turnPass: false,
 
     init: function() {
+        ZORPG.Canvas.setHUD("play");
+
         // Test code. Player, Monsters and Map - THIS IS HACKY, I know
         // TODO: Player, monsters should be stored somewhere else?(idea: build a singleton containing entities[actors])
         // TODO: Add check for create Player/Map/anytghin

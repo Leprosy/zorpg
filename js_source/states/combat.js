@@ -2,6 +2,7 @@
 ZORPG.State.add("combat", {
     name: "Combating",
     combatQ: [],
+    combatIndex: 0,
 
     init: function() {
         // Set key handlers
@@ -35,6 +36,7 @@ ZORPG.State.add("combat", {
     beginTurn: function() {
         console.log("ZORPG.State.combat: Turn begins.");
         this.combatQ = [];
+        this.combatIndex = 0;
 
         // Move monsters
         /* for (var i = 0; i < 3; ++i) {
@@ -58,10 +60,10 @@ ZORPG.State.add("combat", {
         }
 
         this.combatQ.sort(function(a, b) {
-            if (a.actor.spd > b.actor.spd) {
+            if (a.actor.spd < b.actor.spd) {
                 return 1;
             }
-            if (a.actor.spd < b.actor.spd) {
+            if (a.actor.spd > b.actor.spd) {
                 return -1;
             }
             return 0;
@@ -71,9 +73,9 @@ ZORPG.State.add("combat", {
     },
 
     action: function() {
-        var fighter = this.combatQ[this.combatQ.length - 1];
+        var fighter = this.combatQ[this.combatIndex];
         console.log("FIGHTER", fighter, "ACTION");
-        this.combatQ.pop();
+        this.combatIndex++;
     },
 
     update: function() {
@@ -81,12 +83,12 @@ ZORPG.State.add("combat", {
         var _this = this;
 
         // Begin turn
-        if (this.combatQ.length === 0) {
+        if (this.combatQ.length === this.combatIndex) {
             this.beginTurn();
         }
 
         // Perform actions until human
-        while (this.combatQ.length > 0 && this.combatQ[this.combatQ.length - 1].hasCmp("monster")) {
+        while (this.combatQ.length > this.combatIndex && this.combatQ[this.combatIndex].hasCmp("monster")) {
             this.action();
         }
 
@@ -94,9 +96,14 @@ ZORPG.State.add("combat", {
     },
 
     render: function() {
+        var _this = this;
+
         ZORPG.Canvas.update(function() {
             console.log("ZORPG.State.combat: Update completed");
-            $("#console").html("Combating:\n: " + JSON.stringify(ZORPG.Monsters) + "\n" + JSON.stringify(ZORPG.Player.party.actors));
+
+            // Update HUD
+            ZORPG.Canvas.setHUD("combat", {monsters: _this.combatQ});
+            //$("#console").html("Combating:\n: " + JSON.stringify(ZORPG.Monsters) + "\n" + JSON.stringify(ZORPG.Player.party.actors));
         });
     },
 

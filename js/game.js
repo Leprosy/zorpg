@@ -189,6 +189,23 @@ ZORPG.Canvas = function() {
                 $("#roster").append(div);
             }
         },
+        // Set the different states HUDs/GUIs
+        setHUD: function(hud, data) {
+            switch (hud) {
+              case "play":
+                $("#side").html("<h5>-play hud-</h5>");
+                break;
+
+              case "combat":
+                $("#side").html("<h5>-combat hud-</h5>");
+                for (var i = 0; i < data.monsters.length; ++i) {
+                    if (data.monsters[i].hasCmp("monster")) {
+                        $("#side").append('<li id="monster' + i + '">' + data.monsters[i].actor + "</li>");
+                    }
+                }
+                break;
+            }
+        },
         // Shakes the camera
         shake: function(str, call) {
             var speed = 10;
@@ -713,6 +730,7 @@ ZORPG.__name__ = "ZORPG demo";
 ZORPG.State.add("combat", {
     name: "Combating",
     combatQ: [],
+    combatIndex: 0,
     init: function() {
         // Set key handlers
         var _this = this;
@@ -742,6 +760,7 @@ ZORPG.State.add("combat", {
     beginTurn: function() {
         console.log("ZORPG.State.combat: Turn begins.");
         this.combatQ = [];
+        this.combatIndex = 0;
         // Move monsters
         /* for (var i = 0; i < 3; ++i) {
             var combat = ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos);
@@ -761,10 +780,10 @@ ZORPG.State.add("combat", {
             this.combatQ.push(ZORPG.Player.party.actors[i]);
         }
         this.combatQ.sort(function(a, b) {
-            if (a.actor.spd > b.actor.spd) {
+            if (a.actor.spd < b.actor.spd) {
                 return 1;
             }
-            if (a.actor.spd < b.actor.spd) {
+            if (a.actor.spd > b.actor.spd) {
                 return -1;
             }
             return 0;
@@ -772,27 +791,31 @@ ZORPG.State.add("combat", {
         console.log("ZORPG.State.combat: Combat queue generated", this.combatQ);
     },
     action: function() {
-        var fighter = this.combatQ[this.combatQ.length - 1];
+        var fighter = this.combatQ[this.combatIndex];
         console.log("FIGHTER", fighter, "ACTION");
-        this.combatQ.pop();
+        this.combatIndex++;
     },
     update: function() {
         console.log("ZORPG.State.combat: Updating");
         var _this = this;
         // Begin turn
-        if (this.combatQ.length === 0) {
+        if (this.combatQ.length === this.combatIndex) {
             this.beginTurn();
         }
         // Perform actions until human
-        while (this.combatQ.length > 0 && this.combatQ[this.combatQ.length - 1].hasCmp("monster")) {
+        while (this.combatQ.length > this.combatIndex && this.combatQ[this.combatIndex].hasCmp("monster")) {
             this.action();
         }
         this.render();
     },
     render: function() {
+        var _this = this;
         ZORPG.Canvas.update(function() {
             console.log("ZORPG.State.combat: Update completed");
-            $("#console").html("Combating:\n: " + JSON.stringify(ZORPG.Monsters) + "\n" + JSON.stringify(ZORPG.Player.party.actors));
+            // Update HUD
+            ZORPG.Canvas.setHUD("combat", {
+                monsters: _this.combatQ
+            });
         });
     },
     destroy: function() {
@@ -932,6 +955,7 @@ ZORPG.State.add("play", {
     name: "Playing",
     turnPass: false,
     init: function() {
+        ZORPG.Canvas.setHUD("play");
         // Test code. Player, Monsters and Map - THIS IS HACKY, I know
         // TODO: Player, monsters should be stored somewhere else?(idea: build a singleton containing entities[actors])
         // TODO: Add check for create Player/Map/anytghin
@@ -1094,6 +1118,8 @@ ZORPG.Components.actor = {
 };
 
 ZORPG.Components.monster = {
+    attacks: 1,
+    hits: 1,
     type: "undead"
 };
 

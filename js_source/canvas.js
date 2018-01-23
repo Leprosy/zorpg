@@ -181,6 +181,25 @@ ZORPG.Canvas = (function() {
             }
         },
 
+        // Set the different states HUDs/GUIs
+        setHUD: function(hud, data) {
+            switch(hud) {
+                case "play":
+                    $("#side").html("<h5>-play hud-</h5>");
+                    break;
+                case "combat":
+                    $("#side").html("<h5>-combat hud-</h5>");
+
+                    for (var i = 0; i < data.monsters.length; ++i) {
+                        if (data.monsters[i].hasCmp("monster")) {
+                            $("#side").append("<li id=\"monster" + i + "\">" + data.monsters[i].actor + "</li>");
+                        }
+                    }
+
+                    break;
+            }
+        },
+
         // Shakes the camera
         shake: function(str, call) {
             var speed = 10;
