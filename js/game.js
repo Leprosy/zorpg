@@ -776,6 +776,10 @@ ZORPG.State.add("combat", {
                 this.combatQ.push(monster);
             }
         }
+        // If no monsters...return to play
+        if (this.combatQ.length === 0) {
+            ZORPG.State.set("play");
+        }
         for (var i = 0; i < ZORPG.Player.party.actors.length; ++i) {
             this.combatQ.push(ZORPG.Player.party.actors[i]);
         }
@@ -792,7 +796,12 @@ ZORPG.State.add("combat", {
     },
     action: function() {
         var fighter = this.combatQ[this.combatIndex];
-        console.log("FIGHTER", fighter, "ACTION");
+        console.log("ZORPG.State.combat: Action from", fighter);
+        // Monster...attack party
+        if (fighter.hasCmp("monster")) {
+            ZORPG.Player.party.damage(fighter.monster.attacks, ZORPG.Utils.die("1d" + fighter.actor.str));
+            ZORPG.Canvas.shake(.2);
+        }
         this.combatIndex++;
     },
     update: function() {
@@ -1120,7 +1129,6 @@ ZORPG.Components.actor = {
 
 ZORPG.Components.monster = {
     attacks: 1,
-    hits: 1,
     type: "undead"
 };
 
@@ -1166,7 +1174,9 @@ ZORPG.Components.party = {
     // Damage a number of chars
     damage: function(chars, damage) {
         for (var i = 0; i < chars; ++i) {
-            this.actors[Math.round(Math.random() * this.actors.length)].actor.hp -= damage;
+            var ent = this.actors[Math.round(Math.random() * this.actors.length)];
+            ent.actor.hp -= damage;
+            console.log("ZORPG.Component.party: Actor " + ent.actor + " damaged for " + damage);
         }
     }
 };

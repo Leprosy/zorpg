@@ -29,6 +29,5 @@ ZORPG.Components.actor = {
 
 ZORPG.Components.monster = {
     attacks: 1,
-    hits: 1,
     type: "undead"
 }

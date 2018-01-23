@@ -3,6 +3,7 @@ ZORPG.State.add("combat", {
     name: "Combating",
     combatQ: [],
     combatIndex: 0,
+    target: 0,
 
     init: function() {
         // Set key handlers
@@ -55,6 +56,12 @@ ZORPG.State.add("combat", {
                 this.combatQ.push(monster); // Check if monster is alive
             }
         }
+
+        // If no monsters...return to play
+        if (this.combatQ.length === 0) {
+            ZORPG.State.set("play");
+        }
+
         for (var i = 0; i < ZORPG.Player.party.actors.length; ++i) {
             this.combatQ.push(ZORPG.Player.party.actors[i]); // Check if actor is alive
         }
@@ -74,7 +81,14 @@ ZORPG.State.add("combat", {
 
     action: function() {
         var fighter = this.combatQ[this.combatIndex];
-        console.log("FIGHTER", fighter, "ACTION");
+        console.log("ZORPG.State.combat: Action from", fighter);
+
+        // Monster...attack party
+        if (fighter.hasCmp("monster")) {
+            ZORPG.Player.party.damage(fighter.monster.attacks, ZORPG.Utils.die("1d" + fighter.actor.str));
+            ZORPG.Canvas.shake(0.2);
+        }
+
         this.combatIndex++;
     },
 

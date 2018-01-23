@@ -44,7 +44,9 @@ ZORPG.Components.party = {
     // Damage a number of chars
     damage: function(chars, damage) {
         for (var i = 0; i < chars; ++i) {
-            this.actors[Math.round(Math.random() * this.actors.length)].actor.hp -= damage;
+            var ent = this.actors[Math.round(Math.random() * this.actors.length)];
+            ent.actor.hp -= damage;
+            console.log("ZORPG.Component.party: Actor " + ent.actor + " damaged for " + damage);
         }
     }
 }
