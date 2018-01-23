@@ -176,7 +176,7 @@ ZORPG.Canvas = (function() {
 
                 var div = $("<div>");
                 div.addClass("col-md-4");
-                div.html("<b>" + char.actor.name + "</b><br />HP:" + char.actor.hp);
+                div.html(char.actor.toString());
                 $("#roster").append(div);
             }
         },

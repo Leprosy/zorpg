@@ -23,7 +23,7 @@ ZORPG.Components.actor = {
     },
 
     toString: function() {
-        return this.name + ":" + this.hp + "hp";
+        return "<b>" + this.name + "</b>:" + this.hp + "hp " + this.spd + "spd";
     }
 }
 

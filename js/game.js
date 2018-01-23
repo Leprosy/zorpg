@@ -185,7 +185,7 @@ ZORPG.Canvas = function() {
                 var char = ZORPG.Player.party.actors[i];
                 var div = $("<div>");
                 div.addClass("col-md-4");
-                div.html("<b>" + char.actor.name + "</b><br />HP:" + char.actor.hp);
+                div.html(char.actor.toString());
                 $("#roster").append(div);
             }
         },
@@ -960,13 +960,14 @@ ZORPG.State.add("play", {
         // TODO: Player, monsters should be stored somewhere else?(idea: build a singleton containing entities[actors])
         // TODO: Add check for create Player/Map/anytghin
         if (typeof ZORPG.Player === "undefined") {
+            var names = [ "Lepro", "CragHack", "Maximus" ];
             ZORPG.Map.load(JSON.parse(ZORPG.Loader.tasks[0].text));
             ZORPG.Player = new ZORPG.Ent("player", [ "pos", "party" ]);
             ZORPG.Player.pos.x = ZORPG.Map.properties.startX;
             ZORPG.Player.pos.y = ZORPG.Map.properties.startY;
             for (var i = 0; i < 3; ++i) {
                 var ent = new ZORPG.Ent("character" + i, [ "actor" ]);
-                ent.actor.name = "Character " + i;
+                ent.actor.name = names[i];
                 ent.actor.roll();
                 ZORPG.Player.party.actors.push(ent);
             }
@@ -1113,7 +1114,7 @@ ZORPG.Components.actor = {
         this.xp = ZORPG.Utils.die("1d50+10");
     },
     toString: function() {
-        return this.name + ":" + this.hp + "hp";
+        return "<b>" + this.name + "</b>:" + this.hp + "hp " + this.spd + "spd";
     }
 };
 

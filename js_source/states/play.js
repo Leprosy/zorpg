@@ -10,6 +10,7 @@ ZORPG.State.add("play", {
         // TODO: Player, monsters should be stored somewhere else?(idea: build a singleton containing entities[actors])
         // TODO: Add check for create Player/Map/anytghin
         if (typeof ZORPG.Player === "undefined") {
+            var names = ["Lepro", "CragHack", "Maximus"];
             ZORPG.Map.load(JSON.parse(ZORPG.Loader.tasks[0].text));
             ZORPG.Player = new ZORPG.Ent("player", ["pos", "party"]);
             ZORPG.Player.pos.x = ZORPG.Map.properties.startX;
@@ -17,7 +18,7 @@ ZORPG.State.add("play", {
 
             for (var i = 0; i < 3; ++i) {
                 var ent = new ZORPG.Ent("character" + i, ["actor"]);
-                ent.actor.name = "Character " + i;
+                ent.actor.name = names[i];
                 ent.actor.roll();
                 ZORPG.Player.party.actors.push(ent);
             }
