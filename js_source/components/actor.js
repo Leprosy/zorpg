@@ -24,10 +24,17 @@ ZORPG.Components.actor = {
 
     toString: function() {
         return "<b>" + this.name + "</b>:" + this.hp + "hp " + this.spd + "spd";
-    }
-}
+    },
 
-ZORPG.Components.monster = {
-    attacks: 1,
-    type: "undead"
+    isAlive: function() {
+        return this.hp > 0;
+    },
+
+    // Damages this actor
+    damage: function(ent) {
+        var damage = ZORPG.Utils.die("1d" + ent.actor.str); // TODO: some way to calculate damage/dodge/etc.
+        this.hp -= damage;
+        console.log("ZORPG.Components.actor: Actor " + this.name + " gets " + damage + " damage from " + ent.actor.name);
+        ZORPG.Canvas.shake(damage * 0.01)
+    }
 }

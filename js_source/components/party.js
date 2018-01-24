@@ -31,9 +31,9 @@ ZORPG.Components.party = {
     },
 
     // Damage & death
-    isDead: function() {
+    isAlive: function() {
         for (var i = 0; i < this.actors.length; ++i) {
-            if (this.actors[i].hp > 0) {
+            if (this.actors.isAlive()) {
                 return true;
             }
         }
@@ -42,11 +42,11 @@ ZORPG.Components.party = {
     },
 
     // Damage a number of chars
-    damage: function(chars, damage) {
-        for (var i = 0; i < chars; ++i) {
-            var ent = this.actors[Math.round(Math.random() * this.actors.length)];
-            ent.actor.hp -= damage;
-            console.log("ZORPG.Component.party: Actor " + ent.actor + " damaged for " + damage);
+    damage: function(ent) {
+        for (var i = 0; i < ent.monster.attacks; ++i) {
+            var index = Math.round(Math.random() * (this.actors.length - 1));
+            console.log("ZORPG.Component.party: Actor picked to be attacked:", index, this.actors[index]);
+            this.actors[index].actor.damage(ent);
         }
     }
 }
