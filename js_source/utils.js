@@ -26,6 +26,7 @@ ZORPG.Utils = {
     },
 
     // Dice
+    // TODO: allow zero values?
     die: function(str) {
         try {
             //xdy+z => x dices of y faces, ie (random(y) * x) + z
