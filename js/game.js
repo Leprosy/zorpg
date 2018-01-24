@@ -700,6 +700,7 @@ ZORPG.Utils = {
         return false;
     },
     // Dice
+    // TODO: allow zero values?
     die: function(str) {
         try {
             //xdy+z => x dices of y faces, ie (random(y) * x) + z
@@ -731,6 +732,7 @@ ZORPG.State.add("combat", {
     name: "Combating",
     combatQ: [],
     combatIndex: 0,
+    target: 0,
     init: function() {
         // Set key handlers
         var _this = this;
@@ -750,9 +752,9 @@ ZORPG.State.add("combat", {
             _this.render();
         });
         ZORPG.Key.add("Space", function(ev) {
-            console.log("ATTACK!");
             _this.action();
             _this.update();
+            _this.render();
         });
         // Init monster queue & draw
         this.update();
@@ -772,7 +774,7 @@ ZORPG.State.add("combat", {
         // Build combat queue
         for (var i = 0; i < ZORPG.Monsters.length; ++i) {
             var monster = ZORPG.Monsters[i];
-            if (monster.pos.equals(ZORPG.Player.pos) && !ZORPG.Utils.inArray(monster, this.combatQ)) {
+            if (monster.pos.equals(ZORPG.Player.pos) && !ZORPG.Utils.inArray(monster, this.combatQ) && monster.actor.hp >= 0) {
                 this.combatQ.push(monster);
             }
         }
@@ -797,12 +799,28 @@ ZORPG.State.add("combat", {
     action: function() {
         var fighter = this.combatQ[this.combatIndex];
         console.log("ZORPG.State.combat: Action from", fighter);
-        // Monster...attack party
+        // TODO: ENCAPSULATE THIS IN COMPONENTS
+        // fighter is a Monster...attack party
         if (fighter.hasCmp("monster")) {
-            ZORPG.Player.party.damage(fighter.monster.attacks, ZORPG.Utils.die("1d" + fighter.actor.str));
-            ZORPG.Canvas.shake(.2);
+            ZORPG.Player.party.damage(fighter);
+        } else {
+            // fighter is a Party character...attack targeted Monster
+            var monster = this.getTargetedMonster();
+            monster.actor.damage(fighter);
         }
         this.combatIndex++;
+    },
+    getTargetedMonster: function() {
+        var j = 0;
+        for (var i = 0; i < this.combatQ.length; ++i) {
+            if (this.combatQ[i].hasCmp("monster")) {
+                if (j === this.target) {
+                    return this.combatQ[i];
+                } else {
+                    j++;
+                }
+            }
+        }
     },
     update: function() {
         console.log("ZORPG.State.combat: Updating");
@@ -815,7 +833,6 @@ ZORPG.State.add("combat", {
         while (this.combatQ.length > this.combatIndex && this.combatQ[this.combatIndex].hasCmp("monster")) {
             this.action();
         }
-        this.render();
     },
     render: function() {
         var _this = this;
@@ -1124,9 +1141,27 @@ ZORPG.Components.actor = {
     },
     toString: function() {
         return "<b>" + this.name + "</b>:" + this.hp + "hp " + this.spd + "spd";
+    },
+    isAlive: function() {
+        return this.hp > 0;
+    },
+    // Damages this actor
+    damage: function(ent) {
+        // Calculate attack success/damage/etc.
+        // TODO: Which are the rules for this?
+        var damage = ZORPG.Utils.die("1d" + ent.actor.str);
+        this.hp -= damage;
+        console.log("ZORPG.Components.actor: Actor " + this.name + " gets " + damage + " damage from " + ent.actor.name);
+        // If the attack is from a monster, shake camera
+        if (ent.hasCmp("monster")) {
+            ZORPG.Canvas.shake(damage * .01);
+        }
     }
 };
 
+/**
+ * monster: Component that provides monster attributes, like type, num of attacks, treasure spawned, etc.
+ */
 ZORPG.Components.monster = {
     attacks: 1,
     type: "undead"
@@ -1163,20 +1198,20 @@ ZORPG.Components.party = {
         }
     },
     // Damage & death
-    isDead: function() {
+    isAlive: function() {
         for (var i = 0; i < this.actors.length; ++i) {
-            if (this.actors[i].hp > 0) {
+            if (this.actors.isAlive()) {
                 return true;
             }
         }
         return false;
     },
     // Damage a number of chars
-    damage: function(chars, damage) {
-        for (var i = 0; i < chars; ++i) {
-            var ent = this.actors[Math.round(Math.random() * this.actors.length)];
-            ent.actor.hp -= damage;
-            console.log("ZORPG.Component.party: Actor " + ent.actor + " damaged for " + damage);
+    damage: function(ent) {
+        for (var i = 0; i < ent.monster.attacks; ++i) {
+            var index = Math.round(Math.random() * (this.actors.length - 1));
+            console.log("ZORPG.Component.party: Actor picked to be attacked:", index, this.actors[index]);
+            this.actors[index].actor.damage(ent);
         }
     }
 };

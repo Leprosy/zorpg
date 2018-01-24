@@ -32,9 +32,15 @@ ZORPG.Components.actor = {
 
     // Damages this actor
     damage: function(ent) {
-        var damage = ZORPG.Utils.die("1d" + ent.actor.str); // TODO: some way to calculate damage/dodge/etc.
+        // Calculate attack success/damage/etc.
+        // TODO: Which are the rules for this?
+        var damage = ZORPG.Utils.die("1d" + ent.actor.str);
         this.hp -= damage;
         console.log("ZORPG.Components.actor: Actor " + this.name + " gets " + damage + " damage from " + ent.actor.name);
-        ZORPG.Canvas.shake(damage * 0.01)
+
+        // If the attack is from a monster, shake camera
+        if (ent.hasCmp("monster")) {
+            ZORPG.Canvas.shake(damage * 0.01)
+        }
     }
 }

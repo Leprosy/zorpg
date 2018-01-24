@@ -25,9 +25,9 @@ ZORPG.State.add("combat", {
             _this.render();
         });
         ZORPG.Key.add("Space", function(ev) {
-            console.log("ATTACK!");
             _this.action();
             _this.update();
+            _this.render();
         });
 
         // Init monster queue & draw
@@ -52,8 +52,8 @@ ZORPG.State.add("combat", {
         for (var i = 0; i < ZORPG.Monsters.length; ++i) {
             var monster = ZORPG.Monsters[i];
 
-            if (monster.pos.equals(ZORPG.Player.pos) && !ZORPG.Utils.inArray(monster, this.combatQ)) {
-                this.combatQ.push(monster); // Check if monster is alive
+            if (monster.pos.equals(ZORPG.Player.pos) && !ZORPG.Utils.inArray(monster, this.combatQ) && monster.actor.hp >= 0) {
+                this.combatQ.push(monster);
             }
         }
 
@@ -83,13 +83,30 @@ ZORPG.State.add("combat", {
         var fighter = this.combatQ[this.combatIndex];
         console.log("ZORPG.State.combat: Action from", fighter);
 
-        // Monster...attack party
+        // TODO: ENCAPSULATE THIS IN COMPONENTS
+        // fighter is a Monster...attack party
         if (fighter.hasCmp("monster")) {
-            ZORPG.Player.party.damage(fighter.monster.attacks, ZORPG.Utils.die("1d" + fighter.actor.str));
-            ZORPG.Canvas.shake(0.2);
+            ZORPG.Player.party.damage(fighter);
+        } else { // fighter is a Party character...attack targeted Monster
+            var monster = this.getTargetedMonster();
+            monster.actor.damage(fighter);
         }
 
         this.combatIndex++;
+    },
+
+    getTargetedMonster: function() {
+        var j = 0;
+
+        for (var i = 0; i < this.combatQ.length; ++i) {
+            if (this.combatQ[i].hasCmp("monster")) {
+                if (j === this.target) {
+                    return this.combatQ[i];
+                } else {
+                    j++;
+                }
+            }
+        }
     },
 
     update: function() {
@@ -105,8 +122,6 @@ ZORPG.State.add("combat", {
         while (this.combatQ.length > this.combatIndex && this.combatQ[this.combatIndex].hasCmp("monster")) {
             this.action();
         }
-
-        this.render();
     },
 
     render: function() {
