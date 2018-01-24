@@ -94,10 +94,13 @@ ZORPG.State.add("play", {
             this.turnPass = false;
 
             // Monsters
-            for (var i = 0; i < 3; ++i) {
-                if (ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos)) {
-                    combat = true;
-                    monster = ZORPG.Monsters[i];
+            // TODO: refactor checking moster alive
+            for (var i = 0; i < ZORPG.Monsters.length; ++i) {
+                if (ZORPG.Monsters[i].actor.isAlive()) {
+                    if (ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos)) {
+                        combat = true;
+                        monster = ZORPG.Monsters[i];
+                    }
                 }
             }
         }

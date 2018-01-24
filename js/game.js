@@ -167,8 +167,13 @@ ZORPG.Canvas = function() {
                 // Monsters (TODO: animated translation)
                 for (var i = 0; i < ZORPG.Monsters.length; ++i) {
                     var monster = ZORPG.Canvas.scene.getMeshByID("monster" + i);
-                    monster.position.x = ZORPG.Monsters[i].pos.x * _this.tileSize;
-                    monster.position.z = ZORPG.Monsters[i].pos.y * _this.tileSize;
+                    if (ZORPG.Monsters[i].actor.isAlive()) {
+                        monster.position.x = ZORPG.Monsters[i].pos.x * _this.tileSize;
+                        monster.position.z = ZORPG.Monsters[i].pos.y * _this.tileSize;
+                    } else {
+                        // TODO: dispose? change model to a corpse?
+                        monster.scaling.y = .1;
+                    }
                 }
                 // HUD
                 _this.updateChars();
@@ -754,7 +759,6 @@ ZORPG.State.add("combat", {
         ZORPG.Key.add("Space", function(ev) {
             _this.action();
             _this.update();
-            _this.render();
         });
         // Init monster queue & draw
         this.update();
@@ -766,10 +770,6 @@ ZORPG.State.add("combat", {
         // Move monsters
         /* for (var i = 0; i < 3; ++i) {
             var combat = ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos);
-
-            if (combat) {
-                ZORPG.State.set("combat", {monster: ZORPG.Monsters[i]});
-            }
         } */
         // Build combat queue
         for (var i = 0; i < ZORPG.Monsters.length; ++i) {
@@ -778,28 +778,26 @@ ZORPG.State.add("combat", {
                 this.combatQ.push(monster);
             }
         }
-        // If no monsters...return to play
-        if (this.combatQ.length === 0) {
-            ZORPG.State.set("play");
-        }
-        for (var i = 0; i < ZORPG.Player.party.actors.length; ++i) {
-            this.combatQ.push(ZORPG.Player.party.actors[i]);
-        }
-        this.combatQ.sort(function(a, b) {
-            if (a.actor.spd < b.actor.spd) {
-                return 1;
+        // If no alive monsters...return.
+        if (this.combatQ.length > 0) {
+            for (var i = 0; i < ZORPG.Player.party.actors.length; ++i) {
+                this.combatQ.push(ZORPG.Player.party.actors[i]);
             }
-            if (a.actor.spd > b.actor.spd) {
-                return -1;
-            }
-            return 0;
-        });
-        console.log("ZORPG.State.combat: Combat queue generated", this.combatQ);
+            this.combatQ.sort(function(a, b) {
+                if (a.actor.spd < b.actor.spd) {
+                    return 1;
+                }
+                if (a.actor.spd > b.actor.spd) {
+                    return -1;
+                }
+                return 0;
+            });
+            console.log("ZORPG.State.combat: Combat queue generated", this.combatQ);
+        }
     },
     action: function() {
         var fighter = this.combatQ[this.combatIndex];
         console.log("ZORPG.State.combat: Action from", fighter);
-        // TODO: ENCAPSULATE THIS IN COMPONENTS
         // fighter is a Monster...attack party
         if (fighter.hasCmp("monster")) {
             ZORPG.Player.party.damage(fighter);
@@ -829,9 +827,17 @@ ZORPG.State.add("combat", {
         if (this.combatQ.length === this.combatIndex) {
             this.beginTurn();
         }
-        // Perform actions until human
-        while (this.combatQ.length > this.combatIndex && this.combatQ[this.combatIndex].hasCmp("monster")) {
-            this.action();
+        // Are there monsters left? If not...return to play state
+        if (this.combatQ.length > 0) {
+            this.render();
+            // Perform actions until human
+            while (this.combatQ.length > this.combatIndex && this.combatQ[this.combatIndex].hasCmp("monster")) {
+                this.action();
+            }
+            // Render
+            _this.render();
+        } else {
+            ZORPG.State.set("play");
         }
     },
     render: function() {
@@ -890,7 +896,7 @@ ZORPG.State.add("main_menu", {
     destroy: function() {}
 });
 
-// TODO: Refactor the dialog code into something that one can see...
+// TODO: Refactor the dialog code into something that one can look at...
 ZORPG.State.add("message", {
     name: "message",
     init: function() {
@@ -1060,10 +1066,13 @@ ZORPG.State.add("play", {
             console.log("ZORPG.State.play: Turn pass.");
             this.turnPass = false;
             // Monsters
-            for (var i = 0; i < 3; ++i) {
-                if (ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos)) {
-                    combat = true;
-                    monster = ZORPG.Monsters[i];
+            // TODO: refactor checking moster alive
+            for (var i = 0; i < ZORPG.Monsters.length; ++i) {
+                if (ZORPG.Monsters[i].actor.isAlive()) {
+                    if (ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos)) {
+                        combat = true;
+                        monster = ZORPG.Monsters[i];
+                    }
                 }
             }
         }

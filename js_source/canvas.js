@@ -145,8 +145,14 @@ ZORPG.Canvas = (function() {
                 // Monsters (TODO: animated translation)
                 for (var i = 0; i < ZORPG.Monsters.length; ++i) {
                     var monster = ZORPG.Canvas.scene.getMeshByID("monster" + i);
-                    monster.position.x = ZORPG.Monsters[i].pos.x * _this.tileSize;
-                    monster.position.z = ZORPG.Monsters[i].pos.y * _this.tileSize;
+
+                    if (ZORPG.Monsters[i].actor.isAlive()) {
+                        monster.position.x = ZORPG.Monsters[i].pos.x * _this.tileSize;
+                        monster.position.z = ZORPG.Monsters[i].pos.y * _this.tileSize;
+                    } else {
+                        // TODO: dispose? change model to a corpse?
+                        monster.scaling.y = 0.1;
+                    }
                 }
 
                 // HUD
