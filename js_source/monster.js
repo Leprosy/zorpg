@@ -38,6 +38,19 @@ ZORPG.Monsters = (function() {
             if (index >= 0) {
                 monsters.splice(index, 1);
             }
+        },
+
+        // Get the fight-ready monsters(alive & in the same position as the party)
+        getFightReady: function() {
+            var list = [];
+
+            for (var i = 0; i < monsters.length; ++i) {
+                if (monsters[i].pos.equals(ZORPG.Player.pos) && monsters[i].actor.isAlive()) {
+                    list.push(monsters[i]);
+                }
+            }
+
+            return list;
         }
     }
 })();

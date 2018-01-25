@@ -170,6 +170,7 @@ ZORPG.Canvas = function() {
                         mesh.position.z = monster.pos.y * _this.tileSize;
                     } else {
                         // TODO: dispose? change model to a corpse?
+                        mesh.position.y = _this.tileSize * .05;
                         mesh.scaling.y = .1;
                     }
                 });
@@ -535,6 +536,16 @@ ZORPG.Monsters = function() {
             if (index >= 0) {
                 monsters.splice(index, 1);
             }
+        },
+        // Get the fight-ready monsters(alive & in the same position as the party)
+        getFightReady: function() {
+            var list = [];
+            for (var i = 0; i < monsters.length; ++i) {
+                if (monsters[i].pos.equals(ZORPG.Player.pos) && monsters[i].actor.isAlive()) {
+                    list.push(monsters[i]);
+                }
+            }
+            return list;
         }
     };
 }();
@@ -772,7 +783,7 @@ ZORPG.State.add("combat", {
     name: "Combating",
     combatQ: [],
     combatIndex: 0,
-    target: 0,
+    combatTarget: 0,
     init: function() {
         // Set key handlers
         var _this = this;
@@ -795,7 +806,7 @@ ZORPG.State.add("combat", {
             _this.action();
             _this.update();
         });
-        // Init monster queue & draw
+        // Init combat
         this.update();
     },
     beginTurn: function() {
@@ -804,13 +815,8 @@ ZORPG.State.add("combat", {
         this.combatQ = [];
         this.combatIndex = 0;
         // Move monsters
-        // Build combat queue
-        ZORPG.Monsters.each(function(monster) {
-            if (monster.pos.equals(ZORPG.Player.pos) && !ZORPG.Utils.inArray(monster, _this.combatQ) && monster.actor.isAlive()) {
-                _this.combatQ.push(monster);
-            }
-        });
-        // If no alive monsters...return.
+        // Check if are fightable monsters
+        _this.combatQ = ZORPG.Monsters.getFightReady();
         if (this.combatQ.length > 0) {
             for (var i = 0; i < ZORPG.Player.party.actors.length; ++i) {
                 this.combatQ.push(ZORPG.Player.party.actors[i]);
@@ -835,8 +841,7 @@ ZORPG.State.add("combat", {
             ZORPG.Player.party.damage(fighter);
         } else {
             // fighter is a Party character...attack targeted Monster
-            var monster = this.getTargetedMonster();
-            monster.actor.damage(fighter);
+            this.getTargetedMonster().actor.damage(fighter);
         }
         this.combatIndex++;
     },
@@ -844,7 +849,7 @@ ZORPG.State.add("combat", {
         var j = 0;
         for (var i = 0; i < this.combatQ.length; ++i) {
             if (this.combatQ[i].hasCmp("monster")) {
-                if (j === this.target) {
+                if (j === this.combatTarget) {
                     return this.combatQ[i];
                 } else {
                     j++;
@@ -853,33 +858,31 @@ ZORPG.State.add("combat", {
         }
     },
     update: function() {
-        console.log("ZORPG.State.combat: Updating");
+        console.log("ZORPG.State.combat: Update begins.");
         var _this = this;
-        // Begin turn
+        // Checking if turn is begining
         if (this.combatQ.length === this.combatIndex) {
             this.beginTurn();
         }
         // Are there monsters left? If not...return to play state
         if (this.combatQ.length > 0) {
-            this.render();
             // Perform actions until human
             while (this.combatQ.length > this.combatIndex && this.combatQ[this.combatIndex].hasCmp("monster")) {
                 this.action();
             }
-            // Render
-            _this.render();
+            // Ready for the first human
+            this.render();
         } else {
             ZORPG.State.set("play");
         }
     },
+    // Update graphics
     render: function() {
-        var _this = this;
+        ZORPG.Canvas.setHUD("combat", {
+            monsters: this.combatQ
+        });
         ZORPG.Canvas.update(function() {
             console.log("ZORPG.State.combat: Update completed");
-            // Update HUD
-            ZORPG.Canvas.setHUD("combat", {
-                monsters: _this.combatQ
-            });
         });
     },
     destroy: function() {

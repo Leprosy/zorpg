@@ -3,7 +3,7 @@ ZORPG.State.add("combat", {
     name: "Combating",
     combatQ: [],
     combatIndex: 0,
-    target: 0,
+    combatTarget: 0,
 
     init: function() {
         // Set key handlers
@@ -29,9 +29,12 @@ ZORPG.State.add("combat", {
             _this.update();
         });
 
-        // Init monster queue & draw
+        // Init combat
         this.update();
     },
+
+
+
 
     beginTurn: function() {
         console.log("ZORPG.State.combat: Turn begins.");
@@ -41,14 +44,9 @@ ZORPG.State.add("combat", {
 
         // Move monsters
 
-        // Build combat queue
-        ZORPG.Monsters.each(function(monster) {
-            if (monster.pos.equals(ZORPG.Player.pos) && !ZORPG.Utils.inArray(monster, _this.combatQ) && monster.actor.isAlive()) {
-                _this.combatQ.push(monster);
-            }
-        });
+        // Check if are fightable monsters
+        _this.combatQ = ZORPG.Monsters.getFightReady();
 
-        // If no alive monsters...return.
         if (this.combatQ.length > 0) {
             for (var i = 0; i < ZORPG.Player.party.actors.length; ++i) {
                 this.combatQ.push(ZORPG.Player.party.actors[i]); // Check if actor is alive
@@ -76,8 +74,7 @@ ZORPG.State.add("combat", {
         if (fighter.hasCmp("monster")) {
             ZORPG.Player.party.damage(fighter);
         } else { // fighter is a Party character...attack targeted Monster
-            var monster = this.getTargetedMonster();
-            monster.actor.damage(fighter);
+            this.getTargetedMonster().actor.damage(fighter);
         }
 
         this.combatIndex++;
@@ -88,7 +85,7 @@ ZORPG.State.add("combat", {
 
         for (var i = 0; i < this.combatQ.length; ++i) {
             if (this.combatQ[i].hasCmp("monster")) {
-                if (j === this.target) {
+                if (j === this.combatTarget) {
                     return this.combatQ[i];
                 } else {
                     j++;
@@ -98,39 +95,32 @@ ZORPG.State.add("combat", {
     },
 
     update: function() {
-        console.log("ZORPG.State.combat: Updating")
+        console.log("ZORPG.State.combat: Update begins.")
         var _this = this;
 
-        // Begin turn
+        // Checking if turn is begining
         if (this.combatQ.length === this.combatIndex) {
             this.beginTurn();
         }
 
         // Are there monsters left? If not...return to play state
         if (this.combatQ.length > 0) {
-            this.render();
-
             // Perform actions until human
             while (this.combatQ.length > this.combatIndex && this.combatQ[this.combatIndex].hasCmp("monster")) {
                 this.action();
             }
 
-            // Render
-            _this.render();
+            // Ready for the first human
+            this.render();
         } else {
             ZORPG.State.set("play");
         }
     },
 
+    // Update graphics
     render: function() {
-        var _this = this;
-
-        ZORPG.Canvas.update(function() {
-            console.log("ZORPG.State.combat: Update completed");
-
-            // Update HUD
-            ZORPG.Canvas.setHUD("combat", {monsters: _this.combatQ});
-        });
+        ZORPG.Canvas.setHUD("combat", { monsters: this.combatQ });
+        ZORPG.Canvas.update(function() { console.log("ZORPG.State.combat: Update completed") });
     },
 
     destroy: function() {

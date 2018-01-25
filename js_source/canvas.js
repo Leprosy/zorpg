@@ -149,6 +149,7 @@ ZORPG.Canvas = (function() {
                         mesh.position.z = monster.pos.y * _this.tileSize;
                     } else {
                         // TODO: dispose? change model to a corpse?
+                        mesh.position.y = _this.tileSize * 0.05
                         mesh.scaling.y = 0.1;
                     }
                 });
