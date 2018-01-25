@@ -103,16 +103,14 @@ ZORPG.Canvas = function() {
                 }
             }
             // Monsters
-            for (var i = 0; i < ZORPG.Monsters.length; ++i) {
-                var monster = ZORPG.Monsters[i];
+            var _this = this;
+            ZORPG.Monsters.each(function(monster, i) {
                 var mesh = BABYLON.MeshBuilder.CreateSphere("monster" + i, {
-                    diameter: this.tileSize * .4
-                }, this.scene);
-                mesh.position.x = monster.pos.x * this.tileSize;
-                mesh.position.z = monster.pos.y * this.tileSize;
-                mesh.position.y = this.tileSize / 4;
+                    diameter: _this.tileSize * .4
+                }, _this.scene);
+                mesh.position = new BABYLON.Vector3(monster.pos.x * _this.tileSize, _this.tileSize / 4, monster.pos.y * _this.tileSize);
                 mesh.material = monsterMaterial;
-            }
+            });
             // Put camera/player
             this.camera.target.x = map.properties.startX * this.tileSize;
             this.camera.target.z = map.properties.startY * this.tileSize;
@@ -165,16 +163,16 @@ ZORPG.Canvas = function() {
                 _this.camera.animations = [];
                 // Update rest of the world after player animation ends.
                 // Monsters (TODO: animated translation)
-                for (var i = 0; i < ZORPG.Monsters.length; ++i) {
-                    var monster = ZORPG.Canvas.scene.getMeshByID("monster" + i);
-                    if (ZORPG.Monsters[i].actor.isAlive()) {
-                        monster.position.x = ZORPG.Monsters[i].pos.x * _this.tileSize;
-                        monster.position.z = ZORPG.Monsters[i].pos.y * _this.tileSize;
+                ZORPG.Monsters.each(function(monster, i) {
+                    var mesh = ZORPG.Canvas.scene.getMeshByID("monster" + i);
+                    if (monster.actor.isAlive()) {
+                        mesh.position.x = monster.pos.x * _this.tileSize;
+                        mesh.position.z = monster.pos.y * _this.tileSize;
                     } else {
                         // TODO: dispose? change model to a corpse?
-                        monster.scaling.y = .1;
+                        mesh.scaling.y = .1;
                     }
-                }
+                });
                 // HUD
                 _this.updateChars();
                 // After everything is done, callback
@@ -504,6 +502,43 @@ ZORPG.Map = function() {
     };
 }();
 
+var ZORPG = ZORPG || {};
+
+// Monsters!
+ZORPG.Monsters = function() {
+    var monsters = [];
+    return {
+        init: function(totalMonsters) {
+            var total = totalMonsters || 3;
+            for (var i = 0; i < total; ++i) {
+                var ent = new ZORPG.Ent("monster" + i, [ "pos", "actor", "monster" ]);
+                ent.pos.x = ZORPG.Utils.die("1d15");
+                ent.pos.y = ZORPG.Utils.die("1d15");
+                ent.actor.name = "Monster " + i;
+                ent.actor.roll();
+                ent.actor.spd += 5;
+                monsters.push(ent);
+            }
+        },
+        // Iterate calls in the monster list
+        // TODO: Check if monster is alive?
+        each: function(call) {
+            //console.log("ZORPG.Monster: Iterating call", call);
+            for (var i = 0; i < monsters.length; ++i) {
+                //console.log("ZORPG.Monster: Member", i, monsters[i]);
+                call(monsters[i], i);
+            }
+        },
+        // Remove a monster
+        remove: function(ent) {
+            var index = monsters.indexOf(ent);
+            if (index >= 0) {
+                monsters.splice(index, 1);
+            }
+        }
+    };
+}();
+
 // Scripting module
 ZORPG.Script = function() {
     var lineNumber = 0;
@@ -765,19 +800,16 @@ ZORPG.State.add("combat", {
     },
     beginTurn: function() {
         console.log("ZORPG.State.combat: Turn begins.");
+        var _this = this;
         this.combatQ = [];
         this.combatIndex = 0;
         // Move monsters
-        /* for (var i = 0; i < 3; ++i) {
-            var combat = ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos);
-        } */
         // Build combat queue
-        for (var i = 0; i < ZORPG.Monsters.length; ++i) {
-            var monster = ZORPG.Monsters[i];
-            if (monster.pos.equals(ZORPG.Player.pos) && !ZORPG.Utils.inArray(monster, this.combatQ) && monster.actor.hp >= 0) {
-                this.combatQ.push(monster);
+        ZORPG.Monsters.each(function(monster) {
+            if (monster.pos.equals(ZORPG.Player.pos) && !ZORPG.Utils.inArray(monster, _this.combatQ) && monster.actor.isAlive()) {
+                _this.combatQ.push(monster);
             }
-        }
+        });
         // If no alive monsters...return.
         if (this.combatQ.length > 0) {
             for (var i = 0; i < ZORPG.Player.party.actors.length; ++i) {
@@ -988,12 +1020,14 @@ ZORPG.State.add("play", {
     turnPass: false,
     init: function() {
         ZORPG.Canvas.setHUD("play");
-        // Test code. Player, Monsters and Map - THIS IS HACKY, I know
-        // TODO: Player, monsters should be stored somewhere else?(idea: build a singleton containing entities[actors])
-        // TODO: Add check for create Player/Map/anytghin
+        // Test code for player party - THIS IS HACKY, I know
+        // TODO: Player should be stored somewhere else?(idea: build a singleton containing entities[actors])
         if (typeof ZORPG.Player === "undefined") {
-            var names = [ "Lepro", "CragHack", "Maximus" ];
+            // TODO: Add check for create Player/Map/anything
             ZORPG.Map.load(JSON.parse(ZORPG.Loader.tasks[0].text));
+            ZORPG.Monsters.init();
+            // TODO: This should read data from map or something like that
+            var names = [ "Lepro", "CragHack", "Maximus" ];
             ZORPG.Player = new ZORPG.Ent("player", [ "pos", "party" ]);
             ZORPG.Player.pos.x = ZORPG.Map.properties.startX;
             ZORPG.Player.pos.y = ZORPG.Map.properties.startY;
@@ -1002,16 +1036,6 @@ ZORPG.State.add("play", {
                 ent.actor.name = names[i];
                 ent.actor.roll();
                 ZORPG.Player.party.actors.push(ent);
-            }
-            ZORPG.Monsters = [];
-            for (var i = 0; i < 3; ++i) {
-                var ent = new ZORPG.Ent("monster" + i, [ "pos", "actor", "monster" ]);
-                ent.pos.x = ZORPG.Utils.die("1d15");
-                ent.pos.y = ZORPG.Utils.die("1d15");
-                ent.actor.name = "Monster " + i;
-                ent.actor.roll();
-                ent.actor.spd += 5;
-                ZORPG.Monsters.push(ent);
             }
             ZORPG.Canvas.renderMap();
         }
@@ -1061,20 +1085,18 @@ ZORPG.State.add("play", {
         console.log("ZORPG.State.play: Updating");
         // If a turn pass, calculate world entities, check if combat
         var combat = false;
-        var monster;
         if (this.turnPass) {
             console.log("ZORPG.State.play: Turn pass.");
             this.turnPass = false;
             // Monsters
             // TODO: refactor checking moster alive
-            for (var i = 0; i < ZORPG.Monsters.length; ++i) {
-                if (ZORPG.Monsters[i].actor.isAlive()) {
-                    if (ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos)) {
+            ZORPG.Monsters.each(function(monster) {
+                if (monster.actor.isAlive()) {
+                    if (monster.pos.seek(ZORPG.Player.pos)) {
                         combat = true;
-                        monster = ZORPG.Monsters[i];
                     }
                 }
-            }
+            });
         }
         // Render and go to combat if needed
         ZORPG.Canvas.update(function() {

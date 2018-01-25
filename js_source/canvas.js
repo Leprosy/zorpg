@@ -99,14 +99,12 @@ ZORPG.Canvas = (function() {
             }
 
             // Monsters
-            for (var i = 0; i < ZORPG.Monsters.length; ++i) {
-                var monster = ZORPG.Monsters[i];
-                var mesh = BABYLON.MeshBuilder.CreateSphere("monster" + i, {diameter: this.tileSize * 0.4}, this.scene);
-                mesh.position.x = monster.pos.x * this.tileSize;
-                mesh.position.z = monster.pos.y * this.tileSize;
-                mesh.position.y = this.tileSize / 4;
+            var _this = this;
+            ZORPG.Monsters.each(function(monster, i) {
+                var mesh = BABYLON.MeshBuilder.CreateSphere("monster" + i, {diameter: _this.tileSize * 0.4}, _this.scene);
+                mesh.position = new BABYLON.Vector3(monster.pos.x * _this.tileSize, _this.tileSize / 4, monster.pos.y * _this.tileSize);
                 mesh.material = monsterMaterial;
-            }
+            });
 
             // Put camera/player
             this.camera.target.x = map.properties.startX * this.tileSize;
@@ -143,17 +141,17 @@ ZORPG.Canvas = (function() {
 
                 // Update rest of the world after player animation ends.
                 // Monsters (TODO: animated translation)
-                for (var i = 0; i < ZORPG.Monsters.length; ++i) {
-                    var monster = ZORPG.Canvas.scene.getMeshByID("monster" + i);
+                ZORPG.Monsters.each(function(monster, i) {
+                    var mesh = ZORPG.Canvas.scene.getMeshByID("monster" + i);
 
-                    if (ZORPG.Monsters[i].actor.isAlive()) {
-                        monster.position.x = ZORPG.Monsters[i].pos.x * _this.tileSize;
-                        monster.position.z = ZORPG.Monsters[i].pos.y * _this.tileSize;
+                    if (monster.actor.isAlive()) {
+                        mesh.position.x = monster.pos.x * _this.tileSize;
+                        mesh.position.z = monster.pos.y * _this.tileSize;
                     } else {
                         // TODO: dispose? change model to a corpse?
-                        monster.scaling.y = 0.1;
+                        mesh.scaling.y = 0.1;
                     }
-                }
+                });
 
                 // HUD
                 _this.updateChars();

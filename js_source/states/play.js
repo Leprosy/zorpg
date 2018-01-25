@@ -6,12 +6,13 @@ ZORPG.State.add("play", {
     init: function() {
         ZORPG.Canvas.setHUD("play");
 
-        // Test code. Player, Monsters and Map - THIS IS HACKY, I know
-        // TODO: Player, monsters should be stored somewhere else?(idea: build a singleton containing entities[actors])
-        // TODO: Add check for create Player/Map/anytghin
-        if (typeof ZORPG.Player === "undefined") {
-            var names = ["Lepro", "CragHack", "Maximus"];
+        // Test code for player party - THIS IS HACKY, I know
+        // TODO: Player should be stored somewhere else?(idea: build a singleton containing entities[actors])
+        if (typeof ZORPG.Player === "undefined") { // TODO: Add check for create Player/Map/anything
             ZORPG.Map.load(JSON.parse(ZORPG.Loader.tasks[0].text));
+            ZORPG.Monsters.init(); // TODO: This should read data from map or something like that
+
+            var names = ["Lepro", "CragHack", "Maximus"];
             ZORPG.Player = new ZORPG.Ent("player", ["pos", "party"]);
             ZORPG.Player.pos.x = ZORPG.Map.properties.startX;
             ZORPG.Player.pos.y = ZORPG.Map.properties.startY;
@@ -21,17 +22,6 @@ ZORPG.State.add("play", {
                 ent.actor.name = names[i];
                 ent.actor.roll();
                 ZORPG.Player.party.actors.push(ent);
-            }
-
-            ZORPG.Monsters = [];
-            for (var i = 0; i < 3; ++i) {
-                var ent = new ZORPG.Ent("monster" + i, ["pos", "actor", "monster"]);
-                ent.pos.x = ZORPG.Utils.die("1d15")
-                ent.pos.y = ZORPG.Utils.die("1d15");
-                ent.actor.name = "Monster " + i;
-                ent.actor.roll();
-                ent.actor.spd += 5;
-                ZORPG.Monsters.push(ent);
             }
 
             ZORPG.Canvas.renderMap();
@@ -87,7 +77,6 @@ ZORPG.State.add("play", {
 
         // If a turn pass, calculate world entities, check if combat
         var combat = false;
-        var monster;
 
         if (this.turnPass) {
             console.log("ZORPG.State.play: Turn pass.");
@@ -95,14 +84,13 @@ ZORPG.State.add("play", {
 
             // Monsters
             // TODO: refactor checking moster alive
-            for (var i = 0; i < ZORPG.Monsters.length; ++i) {
-                if (ZORPG.Monsters[i].actor.isAlive()) {
-                    if (ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos)) {
+            ZORPG.Monsters.each(function(monster) {
+                if (monster.actor.isAlive()) {
+                    if (monster.pos.seek(ZORPG.Player.pos)) {
                         combat = true;
-                        monster = ZORPG.Monsters[i];
                     }
                 }
-            }
+            });
         }
 
         // Render and go to combat if needed

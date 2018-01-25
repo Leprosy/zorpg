@@ -35,22 +35,18 @@ ZORPG.State.add("combat", {
 
     beginTurn: function() {
         console.log("ZORPG.State.combat: Turn begins.");
+        var _this = this;
         this.combatQ = [];
         this.combatIndex = 0;
 
         // Move monsters
-        /* for (var i = 0; i < 3; ++i) {
-            var combat = ZORPG.Monsters[i].pos.seek(ZORPG.Player.pos);
-        } */
 
         // Build combat queue
-        for (var i = 0; i < ZORPG.Monsters.length; ++i) {
-            var monster = ZORPG.Monsters[i];
-
-            if (monster.pos.equals(ZORPG.Player.pos) && !ZORPG.Utils.inArray(monster, this.combatQ) && monster.actor.hp >= 0) {
-                this.combatQ.push(monster);
+        ZORPG.Monsters.each(function(monster) {
+            if (monster.pos.equals(ZORPG.Player.pos) && !ZORPG.Utils.inArray(monster, _this.combatQ) && monster.actor.isAlive()) {
+                _this.combatQ.push(monster);
             }
-        }
+        });
 
         // If no alive monsters...return.
         if (this.combatQ.length > 0) {
