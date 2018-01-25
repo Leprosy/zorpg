@@ -2,6 +2,7 @@
 ZORPG.State.add("play", {
     name: "Playing",
     turnPass: false,
+    taldos: 0, //???
 
     init: function() {
         ZORPG.Canvas.setHUD("play");
@@ -73,31 +74,23 @@ ZORPG.State.add("play", {
     },
 
     update: function() {
-        console.log("ZORPG.State.play: Updating")
+        this.taldos++;
 
-        // If a turn pass, calculate world entities, check if combat
-        var combat = false;
+        console.log("ZORPG.State.play: Updating")
 
         if (this.turnPass) {
             console.log("ZORPG.State.play: Turn pass.");
             this.turnPass = false;
 
             // Monsters
-            // TODO: refactor checking moster alive
-            ZORPG.Monsters.each(function(monster) {
-                if (monster.actor.isAlive()) {
-                    if (monster.pos.seek(ZORPG.Player.pos)) {
-                        combat = true;
-                    }
-                }
-            });
+            ZORPG.Monsters.seekAndDestroy();
         }
 
         // Render and go to combat if needed
         ZORPG.Canvas.update(function() {
             console.log("ZORPG.State.play: update completed");
 
-            if (combat) {
+            if (ZORPG.Monsters.willFight()) {
                 ZORPG.State.set("combat");
             } else {
                 $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));

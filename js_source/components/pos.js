@@ -79,12 +79,12 @@ ZORPG.Components.pos = {
                }
            }
 
-           // TAG...if monster reachs party.
+           /* TAG...if monster reachs party.
            if (this.equals(pos)) {
                return true;
            } else {
                return false;
-           }
+           } */
        }
     }
 }

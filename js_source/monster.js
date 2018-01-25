@@ -50,7 +50,24 @@ ZORPG.Monsters = (function() {
                 }
             }
 
+            console.log("MONSTERS:", list)
             return list;
+        },
+        willFight: function() {
+            return this.getFightReady().length > 0;
+        },
+
+        // Roam the map, seeking and trying to kill the party
+        // Returns true if there is a fight
+        // TODO: refactor checking moster alive
+        seekAndDestroy: function() {
+            this.each(function(monster) {
+                if (monster.actor.isAlive()) {
+                    if (monster.pos.seek(ZORPG.Player.pos)) {
+                        weHaveFight = true;
+                    }
+                }
+            });
         }
     }
 })();

@@ -55,20 +55,13 @@ ZORPG.State.add("combat", {
         this.combatIndex = 0;
 
         // Move monsters
+        ZORPG.Monsters.seekAndDestroy();
 
         // Check if are fightable monsters & build combat queue
-        this.combatQ = ZORPG.Monsters.getFightReady();
-
-        if (this.combatQ.length > 0) {
-            this.combatQ = this.combatQ.concat(this.getAliveChars());
-
-            this.combatQ.sort(function(a, b) {
-                if (a.actor.spd < b.actor.spd) {
-                    return 1;
-                }
-                if (a.actor.spd > b.actor.spd) {
-                    return -1;
-                }
+        if (ZORPG.Monsters.willFight()) {
+            this.combatQ = ZORPG.Monsters.getFightReady().concat(this.getAliveChars()).sort(function(a, b) {
+                if (a.actor.spd < b.actor.spd) { return 1 }
+                if (a.actor.spd > b.actor.spd) { return -1 }
                 return 0;
             });
 
@@ -149,6 +142,9 @@ ZORPG.State.add("combat", {
     },
 
     destroy: function() {
+        this.combatQ = [];
+        this.combatIndex = 0;
+        this.combatTarget = 0;
         ZORPG.Key.removeAll();
     }
 });

@@ -545,7 +545,23 @@ ZORPG.Monsters = function() {
                     list.push(monsters[i]);
                 }
             }
+            console.log("MONSTERS:", list);
             return list;
+        },
+        willFight: function() {
+            return this.getFightReady().length > 0;
+        },
+        // Roam the map, seeking and trying to kill the party
+        // Returns true if there is a fight
+        // TODO: refactor checking moster alive
+        seekAndDestroy: function() {
+            this.each(function(monster) {
+                if (monster.actor.isAlive()) {
+                    if (monster.pos.seek(ZORPG.Player.pos)) {
+                        weHaveFight = true;
+                    }
+                }
+            });
         }
     };
 }();
@@ -831,11 +847,10 @@ ZORPG.State.add("combat", {
         this.combatQ = [];
         this.combatIndex = 0;
         // Move monsters
+        ZORPG.Monsters.seekAndDestroy();
         // Check if are fightable monsters & build combat queue
-        this.combatQ = ZORPG.Monsters.getFightReady();
-        if (this.combatQ.length > 0) {
-            this.combatQ = this.combatQ.concat(this.getAliveChars());
-            this.combatQ.sort(function(a, b) {
+        if (ZORPG.Monsters.willFight()) {
+            this.combatQ = ZORPG.Monsters.getFightReady().concat(this.getAliveChars()).sort(function(a, b) {
                 if (a.actor.spd < b.actor.spd) {
                     return 1;
                 }
@@ -911,6 +926,9 @@ ZORPG.State.add("combat", {
         });
     },
     destroy: function() {
+        this.combatQ = [];
+        this.combatIndex = 0;
+        this.combatTarget = 0;
         ZORPG.Key.removeAll();
     }
 });
@@ -1046,6 +1064,8 @@ ZORPG.State.add("message", {
 ZORPG.State.add("play", {
     name: "Playing",
     turnPass: false,
+    taldos: 0,
+    //???
     init: function() {
         ZORPG.Canvas.setHUD("play");
         // Test code for player party - THIS IS HACKY, I know
@@ -1110,26 +1130,18 @@ ZORPG.State.add("play", {
         this.update();
     },
     update: function() {
+        this.taldos++;
         console.log("ZORPG.State.play: Updating");
-        // If a turn pass, calculate world entities, check if combat
-        var combat = false;
         if (this.turnPass) {
             console.log("ZORPG.State.play: Turn pass.");
             this.turnPass = false;
             // Monsters
-            // TODO: refactor checking moster alive
-            ZORPG.Monsters.each(function(monster) {
-                if (monster.actor.isAlive()) {
-                    if (monster.pos.seek(ZORPG.Player.pos)) {
-                        combat = true;
-                    }
-                }
-            });
+            ZORPG.Monsters.seekAndDestroy();
         }
         // Render and go to combat if needed
         ZORPG.Canvas.update(function() {
             console.log("ZORPG.State.play: update completed");
-            if (combat) {
+            if (ZORPG.Monsters.willFight()) {
                 ZORPG.State.set("combat");
             } else {
                 $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
@@ -1351,12 +1363,6 @@ ZORPG.Components.pos = {
                 } else if (pos[second] < this[second]) {
                     this[second]--;
                 }
-            }
-            // TAG...if monster reachs party.
-            if (this.equals(pos)) {
-                return true;
-            } else {
-                return false;
             }
         }
     }
