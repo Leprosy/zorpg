@@ -33,7 +33,7 @@ ZORPG.Components.party = {
     // Damage & death
     isAlive: function() {
         for (var i = 0; i < this.actors.length; ++i) {
-            if (this.actors.isAlive()) {
+            if (this.actors[i].actor.isAlive()) {
                 return true;
             }
         }

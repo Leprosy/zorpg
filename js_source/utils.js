@@ -24,6 +24,14 @@ ZORPG.Utils = {
 
         return false;
     },
+    // Remove from array
+    remove: function(arr, elem) {
+        var index = arr.indexOf(elem);
+
+        if (index >= 0) {
+            arr.splice(index, 1);
+        }
+    },
 
     // Dice
     // TODO: allow zero values?

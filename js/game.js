@@ -750,6 +750,13 @@ ZORPG.Utils = {
         }
         return false;
     },
+    // Remove from array
+    remove: function(arr, elem) {
+        var index = arr.indexOf(elem);
+        if (index >= 0) {
+            arr.splice(index, 1);
+        }
+    },
     // Dice
     // TODO: allow zero values?
     die: function(str) {
@@ -809,18 +816,25 @@ ZORPG.State.add("combat", {
         // Init combat
         this.update();
     },
+    getAliveChars: function() {
+        var list = [];
+        var chars = ZORPG.Player.party.actors;
+        for (var i = 0; i < chars.length; ++i) {
+            if (chars[i].actor.isAlive()) {
+                list.push(chars[i]);
+            }
+        }
+        return list;
+    },
     beginTurn: function() {
         console.log("ZORPG.State.combat: Turn begins.");
-        var _this = this;
         this.combatQ = [];
         this.combatIndex = 0;
         // Move monsters
-        // Check if are fightable monsters
-        _this.combatQ = ZORPG.Monsters.getFightReady();
+        // Check if are fightable monsters & build combat queue
+        this.combatQ = ZORPG.Monsters.getFightReady();
         if (this.combatQ.length > 0) {
-            for (var i = 0; i < ZORPG.Player.party.actors.length; ++i) {
-                this.combatQ.push(ZORPG.Player.party.actors[i]);
-            }
+            this.combatQ = this.combatQ.concat(this.getAliveChars());
             this.combatQ.sort(function(a, b) {
                 if (a.actor.spd < b.actor.spd) {
                     return 1;
@@ -839,12 +853,22 @@ ZORPG.State.add("combat", {
         // fighter is a Monster...attack party
         if (fighter.hasCmp("monster")) {
             ZORPG.Player.party.damage(fighter);
-        } else {
+            if (!ZORPG.Player.party.isAlive()) {
+                alert("GAME OVER!");
+            }
+        } else if (fighter.actor.isAlive()) {
             // fighter is a Party character...attack targeted Monster
-            this.getTargetedMonster().actor.damage(fighter);
+            var monster = this.getTargetedMonster();
+            monster.actor.damage(fighter);
+            if (!monster.actor.isAlive()) {
+                // Killed monster -> removed
+                console.log("ZORPG.State.combat: Monster killed", monster);
+                ZORPG.Utils.remove(this.combatQ, monster);
+            }
         }
         this.combatIndex++;
     },
+    // Gets the monster entity that is being targeted by player
     getTargetedMonster: function() {
         var j = 0;
         for (var i = 0; i < this.combatQ.length; ++i) {
@@ -857,6 +881,7 @@ ZORPG.State.add("combat", {
             }
         }
     },
+    // Main update
     update: function() {
         console.log("ZORPG.State.combat: Update begins.");
         var _this = this;
@@ -865,7 +890,7 @@ ZORPG.State.add("combat", {
             this.beginTurn();
         }
         // Are there monsters left? If not...return to play state
-        if (this.combatQ.length > 0) {
+        if (this.combatQ.length > ZORPG.Player.party.actors.length) {
             // Perform actions until human
             while (this.combatQ.length > this.combatIndex && this.combatQ[this.combatIndex].hasCmp("monster")) {
                 this.action();
@@ -1234,7 +1259,7 @@ ZORPG.Components.party = {
     // Damage & death
     isAlive: function() {
         for (var i = 0; i < this.actors.length; ++i) {
-            if (this.actors.isAlive()) {
+            if (this.actors[i].actor.isAlive()) {
                 return true;
             }
         }
