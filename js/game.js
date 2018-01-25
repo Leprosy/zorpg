@@ -899,7 +899,6 @@ ZORPG.State.add("combat", {
     // Main update
     update: function() {
         console.log("ZORPG.State.combat: Update begins.");
-        var _this = this;
         // Checking if turn is begining
         if (this.combatQ.length === this.combatIndex) {
             this.beginTurn();
