@@ -81,10 +81,6 @@ ZORPG.State.add("combat", {
         // fighter is a Monster...attack party
         if (fighter.hasCmp("monster")) {
             ZORPG.Player.party.damage(fighter);
-
-            if (!ZORPG.Player.party.isAlive()) {
-                alert("GAME OVER!"); // TODO: please...
-            }
         } else if (fighter.actor.isAlive()) { // fighter is a Party character...do action against targeted Monster
             var monster = this.getTargetedMonster();
 
@@ -140,8 +136,14 @@ ZORPG.State.add("combat", {
                 this.action();
             }
 
-            // Ready for the first human
-            this.render();
+            // Is the party still alive?
+            if (!ZORPG.Player.party.isAlive()) {
+                alert("GAME OVER!"); // TODO: please...
+                ZORPG.State.set("main_menu");
+            } else {
+                // Ready for the first human
+                this.render();
+            }
         } else {
             ZORPG.State.set("play");
         }

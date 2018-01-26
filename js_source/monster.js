@@ -6,7 +6,7 @@ ZORPG.Monsters = (function() {
 
     return {
         init: function(totalMonsters) {
-            var total = totalMonsters || 3
+            var total = totalMonsters || 10
 
             for (var i = 0; i < total; ++i) {
                 var ent = new ZORPG.Ent("monster" + i, ["pos", "actor", "monster"]);

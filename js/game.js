@@ -517,7 +517,7 @@ ZORPG.Monsters = function() {
     var monsters = [];
     return {
         init: function(totalMonsters) {
-            var total = totalMonsters || 3;
+            var total = totalMonsters || 10;
             for (var i = 0; i < total; ++i) {
                 var ent = new ZORPG.Ent("monster" + i, [ "pos", "actor", "monster" ]);
                 ent.pos.x = ZORPG.Utils.die("1d15");
@@ -525,6 +525,8 @@ ZORPG.Monsters = function() {
                 ent.actor.name = "Monster " + i;
                 ent.actor.roll();
                 ent.actor.spd += 5;
+                ent.monster.gold = 50;
+                ent.monster.xp = 30;
                 monsters.push(ent);
             }
         },
@@ -814,6 +816,11 @@ ZORPG.State.add("combat", {
     combatQ: [],
     combatIndex: 0,
     combatTarget: 0,
+    combatLoot: {
+        xp: 0,
+        gold: 0,
+        gems: 0
+    },
     init: function() {
         // Set key handlers
         var _this = this;
@@ -879,9 +886,6 @@ ZORPG.State.add("combat", {
         // fighter is a Monster...attack party
         if (fighter.hasCmp("monster")) {
             ZORPG.Player.party.damage(fighter);
-            if (!ZORPG.Player.party.isAlive()) {
-                alert("GAME OVER!");
-            }
         } else if (fighter.actor.isAlive()) {
             // fighter is a Party character...do action against targeted Monster
             var monster = this.getTargetedMonster();
@@ -928,8 +932,15 @@ ZORPG.State.add("combat", {
             while (this.combatQ.length > this.combatIndex && this.combatQ[this.combatIndex].hasCmp("monster")) {
                 this.action();
             }
-            // Ready for the first human
-            this.render();
+            // Is the party still alive?
+            if (!ZORPG.Player.party.isAlive()) {
+                alert("GAME OVER!");
+                // TODO: please...
+                ZORPG.State.set("main_menu");
+            } else {
+                // Ready for the first human
+                this.render();
+            }
         } else {
             ZORPG.State.set("play");
         }
@@ -949,6 +960,11 @@ ZORPG.State.add("combat", {
         this.combatQ = [];
         this.combatIndex = 0;
         this.combatTarget = 0;
+        this.combatLoot = {
+            xp: 0,
+            gold: 0,
+            gems: 0
+        };
         ZORPG.Canvas.highlightChar();
         ZORPG.Key.removeAll();
     }
@@ -1256,6 +1272,9 @@ ZORPG.Components.actor = {
  */
 ZORPG.Components.monster = {
     attacks: 1,
+    gold: 0,
+    gems: 0,
+    xp: 0,
     type: "undead"
 };
 
