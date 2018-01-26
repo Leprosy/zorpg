@@ -4,6 +4,7 @@ ZORPG.State.add("combat", {
     combatQ: [],
     combatIndex: 0,
     combatTarget: 0,
+    combatLoot: {xp:0,gold:0,gems:0},
 
     init: function() {
         // Set key handlers
@@ -148,14 +149,20 @@ ZORPG.State.add("combat", {
 
     // Update graphics
     render: function() {
+        var _this = this;
         ZORPG.Canvas.setHUD("combat", { monsters: this.combatQ });
-        ZORPG.Canvas.update(function() { console.log("ZORPG.State.combat: Update completed") });
+        ZORPG.Canvas.update(function() { 
+            ZORPG.Canvas.highlightChar(_this.combatQ[_this.combatIndex]);
+            console.log("ZORPG.State.combat: Update completed")
+        });
     },
 
     destroy: function() {
         this.combatQ = [];
         this.combatIndex = 0;
         this.combatTarget = 0;
+        this.combatLoot = {xp:0,gold:0,gems:0};
+        ZORPG.Canvas.highlightChar();
         ZORPG.Key.removeAll();
     }
 });

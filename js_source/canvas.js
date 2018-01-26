@@ -179,10 +179,18 @@ ZORPG.Canvas = (function() {
             for (var i = 0; i < ZORPG.Player.party.actors.length; ++i) {
                 var char = ZORPG.Player.party.actors[i];
 
-                var div = $("<div>");
+                var div = $('<div id="character' + i + '">');
                 div.addClass("col-md-4");
                 div.html(char.actor.toString());
                 $("#roster").append(div);
+            }
+        },
+
+        // Higlight a character
+        highlightChar: function(ent) {
+            $("#roster div").css("border", "none");
+            if (typeof ent !== "undefined") {
+                $("#roster div#" + ent.name).css("border", "2px solid red");
             }
         },
 

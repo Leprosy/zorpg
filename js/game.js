@@ -187,10 +187,17 @@ ZORPG.Canvas = function() {
             $("#roster").html("");
             for (var i = 0; i < ZORPG.Player.party.actors.length; ++i) {
                 var char = ZORPG.Player.party.actors[i];
-                var div = $("<div>");
+                var div = $('<div id="character' + i + '">');
                 div.addClass("col-md-4");
                 div.html(char.actor.toString());
                 $("#roster").append(div);
+            }
+        },
+        // Higlight a character
+        highlightChar: function(ent) {
+            $("#roster div").css("border", "none");
+            if (typeof ent !== "undefined") {
+                $("#roster div#" + ent.name).css("border", "2px solid red");
             }
         },
         // Set the different states HUDs/GUIs
@@ -929,10 +936,12 @@ ZORPG.State.add("combat", {
     },
     // Update graphics
     render: function() {
+        var _this = this;
         ZORPG.Canvas.setHUD("combat", {
             monsters: this.combatQ
         });
         ZORPG.Canvas.update(function() {
+            ZORPG.Canvas.highlightChar(_this.combatQ[_this.combatIndex]);
             console.log("ZORPG.State.combat: Update completed");
         });
     },
@@ -940,6 +949,7 @@ ZORPG.State.add("combat", {
         this.combatQ = [];
         this.combatIndex = 0;
         this.combatTarget = 0;
+        ZORPG.Canvas.highlightChar();
         ZORPG.Key.removeAll();
     }
 });

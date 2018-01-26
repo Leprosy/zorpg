@@ -15,7 +15,8 @@ ZORPG.Monsters = (function() {
                 ent.actor.name = "Monster " + i;
                 ent.actor.roll();
                 ent.actor.spd += 5;
-
+                ent.monster.gold = 50;
+                ent.monster.xp = 30;
                 monsters.push(ent);
             }
         },
