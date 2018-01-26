@@ -826,7 +826,11 @@ ZORPG.State.add("combat", {
             _this.render();
         });
         ZORPG.Key.add("Space", function(ev) {
-            _this.action();
+            _this.action("pass");
+            _this.update();
+        });
+        ZORPG.Key.add("KeyF", function(ev) {
+            _this.action("attack");
             _this.update();
         });
         // Init combat
@@ -862,7 +866,7 @@ ZORPG.State.add("combat", {
             console.log("ZORPG.State.combat: Combat queue generated", this.combatQ);
         }
     },
-    action: function() {
+    action: function(action) {
         var fighter = this.combatQ[this.combatIndex];
         console.log("ZORPG.State.combat: Action from", fighter);
         // fighter is a Monster...attack party
@@ -872,13 +876,21 @@ ZORPG.State.add("combat", {
                 alert("GAME OVER!");
             }
         } else if (fighter.actor.isAlive()) {
-            // fighter is a Party character...attack targeted Monster
+            // fighter is a Party character...do action against targeted Monster
             var monster = this.getTargetedMonster();
-            monster.actor.damage(fighter);
-            if (!monster.actor.isAlive()) {
-                // Killed monster -> removed
-                console.log("ZORPG.State.combat: Monster killed", monster);
-                ZORPG.Utils.remove(this.combatQ, monster);
+            switch (action) {
+              case "attack":
+                monster.actor.damage(fighter);
+                if (!monster.actor.isAlive()) {
+                    // Killed monster -> removed
+                    console.log("ZORPG.State.combat: Monster killed", monster);
+                    ZORPG.Utils.remove(this.combatQ, monster);
+                }
+                break;
+
+              default:
+                console.log("ZORPG.State.combat: Character passed the turn.", fighter);
+                break;
             }
         }
         this.combatIndex++;
@@ -904,7 +916,7 @@ ZORPG.State.add("combat", {
             this.beginTurn();
         }
         // Are there monsters left? If not...return to play state
-        if (this.combatQ.length > ZORPG.Player.party.actors.length) {
+        if (this.combatQ.length > this.getAliveChars().length) {
             // Perform actions until human
             while (this.combatQ.length > this.combatIndex && this.combatQ[this.combatIndex].hasCmp("monster")) {
                 this.action();
