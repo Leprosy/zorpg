@@ -1427,7 +1427,7 @@ ZORPG.Components.actor = {
         this.xp = ZORPG.Utils.die("1d50+10");
     },
     toString: function() {
-        return "<b>" + this.name + "</b>:" + this.hp + "hp " + this.spd + "spd " + this.str + "str ";
+        return "<b>" + this.name + "</b>:" + this.hp + "hp " + this.spd + "spd " + this.str + "str " + this.ac + "ac";
     },
     isAlive: function() {
         return this.hp > 0;
