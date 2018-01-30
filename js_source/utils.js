@@ -33,8 +33,7 @@ ZORPG.Utils = {
         }
     },
 
-    // Dice
-    // TODO: allow zero values?
+    // This implements RPG dice notation
     die: function(str) {
         try {
             //xdy+z => x dices of y faces, ie (random(y) * x) + z
@@ -45,11 +44,16 @@ ZORPG.Utils = {
             die = die.split("d");
             var factor = 1 * die[0];
             var faces = 1 * die[1];
+            console.log("Game.Utils.die: xdy+z:", factor, faces, plus);
 
-            return plus + (Math.round(Math.random() * faces) * factor);
+            return factor * Math.round(Math.random() * (faces - 1)) + 1 + plus
         } catch(e) {
             console.error("Game.Utils.die: Bad die string", str);
             return false;
         }
+    },
+
+    log: function(str) {
+        $("#console").prepend(">" + str + "\n");
     }
 };

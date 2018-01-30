@@ -80,6 +80,7 @@ ZORPG.State.add("play", {
 
         if (this.turnPass) {
             console.log("ZORPG.State.play: Turn pass.");
+            ZORPG.Utils.log("Time passes...");
             this.turnPass = false;
 
             // Monsters
@@ -91,9 +92,10 @@ ZORPG.State.add("play", {
             console.log("ZORPG.State.play: update completed");
 
             if (ZORPG.Monsters.willFight()) {
+                ZORPG.Utils.log("Combat begins!");
                 ZORPG.State.set("combat");
             } else {
-                $("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
+                //$("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));
             }
         });
     },

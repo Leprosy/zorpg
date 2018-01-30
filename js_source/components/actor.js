@@ -33,14 +33,23 @@ ZORPG.Components.actor = {
     // Damages this actor
     damage: function(ent) {
         // Calculate attack success/damage/etc.
-        // TODO: Which are the rules for this?
+        // attack roll - AC - Speed bonus
+        // TODO: add resistances, spell buffs etc.
         var damage = ZORPG.Utils.die("1d" + ent.actor.str);
-        this.hp -= damage;
-        console.log("ZORPG.Components.actor: Actor " + this.name + " gets " + damage + " damage from " + ent.actor.name);
+        damage -= this.ac + ZORPG.Tables.getStatBonus(this.spd);
 
-        // If the attack is from a monster, shake camera
-        if (ent.hasCmp("monster")) {
-            ZORPG.Canvas.shake(damage * 0.01)
+        if (damage > 0) {
+            this.hp -= damage;
+            console.log("ZORPG.Components.actor: Actor " + this.name + " gets " + damage + " damage from " + ent.actor.name);
+            ZORPG.Utils.log(this.name + " gets " + damage + " damage from " + ent.actor.name);
+
+            // If the attack is from a monster, shake camera
+            if (ent.hasCmp("monster")) {
+                ZORPG.Canvas.shake(damage * 0.01)
+            }
+        } else {
+            console.log("ZORPG.Components.actor: Actor " + this.name + " dodge attack from " + ent.actor.name);
+            ZORPG.Utils.log(this.name + " dodge attack from " + ent.actor.name);
         }
     }
 }
