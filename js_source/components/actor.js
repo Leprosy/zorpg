@@ -23,7 +23,7 @@ ZORPG.Components.actor = {
     },
 
     toString: function() {
-        return "<b>" + this.name + "</b>:" + this.hp + "hp " + this.spd + "spd";
+        return "<b>" + this.name + "</b>:" + this.hp + "hp " + this.spd + "spd " + this.str + "str ";
     },
 
     isAlive: function() {
@@ -36,7 +36,9 @@ ZORPG.Components.actor = {
         // attack roll - AC - Speed bonus
         // TODO: add resistances, spell buffs etc.
         var damage = ZORPG.Utils.die("1d" + ent.actor.str);
-        damage -= this.ac + ZORPG.Tables.getStatBonus(this.spd);
+        console.log("ZORPG.Components.actor: Damage rolled = ", damage, "correction =", this.ac + ZORPG.Tables.getStatBonus(this.spd).bonus);
+        damage -= this.ac + ZORPG.Tables.getStatBonus(this.spd).bonus;
+        console.log("ZORPG.Components.actor: Damage corrected", damage);
 
         if (damage > 0) {
             this.hp -= damage;

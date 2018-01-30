@@ -44,9 +44,10 @@ ZORPG.Utils = {
             die = die.split("d");
             var factor = 1 * die[0];
             var faces = 1 * die[1];
-            console.log("Game.Utils.die: xdy+z:", factor, faces, plus);
+            var result = factor * Math.round(Math.random() * (faces - 1)) + 1 + plus;
+            console.log("Game.Utils.die: xdy+z:", factor, faces, plus, "=", result);
 
-            return factor * Math.round(Math.random() * (faces - 1)) + 1 + plus
+            return result;
         } catch(e) {
             console.error("Game.Utils.die: Bad die string", str);
             return false;

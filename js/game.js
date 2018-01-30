@@ -967,8 +967,9 @@ ZORPG.Utils = {
             die = die.split("d");
             var factor = 1 * die[0];
             var faces = 1 * die[1];
-            console.log("Game.Utils.die: xdy+z:", factor, faces, plus);
-            return factor * Math.round(Math.random() * (faces - 1)) + 1 + plus;
+            var result = factor * Math.round(Math.random() * (faces - 1)) + 1 + plus;
+            console.log("Game.Utils.die: xdy+z:", factor, faces, plus, "=", result);
+            return result;
         } catch (e) {
             console.error("Game.Utils.die: Bad die string", str);
             return false;
@@ -1426,7 +1427,7 @@ ZORPG.Components.actor = {
         this.xp = ZORPG.Utils.die("1d50+10");
     },
     toString: function() {
-        return "<b>" + this.name + "</b>:" + this.hp + "hp " + this.spd + "spd";
+        return "<b>" + this.name + "</b>:" + this.hp + "hp " + this.spd + "spd " + this.str + "str ";
     },
     isAlive: function() {
         return this.hp > 0;
@@ -1437,7 +1438,9 @@ ZORPG.Components.actor = {
         // attack roll - AC - Speed bonus
         // TODO: add resistances, spell buffs etc.
         var damage = ZORPG.Utils.die("1d" + ent.actor.str);
-        damage -= this.ac + ZORPG.Tables.getStatBonus(this.spd);
+        console.log("ZORPG.Components.actor: Damage rolled = ", damage, "correction =", this.ac + ZORPG.Tables.getStatBonus(this.spd).bonus);
+        damage -= this.ac + ZORPG.Tables.getStatBonus(this.spd).bonus;
+        console.log("ZORPG.Components.actor: Damage corrected", damage);
         if (damage > 0) {
             this.hp -= damage;
             console.log("ZORPG.Components.actor: Actor " + this.name + " gets " + damage + " damage from " + ent.actor.name);
