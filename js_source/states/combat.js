@@ -90,7 +90,7 @@ ZORPG.State.add("combat", {
 
                     if (!monster.actor.isAlive()) { // Killed monster -> removed
                         console.log("ZORPG.State.combat: Monster killed", monster)
-                        ZORPG.Utils.remove(this.combatQ, monster);
+                        ZORPG.$.remove(this.combatQ, monster);
                     }
                     break;
                 default:

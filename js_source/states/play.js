@@ -12,18 +12,10 @@ ZORPG.State.add("play", {
         if (typeof ZORPG.Player === "undefined") { // TODO: Add check for create Player/Map/anything
             ZORPG.Map.load(JSON.parse(ZORPG.Loader.tasks[0].text));
             ZORPG.Monsters.init(); // TODO: This should read data from map or something like that
-
-            var names = ["Lepro", "CragHack", "Maximus"];
             ZORPG.Player = new ZORPG.Ent("player", ["pos", "party"]);
             ZORPG.Player.pos.x = ZORPG.Map.properties.startX;
             ZORPG.Player.pos.y = ZORPG.Map.properties.startY;
-
-            for (var i = 0; i < 3; ++i) {
-                var ent = new ZORPG.Ent("character" + i, ["actor"]);
-                ent.actor.name = names[i];
-                ent.actor.roll();
-                ZORPG.Player.party.actors.push(ent);
-            }
+            ZORPG.Player.party.generateDefaultParty();
 
             ZORPG.Canvas.renderMap();
         }
@@ -80,7 +72,7 @@ ZORPG.State.add("play", {
 
         if (this.turnPass) {
             console.log("ZORPG.State.play: Turn pass.");
-            ZORPG.Utils.log("Time passes...");
+            ZORPG.$.log("Time passes...");
             this.turnPass = false;
 
             // Monsters
@@ -92,7 +84,7 @@ ZORPG.State.add("play", {
             console.log("ZORPG.State.play: update completed");
 
             if (ZORPG.Monsters.willFight()) {
-                ZORPG.Utils.log("Combat begins!");
+                ZORPG.$.log("Combat begins!");
                 ZORPG.State.set("combat");
             } else {
                 //$("#console").html("Party Data:\nstatus: " + JSON.stringify(ZORPG.Player.party) + "\npos:" + JSON.stringify(ZORPG.Player.pos));

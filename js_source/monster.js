@@ -10,8 +10,8 @@ ZORPG.Monsters = (function() {
 
             for (var i = 0; i < total; ++i) {
                 var ent = new ZORPG.Ent("monster" + i, ["pos", "actor", "monster"]);
-                ent.pos.x = ZORPG.Utils.die("1d15")
-                ent.pos.y = ZORPG.Utils.die("1d15");
+                ent.pos.x = ZORPG.$.die("1d15")
+                ent.pos.y = ZORPG.$.die("1d15");
                 ent.actor.name = "Monster " + i;
                 ent.actor.roll();
                 ent.actor.spd += 5;
@@ -24,10 +24,7 @@ ZORPG.Monsters = (function() {
         // Iterate calls in the monster list
         // TODO: Check if monster is alive?
         each: function(call) {
-            //console.log("ZORPG.Monster: Iterating call", call);
-
             for (var i = 0; i < monsters.length; ++i) {
-                //console.log("ZORPG.Monster: Member", i, monsters[i]);
                 call(monsters[i], i);
             }
         },
@@ -51,7 +48,6 @@ ZORPG.Monsters = (function() {
                 }
             }
 
-            console.log("MONSTERS:", list)
             return list;
         },
         willFight: function() {
@@ -72,3 +68,8 @@ ZORPG.Monsters = (function() {
         }
     }
 })();
+
+/**
+ * Monsters definition?
+ */
+ZORPG.Monsters.data = []

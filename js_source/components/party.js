@@ -48,5 +48,53 @@ ZORPG.Components.party = {
             console.log("ZORPG.Component.party: Actor picked to be attacked:", index, this.actors[index]);
             this.actors[index].actor.damage(ent);
         }
-    }
+    },
+
+    // Default party
+    generateDefaultParty: function() {
+        var data = [{
+            name:"Sir Lepro",
+            cls: "knight",
+            race: "human",
+            //hp: 12,
+            str: 17,
+            int: 13,
+            per: 13,
+            end: 19,
+            spd: 16,
+            acc: 15,
+            lck: 12
+        }, {
+            name:"CragHack", // Dwarf, barb
+            cls: "barbarian",
+            race: "dwarf",
+            //hp: 23,
+            str: 18,
+            int: 7,
+            per: 12,
+            end: 21,
+            spd: 16,
+            acc: 17,
+            lck: 14
+        }, {
+            name:"Tyro", // H.orc knight
+            cls: "knight",
+            race: "half-orc",
+            //hp: 16,
+            str: 19,
+            int: 10,
+            per: 8,
+            end: 19,
+            spd: 16,
+            acc: 16,
+            lck: 14
+        }];
+
+        for (var i = 0; i < 3; ++i) {
+            var ent = new ZORPG.Ent("character" + i, ["actor"]);
+            ZORPG.$.extend(ent.actor, data[i]);
+            ent.actor.init();
+            ZORPG.Player.party.actors.push(ent);
+        }
+    },
 }

@@ -49,7 +49,7 @@ ZORPG.Key = (function() {
                 throw Error("ZORPG.Key: Invalid listener function provided.");
             }
 
-            if (ZORPG.Utils.isEmptyObj(keys)) {
+            if (ZORPG.$.isEmptyObj(keys)) {
                 document.addEventListener("keydown", listener);
                 console.log("ZORPG.Key: Listener registered. Adding the key too.", code)
             } else {
@@ -65,7 +65,7 @@ ZORPG.Key = (function() {
             if (keys.hasOwnProperty(code) >= 0) {
                 delete keys[code];
 
-                if (ZORPG.Utils.isEmptyObj(keys)) {
+                if (ZORPG.$.isEmptyObj(keys)) {
                     console.log("ZORPG.Key: No more handlers, removing listener.");
                     document.removeEventListener("keydown", listener);
                 }

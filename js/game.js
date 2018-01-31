@@ -282,7 +282,7 @@ ZORPG.Ent = function(name, cmp) {
     this.name = name;
     this.tags = [];
     // Add components, if any
-    if (ZORPG.Utils.isArray(cmp)) {
+    if (ZORPG.$.isArray(cmp)) {
         for (var i = 0; i < cmp.length; ++i) {
             this.addCmp(cmp[i]);
         }
@@ -416,7 +416,7 @@ ZORPG.Key = function() {
             if (typeof handler !== "function") {
                 throw Error("ZORPG.Key: Invalid listener function provided.");
             }
-            if (ZORPG.Utils.isEmptyObj(keys)) {
+            if (ZORPG.$.isEmptyObj(keys)) {
                 document.addEventListener("keydown", listener);
                 console.log("ZORPG.Key: Listener registered. Adding the key too.", code);
             } else {
@@ -429,7 +429,7 @@ ZORPG.Key = function() {
             console.log("ZORPG.Key: Removing handler", code);
             if (keys.hasOwnProperty(code) >= 0) {
                 delete keys[code];
-                if (ZORPG.Utils.isEmptyObj(keys)) {
+                if (ZORPG.$.isEmptyObj(keys)) {
                     console.log("ZORPG.Key: No more handlers, removing listener.");
                     document.removeEventListener("keydown", listener);
                 }
@@ -520,8 +520,8 @@ ZORPG.Monsters = function() {
             var total = totalMonsters || 10;
             for (var i = 0; i < total; ++i) {
                 var ent = new ZORPG.Ent("monster" + i, [ "pos", "actor", "monster" ]);
-                ent.pos.x = ZORPG.Utils.die("1d15");
-                ent.pos.y = ZORPG.Utils.die("1d15");
+                ent.pos.x = ZORPG.$.die("1d15");
+                ent.pos.y = ZORPG.$.die("1d15");
                 ent.actor.name = "Monster " + i;
                 ent.actor.roll();
                 ent.actor.spd += 5;
@@ -533,9 +533,7 @@ ZORPG.Monsters = function() {
         // Iterate calls in the monster list
         // TODO: Check if monster is alive?
         each: function(call) {
-            //console.log("ZORPG.Monster: Iterating call", call);
             for (var i = 0; i < monsters.length; ++i) {
-                //console.log("ZORPG.Monster: Member", i, monsters[i]);
                 call(monsters[i], i);
             }
         },
@@ -554,7 +552,6 @@ ZORPG.Monsters = function() {
                     list.push(monsters[i]);
                 }
             }
-            console.log("MONSTERS:", list);
             return list;
         },
         willFight: function() {
@@ -574,6 +571,11 @@ ZORPG.Monsters = function() {
         }
     };
 }();
+
+/**
+ * Monsters definition?
+ */
+ZORPG.Monsters.data = [];
 
 // Scripting module
 ZORPG.Script = function() {
@@ -711,7 +713,7 @@ ZORPG.State = function() {
     return {
         // Adds a state. obj needs to have a structure?
         add: function(key, obj) {
-            if (ZORPG.Utils.isObj(obj)) {
+            if (ZORPG.$.isObj(obj)) {
                 obj._id = key;
                 states[key] = obj;
             } else {
@@ -721,7 +723,7 @@ ZORPG.State = function() {
         // Switches the active state
         set: function(key, scope) {
             if (typeof states[key] !== "undefined") {
-                if (ZORPG.Utils.isObj(currentState) && typeof currentState.destroy === "function") {
+                if (ZORPG.$.isObj(currentState) && typeof currentState.destroy === "function") {
                     console.log("%cZORPG.State." + currentState._id + " ended", "font-weight: bold");
                     currentState.destroy();
                 }
@@ -772,6 +774,11 @@ Ranger       9       6  Pathfinding      Awaken         Int/Per/End/Spd 12
             at: 5,
             skill: "arms master"
         },
+        barbarian: {
+            hp: 12,
+            at: 4,
+            skill: ""
+        },
         sorcerer: {
             hp: 4,
             at: 8,
@@ -790,12 +797,17 @@ Half-orc     +2     -2   10   10   10    0    0     0   -10 -
     race: {
         human: {
             hp: 0,
-            mp: 0,
+            sp: 0,
+            skill: "swimming"
+        },
+        dwarf: {
+            hp: 1,
+            sp: -1,
             skill: "swimming"
         },
         "half-orc": {
             hp: 2,
-            mp: -2,
+            sp: -2,
             skill: ""
         }
     },
@@ -828,99 +840,99 @@ Half-orc     +2     -2   10   10   10    0    0     0   -10 -
      */
     getStatBonus: function(stat) {
         if (stat >= 250) return {
-            bonus: 20,
+            value: 20,
             name: "Ultimate"
         };
         if (stat >= 225) return {
-            bonus: 17,
+            value: 17,
             name: "Awe Inspiring"
         };
         if (stat >= 200) return {
-            bonus: 16,
+            value: 16,
             name: "Awesome"
         };
         if (stat >= 175) return {
-            bonus: 15,
+            value: 15,
             name: "Collosal"
         };
         if (stat >= 150) return {
-            bonus: 14,
+            value: 14,
             name: "Tremendous"
         };
         if (stat >= 125) return {
-            bonus: 13,
+            value: 13,
             name: "Monumental"
         };
         if (stat >= 100) return {
-            bonus: 12,
+            value: 12,
             name: "Astonishing"
         };
         if (stat >= 75) return {
-            bonus: 11,
+            value: 11,
             name: "Astounding"
         };
         if (stat >= 50) return {
-            bonus: 10,
+            value: 10,
             name: "Fantastic"
         };
         if (stat >= 40) return {
-            bonus: 9,
+            value: 9,
             name: "Gigantic"
         };
         if (stat >= 35) return {
-            bonus: 8,
+            value: 8,
             name: "Incredible"
         };
         if (stat >= 30) return {
-            bonus: 7,
+            value: 7,
             name: "Amazing"
         };
         if (stat >= 25) return {
-            bonus: 6,
+            value: 6,
             name: "Super"
         };
         if (stat >= 21) return {
-            bonus: 5,
+            value: 5,
             name: "Great"
         };
         if (stat >= 19) return {
-            bonus: 4,
+            value: 4,
             name: "Very High"
         };
         if (stat >= 17) return {
-            bonus: 3,
+            value: 3,
             name: "High"
         };
         if (stat >= 15) return {
-            bonus: 2,
+            value: 2,
             name: "Very Good"
         };
         if (stat >= 13) return {
-            bonus: 1,
+            value: 1,
             name: "Good"
         };
         if (stat >= 11) return {
-            bonus: 0,
+            value: 0,
             name: "Average"
         };
         if (stat >= 9) return {
-            bonus: -1,
+            value: -1,
             name: "Low"
         };
         if (stat >= 7) return {
-            bonus: -2,
+            value: -2,
             name: "Very Low"
         };
         if (stat >= 5) return {
-            bonus: -3,
+            value: -3,
             name: "Poor"
         };
         if (stat >= 3) return {
-            bonus: -4,
+            value: -4,
             name: "Very Poor"
         };
         if (stat >= 0) return {
-            bonus: -5,
+            value: -5,
             name: "Nonexistant"
         };
     }
@@ -931,7 +943,7 @@ var ZORPG = ZORPG || {};
 /**
  * Loaders, helpers and other utils & tools
  */
-ZORPG.Utils = {
+ZORPG.$ = {
     // The basic variable of all leprosystems software artifacts
     taldo: "OAW",
     // Several type checks & utils
@@ -957,6 +969,13 @@ ZORPG.Utils = {
             arr.splice(index, 1);
         }
     },
+    // Object extension
+    extend: function(source, newObj) {
+        var keys = Object.keys(newObj);
+        for (var i = 0; i < keys.length; ++i) {
+            source[keys[i]] = newObj[keys[i]];
+        }
+    },
     // This implements RPG dice notation
     die: function(str) {
         try {
@@ -968,15 +987,16 @@ ZORPG.Utils = {
             var factor = 1 * die[0];
             var faces = 1 * die[1];
             var result = factor * Math.round(Math.random() * (faces - 1)) + 1 + plus;
-            console.log("Game.Utils.die: xdy+z:", factor, faces, plus, "=", result);
+            //console.log("Game.Utils.die: xdy+z:", factor, faces, plus, "=", result);
             return result;
         } catch (e) {
             console.error("Game.Utils.die: Bad die string", str);
             return false;
         }
     },
+    // Output data to the game console
     log: function(str) {
-        $("#console").prepend(">" + str + "\n");
+        $("#console").prepend("> " + str + "\n");
     }
 };
 
@@ -1074,7 +1094,7 @@ ZORPG.State.add("combat", {
                 if (!monster.actor.isAlive()) {
                     // Killed monster -> removed
                     console.log("ZORPG.State.combat: Monster killed", monster);
-                    ZORPG.Utils.remove(this.combatQ, monster);
+                    ZORPG.$.remove(this.combatQ, monster);
                 }
                 break;
 
@@ -1291,16 +1311,10 @@ ZORPG.State.add("play", {
             ZORPG.Map.load(JSON.parse(ZORPG.Loader.tasks[0].text));
             ZORPG.Monsters.init();
             // TODO: This should read data from map or something like that
-            var names = [ "Lepro", "CragHack", "Maximus" ];
             ZORPG.Player = new ZORPG.Ent("player", [ "pos", "party" ]);
             ZORPG.Player.pos.x = ZORPG.Map.properties.startX;
             ZORPG.Player.pos.y = ZORPG.Map.properties.startY;
-            for (var i = 0; i < 3; ++i) {
-                var ent = new ZORPG.Ent("character" + i, [ "actor" ]);
-                ent.actor.name = names[i];
-                ent.actor.roll();
-                ZORPG.Player.party.actors.push(ent);
-            }
+            ZORPG.Player.party.generateDefaultParty();
             ZORPG.Canvas.renderMap();
         }
         // Set key handlers
@@ -1350,7 +1364,7 @@ ZORPG.State.add("play", {
         console.log("ZORPG.State.play: Updating");
         if (this.turnPass) {
             console.log("ZORPG.State.play: Turn pass.");
-            ZORPG.Utils.log("Time passes...");
+            ZORPG.$.log("Time passes...");
             this.turnPass = false;
             // Monsters
             ZORPG.Monsters.seekAndDestroy();
@@ -1359,7 +1373,7 @@ ZORPG.State.add("play", {
         ZORPG.Canvas.update(function() {
             console.log("ZORPG.State.play: update completed");
             if (ZORPG.Monsters.willFight()) {
-                ZORPG.Utils.log("Combat begins!");
+                ZORPG.$.log("Combat begins!");
                 ZORPG.State.set("combat");
             } else {}
         });
@@ -1412,23 +1426,44 @@ ZORPG.Components.actor = {
     hp: 0,
     xp: 0,
     level: 1,
+    cls: "",
+    race: "",
     name: "",
     str: 1,
+    end: 1,
+    acc: 1,
     spd: 1,
-    con: 1,
-    ac: 0,
+    lck: 1,
+    "int": 1,
+    per: 1,
     // Roll attributes & get a random monster - DEBUG only?
     roll: function() {
-        this.spd = ZORPG.Utils.die("1d10+4");
-        this.str = ZORPG.Utils.die("1d10+4");
-        this.con = ZORPG.Utils.die("1d10+4");
-        this.ac = ZORPG.Utils.die("1d10+4");
-        this.hp = ZORPG.Utils.die("1d30+10");
-        this.xp = ZORPG.Utils.die("1d50+10");
+        this.spd = ZORPG.$.die("1d10+4");
+        this.str = ZORPG.$.die("1d10+4");
+        this.con = ZORPG.$.die("1d10+4");
+        this.ac = ZORPG.$.die("1d10+4");
+        this.hp = ZORPG.$.die("1d30+10");
+        this.xp = ZORPG.$.die("1d50+10");
     },
     toString: function() {
-        return "<b>" + this.name + "</b>:" + this.hp + "hp " + this.spd + "spd " + this.str + "str " + this.ac + "ac";
+        return "<b>" + this.name + "</b>:" + this.hp + "/" + this.getMaxHP() + "hp " + this.spd + "spd " + this.str + "str " + this.getAC() + "ac";
     },
+    // Gets max HP => Level * (Endurance bonus + racial bonus + class bonus)
+    getMaxHP: function() {
+        var attrBonus = ZORPG.Tables.getStatBonus(this.end).value;
+        var classBonus = ZORPG.Tables.cls[this.cls].hp;
+        var racialBonus = ZORPG.Tables.race[this.race].hp;
+        return this.level * (attrBonus + classBonus + racialBonus);
+    },
+    // Gets actor AC => Total armor + speed attr bonus + buffs
+    getAC: function() {
+        return ZORPG.Tables.getStatBonus(this.spd).value;
+    },
+    // init the char? We need this?
+    init: function() {
+        this.hp = this.getMaxHP();
+    },
+    // Is actor alive
     isAlive: function() {
         return this.hp > 0;
     },
@@ -1437,21 +1472,21 @@ ZORPG.Components.actor = {
         // Calculate attack success/damage/etc.
         // attack roll - AC - Speed bonus
         // TODO: add resistances, spell buffs etc.
-        var damage = ZORPG.Utils.die("1d" + ent.actor.str);
-        console.log("ZORPG.Components.actor: Damage rolled = ", damage, "correction =", this.ac + ZORPG.Tables.getStatBonus(this.spd).bonus);
-        damage -= this.ac + ZORPG.Tables.getStatBonus(this.spd).bonus;
+        var damage = ZORPG.$.die("1d" + ent.actor.str);
+        console.log("ZORPG.Components.actor: Damage rolled = ", damage, "correction =", this.ac + ZORPG.Tables.getStatBonus(this.spd).value);
+        damage -= this.ac + ZORPG.Tables.getStatBonus(this.spd).value;
         console.log("ZORPG.Components.actor: Damage corrected", damage);
         if (damage > 0) {
             this.hp -= damage;
             console.log("ZORPG.Components.actor: Actor " + this.name + " gets " + damage + " damage from " + ent.actor.name);
-            ZORPG.Utils.log(this.name + " gets " + damage + " damage from " + ent.actor.name);
+            ZORPG.$.log(this.name + " gets " + damage + " damage from " + ent.actor.name);
             // If the attack is from a monster, shake camera
             if (ent.hasCmp("monster")) {
                 ZORPG.Canvas.shake(damage * .01);
             }
         } else {
             console.log("ZORPG.Components.actor: Actor " + this.name + " dodge attack from " + ent.actor.name);
-            ZORPG.Utils.log(this.name + " dodge attack from " + ent.actor.name);
+            ZORPG.$.log(this.name + " dodge attack from " + ent.actor.name);
         }
     }
 };
@@ -1512,6 +1547,54 @@ ZORPG.Components.party = {
             var index = Math.round(Math.random() * (this.actors.length - 1));
             console.log("ZORPG.Component.party: Actor picked to be attacked:", index, this.actors[index]);
             this.actors[index].actor.damage(ent);
+        }
+    },
+    // Default party
+    generateDefaultParty: function() {
+        var data = [ {
+            name: "Sir Lepro",
+            cls: "knight",
+            race: "human",
+            //hp: 12,
+            str: 17,
+            "int": 13,
+            per: 13,
+            end: 19,
+            spd: 16,
+            acc: 15,
+            lck: 12
+        }, {
+            name: "CragHack",
+            // Dwarf, barb
+            cls: "barbarian",
+            race: "dwarf",
+            //hp: 23,
+            str: 18,
+            "int": 7,
+            per: 12,
+            end: 21,
+            spd: 16,
+            acc: 17,
+            lck: 14
+        }, {
+            name: "Tyro",
+            // H.orc knight
+            cls: "knight",
+            race: "half-orc",
+            //hp: 16,
+            str: 19,
+            "int": 10,
+            per: 8,
+            end: 19,
+            spd: 16,
+            acc: 16,
+            lck: 14
+        } ];
+        for (var i = 0; i < 3; ++i) {
+            var ent = new ZORPG.Ent("character" + i, [ "actor" ]);
+            ZORPG.$.extend(ent.actor, data[i]);
+            ent.actor.init();
+            ZORPG.Player.party.actors.push(ent);
         }
     }
 };

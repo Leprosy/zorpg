@@ -10,7 +10,7 @@ ZORPG.State = (function() {
     return {
         // Adds a state. obj needs to have a structure?
         add: function(key, obj) {
-            if (ZORPG.Utils.isObj(obj)) {
+            if (ZORPG.$.isObj(obj)) {
                 obj._id = key;
                 states[key] = obj;
             } else {
@@ -21,7 +21,7 @@ ZORPG.State = (function() {
         // Switches the active state
         set: function(key, scope) {
             if (typeof states[key] !== "undefined") {
-                if (ZORPG.Utils.isObj(currentState) && typeof currentState.destroy === "function") {
+                if (ZORPG.$.isObj(currentState) && typeof currentState.destroy === "function") {
                     console.log("%cZORPG.State." + currentState._id + " ended", "font-weight: bold");
                     currentState.destroy();
                 }

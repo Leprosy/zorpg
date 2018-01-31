@@ -16,7 +16,7 @@ ZORPG.Ent = function(name, cmp) {
     this.tags = [];
 
     // Add components, if any
-    if (ZORPG.Utils.isArray(cmp)) {
+    if (ZORPG.$.isArray(cmp)) {
         for (var i = 0; i < cmp.length; ++i) {
             this.addCmp(cmp[i]);
         }

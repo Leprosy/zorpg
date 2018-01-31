@@ -3,7 +3,7 @@ var ZORPG = ZORPG || {};
 /**
  * Loaders, helpers and other utils & tools
  */
-ZORPG.Utils = {
+ZORPG.$ = {
     // The basic variable of all leprosystems software artifacts
     taldo: "OAW",
 
@@ -33,6 +33,15 @@ ZORPG.Utils = {
         }
     },
 
+    // Object extension
+    extend: function(source, newObj) {
+        var keys = Object.keys(newObj);
+
+        for (var i = 0; i < keys.length; ++i) {
+            source[keys[i]] = newObj[keys[i]];
+        }
+    },
+
     // This implements RPG dice notation
     die: function(str) {
         try {
@@ -45,7 +54,7 @@ ZORPG.Utils = {
             var factor = 1 * die[0];
             var faces = 1 * die[1];
             var result = factor * Math.round(Math.random() * (faces - 1)) + 1 + plus;
-            console.log("Game.Utils.die: xdy+z:", factor, faces, plus, "=", result);
+            //console.log("Game.Utils.die: xdy+z:", factor, faces, plus, "=", result);
 
             return result;
         } catch(e) {
@@ -54,7 +63,8 @@ ZORPG.Utils = {
         }
     },
 
+    // Output data to the game console
     log: function(str) {
-        $("#console").prepend(">" + str + "\n");
+        $("#console").prepend("> " + str + "\n");
     }
 };

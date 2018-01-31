@@ -15,6 +15,7 @@ Ranger       9       6  Pathfinding      Awaken         Int/Per/End/Spd 12
      */
     cls: {
         "knight": { hp: 10, at: 5, skill: "arms master"},
+        "barbarian": { hp: 12, at: 4, skill: ""},
         "sorcerer": { hp: 4, at: 8, skill: "cartography" }
     },
 
@@ -28,8 +29,9 @@ Gnome        -1     +1    2    2    2    2    2    20   +10 Danger Sense
 Half-orc     +2     -2   10   10   10    0    0     0   -10 -
      */
     race: {
-        "human": { hp: 0, mp: 0, skill: "swimming"},
-        "half-orc": { hp: 2, mp: -2, skill: "" },
+        "human": { hp: 0, sp: 0, skill: "swimming"},
+        "dwarf": { hp: 1, sp: -1, skill: "swimming"},
+        "half-orc": { hp: 2, sp: -2, skill: "" },
     },
 
     /**
@@ -60,29 +62,29 @@ Half-orc     +2     -2   10   10   10    0    0     0   -10 -
 250+          Ultimate          +20
      */
     getStatBonus: function(stat) {
-        if (stat >= 250) return {bonus: 20, name: "Ultimate"}
-        if (stat >= 225) return {bonus: 17, name: "Awe Inspiring"}
-        if (stat >= 200) return {bonus: 16, name: "Awesome"}
-        if (stat >= 175) return {bonus: 15, name: "Collosal"}
-        if (stat >= 150) return {bonus: 14, name: "Tremendous"}
-        if (stat >= 125) return {bonus: 13, name: "Monumental"}
-        if (stat >= 100) return {bonus: 12, name: "Astonishing"}
-        if (stat >= 75) return {bonus: 11, name: "Astounding"}
-        if (stat >= 50) return {bonus: 10, name: "Fantastic"}
-        if (stat >= 40) return {bonus: 9, name: "Gigantic"}
-        if (stat >= 35) return {bonus: 8, name: "Incredible"}
-        if (stat >= 30) return {bonus: 7, name: "Amazing"}
-        if (stat >= 25) return {bonus: 6, name: "Super"}
-        if (stat >= 21) return {bonus: 5, name: "Great"}
-        if (stat >= 19) return {bonus: 4, name: "Very High"}
-        if (stat >= 17) return {bonus: 3, name: "High"}
-        if (stat >= 15) return {bonus: 2, name: "Very Good"}
-        if (stat >= 13) return {bonus: 1, name: "Good"}
-        if (stat >= 11) return {bonus: 0, name: "Average"}
-        if (stat >= 9) return {bonus: -1, name: "Low"}
-        if (stat >= 7) return {bonus: -2, name: "Very Low"}
-        if (stat >= 5) return {bonus: -3, name: "Poor"}
-        if (stat >= 3) return {bonus: -4, name: "Very Poor"}
-        if (stat >= 0) return {bonus: -5, name: "Nonexistant"}
+        if (stat >= 250) return {value: 20, name: "Ultimate"}
+        if (stat >= 225) return {value: 17, name: "Awe Inspiring"}
+        if (stat >= 200) return {value: 16, name: "Awesome"}
+        if (stat >= 175) return {value: 15, name: "Collosal"}
+        if (stat >= 150) return {value: 14, name: "Tremendous"}
+        if (stat >= 125) return {value: 13, name: "Monumental"}
+        if (stat >= 100) return {value: 12, name: "Astonishing"}
+        if (stat >= 75) return {value: 11, name: "Astounding"}
+        if (stat >= 50) return {value: 10, name: "Fantastic"}
+        if (stat >= 40) return {value: 9, name: "Gigantic"}
+        if (stat >= 35) return {value: 8, name: "Incredible"}
+        if (stat >= 30) return {value: 7, name: "Amazing"}
+        if (stat >= 25) return {value: 6, name: "Super"}
+        if (stat >= 21) return {value: 5, name: "Great"}
+        if (stat >= 19) return {value: 4, name: "Very High"}
+        if (stat >= 17) return {value: 3, name: "High"}
+        if (stat >= 15) return {value: 2, name: "Very Good"}
+        if (stat >= 13) return {value: 1, name: "Good"}
+        if (stat >= 11) return {value: 0, name: "Average"}
+        if (stat >= 9) return {value: -1, name: "Low"}
+        if (stat >= 7) return {value: -2, name: "Very Low"}
+        if (stat >= 5) return {value: -3, name: "Poor"}
+        if (stat >= 3) return {value: -4, name: "Very Poor"}
+        if (stat >= 0) return {value: -5, name: "Nonexistant"}
     }
 }
