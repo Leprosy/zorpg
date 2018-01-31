@@ -65,8 +65,10 @@ ZORPG.State.add("combat", {
         // Check if are fightable monsters & build combat queue
         if (ZORPG.Monsters.willFight()) {
             this.combatQ = ZORPG.Monsters.getFightReady().concat(this.getAliveChars()).sort(function(a, b) {
-                if (a.actor.spd < b.actor.spd) { return 1 }
-                if (a.actor.spd > b.actor.spd) { return -1 }
+                var spdA = a.hasCmp("actor") ? a.actor.spd : a.monster.spd;
+                var spdB = b.hasCmp("actor") ? b.actor.spd : b.monster.spd;
+                if (spdA < spdB) return 1;
+                if (spdA > spdB) return -1;
                 return 0;
             });
 
@@ -86,9 +88,9 @@ ZORPG.State.add("combat", {
 
             switch(action) {
                 case "attack":
-                    monster.actor.damage(fighter);
+                    monster.monster.damage(fighter);
 
-                    if (!monster.actor.isAlive()) { // Killed monster -> removed
+                    if (!monster.monster.isAlive()) { // Killed monster -> removed
                         console.log("ZORPG.State.combat: Monster killed", monster)
                         ZORPG.$.remove(this.combatQ, monster);
                     }

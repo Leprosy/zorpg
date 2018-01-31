@@ -16,16 +16,7 @@ ZORPG.Components.actor = {
     int: 1,
     per: 1,
 
-    // Roll attributes & get a random monster - DEBUG only?
-    roll: function() {
-        this.spd = ZORPG.$.die("1d10+4");
-        this.str = ZORPG.$.die("1d10+4");
-        this.con = ZORPG.$.die("1d10+4");
-        this.ac = ZORPG.$.die("1d10+4");
-
-        this.hp = ZORPG.$.die("1d30+10");
-        this.xp = ZORPG.$.die("1d50+10");
-    },
+    // Debug component
     toString: function() {
         return "<b>" + this.name + "</b>:" + this.hp + "/" + this.getMaxHP() + "hp " + this.spd + "spd " + this.str + "str " + this.getAC() + "ac";
     },
@@ -55,6 +46,15 @@ ZORPG.Components.actor = {
         return armorAC + spdBonus + buffsAC;
     },
 
+    // Gets an attack damage with bonuses and all - "Bonuses" can't reduce this bellow 1
+    getAttackDamage: function() {
+        var weaponDamage = ZORPG.$.die("1d6") // TODO: this die is debug only...items should provide this
+        var bonusDamage = ZORPG.Tables.getStatBonus(this.str).value;
+        var buffsDamage = 0;
+
+        return Math.max(weaponDamage + bonusDamage + buffsDamage, 1);
+    },
+
     // init the char? We need this?
     init: function() {
         this.hp = this.getMaxHP();
@@ -68,25 +68,42 @@ ZORPG.Components.actor = {
     // Damages this actor
     damage: function(ent) {
         // Calculate attack success/damage/etc.
-        // attack roll - AC - Speed bonus
         // TODO: add resistances, spell buffs etc.
-        var damage = ZORPG.$.die("1d" + ent.actor.str);
-        console.log("ZORPG.Components.actor: Damage rolled = ", damage, "correction =", this.ac + ZORPG.Tables.getStatBonus(this.spd).value);
-        damage -= this.ac + ZORPG.Tables.getStatBonus(this.spd).value;
-        console.log("ZORPG.Components.actor: Damage corrected", damage);
+        var damage = ZORPG.$.die(ent.monster.attackDie);
+        var totalDamage = 0;
 
-        if (damage > 0) {
-            this.hp -= damage;
-            console.log("ZORPG.Components.actor: Actor " + this.name + " gets " + damage + " damage from " + ent.actor.name);
-            ZORPG.$.log(this.name + " gets " + damage + " damage from " + ent.actor.name);
+        // If damage is physical -> AC
+        if (ent.monster.attackType === "physical") {
+            var check = ZORPG.$.die("1d20"); // Check die: 1 = Critical save, 20 = Critical fail(chance of double damage)
+            console.log("ZORPG.Component.actor: Check die/Damage", check, damage);
 
-            // If the attack is from a monster, shake camera
-            if (ent.hasCmp("monster")) {
-                ZORPG.Canvas.shake(damage * 0.01)
+            if (check > 1) {
+                if (check == 20) {
+                    totalDamage += damage;
+                }
+
+                check += ent.monster.toHit / 4 + ZORPG.$.die("1d" + ent.monster.toHit);
+                var ac = this.getAC(); // TODO: Check if any chars have blocked
+                console.log("ZORPG.Component.actor: Corrected check die/Armor Class", check, ac);
+
+                if (ac <= check) {
+                    totalDamage += damage;
+                }
             }
         } else {
-            console.log("ZORPG.Components.actor: Actor " + this.name + " dodge attack from " + ent.actor.name);
-            ZORPG.$.log(this.name + " dodge attack from " + ent.actor.name);
+            // If damage is magical -> saving throw
+            // NOT IMPLEMENTED YET!
+            alert("MAGIC! OAW!")
+        }
+
+        if (totalDamage > 0) {
+            this.hp -= totalDamage;
+            console.log("ZORPG.Components.actor: Actor " + this.name + " gets " + totalDamage + " damage from " + ent.monster.name);
+            ZORPG.$.log(this.name + " gets " + totalDamage + " damage from " + ent.monster.name);
+            ZORPG.Canvas.shake(totalDamage * 0.01);
+        } else {
+            console.log("ZORPG.Components.actor: Actor " + this.name + " dodge attack from " + ent.monster.name);
+            ZORPG.$.log(this.name + " dodge attack from " + ent.monster.name);
         }
     }
 }

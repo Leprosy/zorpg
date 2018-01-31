@@ -144,7 +144,7 @@ ZORPG.Canvas = (function() {
                 ZORPG.Monsters.each(function(monster, i) {
                     var mesh = ZORPG.Canvas.scene.getMeshByID("monster" + i);
 
-                    if (monster.actor.isAlive()) {
+                    if (monster.monster.isAlive()) {
                         mesh.position.x = monster.pos.x * _this.tileSize;
                         mesh.position.z = monster.pos.y * _this.tileSize;
                     } else {
@@ -205,7 +205,7 @@ ZORPG.Canvas = (function() {
 
                     for (var i = 0; i < data.monsters.length; ++i) {
                         if (data.monsters[i].hasCmp("monster")) {
-                            $("#side").append("<li id=\"monster" + i + "\">" + data.monsters[i].actor + "</li>");
+                            $("#side").append("<li id=\"monster" + i + "\">" + data.monsters[i].monster + "</li>");
                         }
                     }
 
