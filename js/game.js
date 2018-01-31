@@ -1455,9 +1455,20 @@ ZORPG.Components.actor = {
         var racialBonus = ZORPG.Tables.race[this.race].hp;
         return this.level * (attrBonus + classBonus + racialBonus);
     },
+    // Gets the toHit value => Acc bonus + weapon bonus + buffs
+    getToHit: function() {
+        var accBonus = ZORPG.Tables.getStatBonus(this.acc).value;
+        var weaponBonus = 1;
+        // This is for debug. Should be any weapon bonus
+        return accBonus + weaponBonus;
+    },
     // Gets actor AC => Total armor + speed attr bonus + buffs
     getAC: function() {
-        return ZORPG.Tables.getStatBonus(this.spd).value;
+        var armorAC = 4;
+        // this is a debug purpose hardcoded number. This will be the weared armor AC
+        var spdBonus = ZORPG.Tables.getStatBonus(this.spd).value;
+        var buffsAC = 0;
+        return armorAC + spdBonus + buffsAC;
     },
     // init the char? We need this?
     init: function() {
