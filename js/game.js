@@ -46,7 +46,8 @@ ZORPG.Canvas = function() {
             ZORPG.Loader.onTasksDoneObservable.add(function(a, b, c) {});
             ZORPG.Loader.onProgressObservable.add(function(progress, event) {
                 console.log("ZORPG.Loader: Progress", progress);
-                ZORPG.Canvas.engine.loadingUIText = "Loading " + progress.remainingCount + "/" + progress.totalCount;
+                var perc = Math.round((progress.totalCount - progress.remainingCount) * 100 / progress.totalCount);
+                ZORPG.Canvas.engine.loadingUIText = "Loading " + perc + "% (" + progress.remainingCount + "/" + progress.totalCount + ")";
             });
             // Camera
             this.camera = new BABYLON.ArcRotateCamera("camera1", 0, 0, this.tileSize * .8, new BABYLON.Vector3(0, 0, 0), this.scene);
@@ -1138,6 +1139,7 @@ ZORPG.State.add("combat", {
             }
         }
         this.combatIndex++;
+        if (this.combatIndex >= this.combatQ.length) this.combatIndex = 0;
     },
     // Gets the monster entity that is being targeted by player
     getTargetedMonster: function() {
@@ -1156,7 +1158,7 @@ ZORPG.State.add("combat", {
     update: function() {
         console.log("ZORPG.State.combat: Update begins.");
         // Checking if turn is begining
-        if (this.combatQ.length === this.combatIndex) {
+        if (this.combatIndex === 0) {
             this.beginTurn();
         }
         // Are there monsters left? If not...return to play state

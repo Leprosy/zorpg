@@ -30,7 +30,8 @@ ZORPG.Canvas = (function() {
             ZORPG.Loader.onTasksDoneObservable.add(function(a, b ,c) {});
             ZORPG.Loader.onProgressObservable.add(function(progress, event) {
                 console.log("ZORPG.Loader: Progress", progress)
-                ZORPG.Canvas.engine.loadingUIText = "Loading " + progress.remainingCount + "/" + progress.totalCount;
+                var perc = Math.round((progress.totalCount - progress.remainingCount) * 100 / progress.totalCount);
+                ZORPG.Canvas.engine.loadingUIText = "Loading " + perc + "% (" + progress.remainingCount + "/" + progress.totalCount + ")";
             });
 
             // Camera

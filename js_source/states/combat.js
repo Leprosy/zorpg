@@ -101,7 +101,7 @@ ZORPG.State.add("combat", {
             }
         }
 
-        this.combatIndex++;
+        this.combatIndex++; if (this.combatIndex >= this.combatQ.length) this.combatIndex = 0;
     },
 
     // Gets the monster entity that is being targeted by player
@@ -127,7 +127,7 @@ ZORPG.State.add("combat", {
         console.log("ZORPG.State.combat: Update begins.")
 
         // Checking if turn is begining
-        if (this.combatQ.length === this.combatIndex) {
+        if (this.combatIndex === 0) {
             this.beginTurn();
         }
 
