@@ -8,8 +8,7 @@ ZORPG.State.add("load", {
         ZORPG.Loader.addImageTask("splash", "img/splash.png");
         ZORPG.Loader.addImageTask("npc", "img/npc.png");
         ZORPG.Loader.onTasksDoneObservable.add(function() {
-            //ZORPG.State.set("main_menu");
-            ZORPG.State.set("play");
+            ZORPG.State.set("main_menu");
         });
         ZORPG.Loader.load();
 

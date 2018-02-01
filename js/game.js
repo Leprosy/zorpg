@@ -1249,8 +1249,7 @@ ZORPG.State.add("load", {
         ZORPG.Loader.addImageTask("splash", "img/splash.png");
         ZORPG.Loader.addImageTask("npc", "img/npc.png");
         ZORPG.Loader.onTasksDoneObservable.add(function() {
-            //ZORPG.State.set("main_menu");
-            ZORPG.State.set("play");
+            ZORPG.State.set("main_menu");
         });
         ZORPG.Loader.load();
     },
@@ -1278,7 +1277,16 @@ ZORPG.State.add("main_menu", {
         ZORPG.Canvas.GUI.addControl(splash);
         ZORPG.Canvas.GUI.addControl(button1);
     },
-    destroy: function() {}
+    destroy: function() {
+        // We will create anything here
+        ZORPG.Map.load(JSON.parse(ZORPG.Loader.tasks[0].text));
+        ZORPG.Monsters.init();
+        // TODO: This should read data from map or something like that
+        ZORPG.Player = new ZORPG.Ent("player", [ "pos", "party" ]);
+        ZORPG.Player.pos.x = ZORPG.Map.properties.startX;
+        ZORPG.Player.pos.y = ZORPG.Map.properties.startY;
+        ZORPG.Player.party.generateDefaultParty();
+    }
 });
 
 // TODO: Refactor the dialog code into something that one can look at...
@@ -1375,19 +1383,7 @@ ZORPG.State.add("play", {
     //???
     init: function() {
         ZORPG.Canvas.setHUD("play");
-        // Test code for player party - THIS IS HACKY, I know
-        // TODO: Player should be stored somewhere else?(idea: build a singleton containing entities[actors])
-        if (typeof ZORPG.Player === "undefined") {
-            // TODO: Add check for create Player/Map/anything
-            ZORPG.Map.load(JSON.parse(ZORPG.Loader.tasks[0].text));
-            ZORPG.Monsters.init();
-            // TODO: This should read data from map or something like that
-            ZORPG.Player = new ZORPG.Ent("player", [ "pos", "party" ]);
-            ZORPG.Player.pos.x = ZORPG.Map.properties.startX;
-            ZORPG.Player.pos.y = ZORPG.Map.properties.startY;
-            ZORPG.Player.party.generateDefaultParty();
-            ZORPG.Canvas.renderMap();
-        }
+        ZORPG.Canvas.renderMap();
         // Set key handlers
         var _this = this;
         ZORPG.Key.setPre(function(ev) {

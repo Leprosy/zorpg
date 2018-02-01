@@ -22,5 +22,13 @@ ZORPG.State.add("main_menu", {
         ZORPG.Canvas.GUI.addControl(button1);
     },
 
-    destroy: function() {}
+    destroy: function() {
+        // We will create anything here
+        ZORPG.Map.load(JSON.parse(ZORPG.Loader.tasks[0].text));
+        ZORPG.Monsters.init(); // TODO: This should read data from map or something like that
+        ZORPG.Player = new ZORPG.Ent("player", ["pos", "party"]);
+        ZORPG.Player.pos.x = ZORPG.Map.properties.startX;
+        ZORPG.Player.pos.y = ZORPG.Map.properties.startY;
+        ZORPG.Player.party.generateDefaultParty();
+    }
 });

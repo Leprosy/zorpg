@@ -6,20 +6,7 @@ ZORPG.State.add("play", {
 
     init: function() {
         ZORPG.Canvas.setHUD("play");
-
-        // Test code for player party - THIS IS HACKY, I know
-        // TODO: Player should be stored somewhere else?(idea: build a singleton containing entities[actors])
-        if (typeof ZORPG.Player === "undefined") { // TODO: Add check for create Player/Map/anything
-            ZORPG.Map.load(JSON.parse(ZORPG.Loader.tasks[0].text));
-            ZORPG.Monsters.init(); // TODO: This should read data from map or something like that
-            ZORPG.Player = new ZORPG.Ent("player", ["pos", "party"]);
-            ZORPG.Player.pos.x = ZORPG.Map.properties.startX;
-            ZORPG.Player.pos.y = ZORPG.Map.properties.startY;
-            ZORPG.Player.party.generateDefaultParty();
-
-            ZORPG.Canvas.renderMap();
-        }
-
+        ZORPG.Canvas.renderMap();
 
         // Set key handlers
         var _this = this;
