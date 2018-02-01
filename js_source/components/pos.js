@@ -7,6 +7,7 @@ ZORPG.Components.pos = {
     x: 0,
     y: 0,
     ang: 0,
+    group: "", // Used for monster groups
 
     rotR: function() {
         this.ang = (this.ang + Math.PI / 2)// % (Math.PI * 2);

@@ -142,12 +142,22 @@ ZORPG.Canvas = (function() {
 
                 // Update rest of the world after player animation ends.
                 // Monsters (TODO: animated translation)
+                ZORPG.Monsters.setGroups();
                 ZORPG.Monsters.each(function(monster, i) {
                     var mesh = ZORPG.Canvas.scene.getMeshByID("monster" + i);
 
                     if (monster.monster.isAlive()) {
                         mesh.position.x = monster.pos.x * _this.tileSize;
                         mesh.position.z = monster.pos.y * _this.tileSize;
+
+                        // Groups
+                        if (monster.pos.group !== "") {
+                            var pos = monster.pos.group.split("-");
+                            var d = _this.tileSize / 4;
+                            var delta = (pos[1] * d - pos[0] * 2 * d);
+                            mesh.position.x -= delta * Math.abs(Math.cos(player.ang));
+                            mesh.position.z -= delta * Math.abs(Math.sin(player.ang));
+                        }
                     } else {
                         // TODO: dispose? change model to a corpse?
                         mesh.position.y = _this.tileSize * 0.05

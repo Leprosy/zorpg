@@ -164,11 +164,20 @@ ZORPG.Canvas = function() {
                 _this.camera.animations = [];
                 // Update rest of the world after player animation ends.
                 // Monsters (TODO: animated translation)
+                ZORPG.Monsters.setGroups();
                 ZORPG.Monsters.each(function(monster, i) {
                     var mesh = ZORPG.Canvas.scene.getMeshByID("monster" + i);
                     if (monster.monster.isAlive()) {
                         mesh.position.x = monster.pos.x * _this.tileSize;
                         mesh.position.z = monster.pos.y * _this.tileSize;
+                        // Groups
+                        if (monster.pos.group !== "") {
+                            var pos = monster.pos.group.split("-");
+                            var d = _this.tileSize / 4;
+                            var delta = pos[1] * d - pos[0] * 2 * d;
+                            mesh.position.x -= delta * Math.abs(Math.cos(player.ang));
+                            mesh.position.z -= delta * Math.abs(Math.sin(player.ang));
+                        }
                     } else {
                         // TODO: dispose? change model to a corpse?
                         mesh.position.y = _this.tileSize * .05;
@@ -518,11 +527,13 @@ ZORPG.Monsters = function() {
     var monsters = [];
     return {
         init: function(totalMonsters) {
-            var total = totalMonsters || 10;
+            var total = totalMonsters || 3;
             for (var i = 0; i < total; ++i) {
                 var ent = new ZORPG.Ent("monster" + i, [ "pos", "monster" ]);
-                ent.pos.x = ZORPG.$.die("1d20");
-                ent.pos.y = ZORPG.$.die("1d20");
+                ent.pos.x = 10;
+                ZORPG.$.die("1d20");
+                ent.pos.y = 1;
+                ZORPG.$.die("1d20");
                 ZORPG.$.extend(ent.monster, ZORPG.Monsters.data[ZORPG.$.die("1d3") - 1]);
                 ent.monster.name = ent.monster.name + " " + i;
                 monsters.push(ent);
@@ -540,6 +551,32 @@ ZORPG.Monsters = function() {
             var index = monsters.indexOf(ent);
             if (index >= 0) {
                 monsters.splice(index, 1);
+            }
+        },
+        // Get how many monsters are in the monster pos
+        setGroups: function() {
+            // Clear
+            for (var i = 0; i < monsters.length; ++i) {
+                monsters[i].pos.group = "";
+            }
+            for (var i = 0; i < monsters.length; ++i) {
+                var monster = monsters[i];
+                var list = [ monster ];
+                if (monster.pos.group === "" && monster.monster.isAlive()) {
+                    for (var j = 0; j < monsters.length; ++j) {
+                        if (j !== i) {
+                            if (monster.pos.x === monsters[j].pos.x && monster.pos.y === monsters[j].pos.y && monsters[j].monster.isAlive()) {
+                                list.push(monsters[j]);
+                            }
+                        }
+                    }
+                    if (list.length > 1) {
+                        for (var k = 0; k < list.length; ++k) {
+                            list[k].pos.group = k + "-" + (list.length - 1);
+                        }
+                        console.log("MONSTER", monster, "list", list);
+                    }
+                }
             }
         },
         // Get the fight-ready monsters(alive & in the same position as the party)
@@ -1737,6 +1774,8 @@ ZORPG.Components.pos = {
     x: 0,
     y: 0,
     ang: 0,
+    group: "",
+    // Used for monster groups
     rotR: function() {
         this.ang = this.ang + Math.PI / 2;
     },
