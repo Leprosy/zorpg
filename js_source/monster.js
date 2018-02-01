@@ -6,12 +6,12 @@ ZORPG.Monsters = (function() {
 
     return {
         init: function(totalMonsters) {
-            var total = totalMonsters || 3
+            var total = totalMonsters || 10
 
             for (var i = 0; i < total; ++i) {
                 var ent = new ZORPG.Ent("monster" + i, ["pos", "monster"]);
-                ent.pos.x = 10; ZORPG.$.die("1d20")
-                ent.pos.y = 1; ZORPG.$.die("1d20");
+                ent.pos.x = ZORPG.$.die("1d20")
+                ent.pos.y = ZORPG.$.die("1d20");
                 ZORPG.$.extend(ent.monster, ZORPG.Monsters.data[ZORPG.$.die("1d3") - 1]);
                 ent.monster.name = ent.monster.name + " " + i;
                 monsters.push(ent);
