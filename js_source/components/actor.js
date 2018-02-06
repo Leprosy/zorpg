@@ -56,7 +56,7 @@ ZORPG.Components.actor = {
         var armorAC = 0;
 
         for (var i = 0; i < this.items.length; ++i) {
-            var item = items[i].item;
+            var item = this.items[i].item;
 
             if (item.equiped) {
                 armorAC += item.getAC();

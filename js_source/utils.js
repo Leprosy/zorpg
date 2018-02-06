@@ -49,6 +49,10 @@ ZORPG.$ = {
 
     // This implements RPG dice notation
     die: function(str) {
+        if (typeof str === "undefined" || str === "") {
+            return 0;
+        }
+
         try {
             //xdy+z => x dices of y faces, ie (random(y) * x) + z
             var plus = str.split("+");
@@ -64,7 +68,7 @@ ZORPG.$ = {
             return result;
         } catch(e) {
             console.error("Game.Utils.die: Bad die string", str);
-            return false;
+            return 0;
         }
     },
 

@@ -1179,6 +1179,9 @@ ZORPG.$ = {
     },
     // This implements RPG dice notation
     die: function(str) {
+        if (typeof str === "undefined" || str === "") {
+            return 0;
+        }
         try {
             //xdy+z => x dices of y faces, ie (random(y) * x) + z
             var plus = str.split("+");
@@ -1188,11 +1191,11 @@ ZORPG.$ = {
             var factor = 1 * die[0];
             var faces = 1 * die[1];
             var result = factor * Math.round(Math.random() * (faces - 1)) + 1 + plus;
-            console.log("Game.Utils.die: xdy+z:", factor, faces, plus, "=", result);
+            //console.log("Game.Utils.die: xdy+z:", factor, faces, plus, "=", result);
             return result;
         } catch (e) {
             console.error("Game.Utils.die: Bad die string", str);
-            return false;
+            return 0;
         }
     },
     // Get a random object from a map
@@ -1668,7 +1671,7 @@ ZORPG.Components.actor = {
         var buffsAC = 0;
         var armorAC = 0;
         for (var i = 0; i < this.items.length; ++i) {
-            var item = items[i].item;
+            var item = this.items[i].item;
             if (item.equiped) {
                 armorAC += item.getAC();
             }
@@ -1756,12 +1759,17 @@ ZORPG.Components.item = {
         return ZORPG.Tables.item[this.name].type;
     },
     getToHit: function() {
-        return 0;
+        var addBonus = this.getType(this.name) === "weapon";
+        return addBonus ? ZORPG.Tables.material[this.material].toHit : 0;
     },
-    getDamage: function() {},
+    getDmg: function() {
+        // TODO: Check weapons that has ac bonus - ie: Armored Long Sword
+        var addBonus = this.getType(this.name) === "weapon";
+        return ZORPG.Tables.item[this.name].dmg + (addBonus ? "+" + ZORPG.Tables.material[this.material].dmg : "");
+    },
     getAC: function() {
-        var itemAC = ZORPG.Tables.item[this.name].ac;
-        return itemAC + itemAC > 0 ? ZORPG.Tables.material[this.material].ac : 0;
+        var addBonus = this.getType(this.name) !== "weapon";
+        return ZORPG.Tables.item[this.name].ac + (addBonus ? ZORPG.Tables.material[this.material].ac : 0);
     },
     // TODO: Debug? could be useful to generate random loot
     generate: function(type) {
