@@ -53,7 +53,7 @@ ZORPG.$ = {
             //xdy+z => x dices of y faces, ie (random(y) * x) + z
             var plus = str.split("+");
             var die = plus[0];
-            plus = 1 * plus[1] || 0;
+            plus = 1 * plus[1] + 1 * plus[2] || 0;
 
             die = die.split("d");
             var factor = 1 * die[0];

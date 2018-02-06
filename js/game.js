@@ -1183,12 +1183,12 @@ ZORPG.$ = {
             //xdy+z => x dices of y faces, ie (random(y) * x) + z
             var plus = str.split("+");
             var die = plus[0];
-            plus = 1 * plus[1] || 0;
+            plus = 1 * plus[1] + 1 * plus[2] || 0;
             die = die.split("d");
             var factor = 1 * die[0];
             var faces = 1 * die[1];
             var result = factor * Math.round(Math.random() * (faces - 1)) + 1 + plus;
-            //console.log("Game.Utils.die: xdy+z:", factor, faces, plus, "=", result);
+            console.log("Game.Utils.die: xdy+z:", factor, faces, plus, "=", result);
             return result;
         } catch (e) {
             console.error("Game.Utils.die: Bad die string", str);
@@ -1654,17 +1654,25 @@ ZORPG.Components.actor = {
     getToHit: function() {
         var accBonus = ZORPG.Tables.getStatBonus(this.acc).value;
         var weaponBonus = 0;
-        /* for (var i = 0; i < this.items.length; ++i) {
-            weaponBonus += this.items[i].getToHit();
-        } */
+        for (var i = 0; i < this.items.length; ++i) {
+            var item = items[i].item;
+            if (item.type === "weapon" && item.equiped) {
+                weaponBonus += item.getToHit();
+            }
+        }
         return accBonus + weaponBonus;
     },
     // Gets actor AC => Total armor + speed attr bonus + buffs
     getAC: function() {
-        var armorAC = 4;
-        // this is a debug purpose hardcoded number. This will be the weared armor AC
         var spdBonus = ZORPG.Tables.getStatBonus(this.spd).value;
         var buffsAC = 0;
+        var armorAC = 0;
+        for (var i = 0; i < this.items.length; ++i) {
+            var item = items[i].item;
+            if (item.equiped) {
+                armorAC += item.getAC();
+            }
+        }
         return armorAC + spdBonus + buffsAC;
     },
     // Gets an attack damage with bonuses and all - "Bonuses" can't reduce this bellow 1
@@ -1744,14 +1752,16 @@ ZORPG.Components.item = {
     //attribute: "",
     name: "",
     equiped: false,
+    getType: function() {
+        return ZORPG.Tables.item[this.name].type;
+    },
     getToHit: function() {
-        return ZORPG.Tables.material[this.material].toHit;
+        return 0;
     },
-    getDamage: function() {
-        return ZORPG.Tables.item[this.name].dmg + "+" + ZORPG.Tables.material[this.material].dmg;
-    },
+    getDamage: function() {},
     getAC: function() {
-        return ZORPG.Tables.item[this.name].ac + ZORPG.Tables.material[this.material].ac;
+        var itemAC = ZORPG.Tables.item[this.name].ac;
+        return itemAC + itemAC > 0 ? ZORPG.Tables.material[this.material].ac : 0;
     },
     // TODO: Debug? could be useful to generate random loot
     generate: function(type) {
