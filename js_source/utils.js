@@ -34,11 +34,16 @@ ZORPG.$ = {
     },
 
     // Object extension
+    // TODO: Check arrays, functions, objects...this works for copy components?
     extend: function(source, newObj) {
         var keys = Object.keys(newObj);
 
         for (var i = 0; i < keys.length; ++i) {
-            source[keys[i]] = newObj[keys[i]];
+            if (Array.isArray(newObj[keys[i]])) {
+                source[keys[i]] = [];
+            } else {
+                source[keys[i]] = newObj[keys[i]];
+            }
         }
     },
 

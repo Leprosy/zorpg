@@ -38,18 +38,30 @@ ZORPG.Components.actor = {
         var accBonus = ZORPG.Tables.getStatBonus(this.acc).value;
         var weaponBonus = 0;
 
-        /* for (var i = 0; i < this.items.length; ++i) {
-            weaponBonus += this.items[i].getToHit();
-        } */
+        for (var i = 0; i < this.items.length; ++i) {
+            var item = items[i].item;
+
+            if (item.type === "weapon" && item.equiped) {
+                weaponBonus += item.getToHit();
+            }
+        }
 
         return accBonus + weaponBonus;
     },
 
     // Gets actor AC => Total armor + speed attr bonus + buffs
     getAC: function() {
-        var armorAC = 4; // this is a debug purpose hardcoded number. This will be the weared armor AC
         var spdBonus = ZORPG.Tables.getStatBonus(this.spd).value;
         var buffsAC = 0;
+        var armorAC = 0;
+
+        for (var i = 0; i < this.items.length; ++i) {
+            var item = items[i].item;
+
+            if (item.equiped) {
+                armorAC += item.getAC();
+            }
+        }
 
         return armorAC + spdBonus + buffsAC;
     },
