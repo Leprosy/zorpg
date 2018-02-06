@@ -8,6 +8,7 @@ ZORPG.Components.actor = {
     cls: "",
     race: "",
     name: "",
+
     str: 1,
     end: 1,
     acc: 1,
@@ -16,9 +17,12 @@ ZORPG.Components.actor = {
     int: 1,
     per: 1,
 
+    items: [],
+
     // Debug component
     toString: function() {
-        return "<b>" + this.name + "</b>:" + this.hp + "/" + this.getMaxHP() + "hp " + this.spd + "spd " + this.str + "str " + this.getAC() + "ac";
+        return "<b>" + this.name + "</b>:" + this.hp + "/" + this.getMaxHP() +
+               "hp " + this.spd + "spd " + this.str + "str " + this.getAC() + "ac";
     },
 
     // Gets max HP => Level * (Endurance bonus + racial bonus + class bonus)
@@ -26,13 +30,17 @@ ZORPG.Components.actor = {
         var attrBonus = ZORPG.Tables.getStatBonus(this.end).value;
         var classBonus = ZORPG.Tables.cls[this.cls].hp;
         var racialBonus = ZORPG.Tables.race[this.race].hp;
-        return this.level * (attrBonus + classBonus + racialBonus);
+        return this.level * (attrBonus + classBonus + racialBonus); // + Bodybuilding
     },
 
     // Gets the toHit value => Acc bonus + weapon bonus + buffs
     getToHit: function() {
         var accBonus = ZORPG.Tables.getStatBonus(this.acc).value;
-        var weaponBonus = 1; // This is for debug. Should be any weapon bonus
+        var weaponBonus = 0;
+
+        /* for (var i = 0; i < this.items.length; ++i) {
+            weaponBonus += this.items[i].getToHit();
+        } */
 
         return accBonus + weaponBonus;
     },
@@ -55,9 +63,16 @@ ZORPG.Components.actor = {
         return Math.max(weaponDamage + bonusDamage + buffsDamage, 1);
     },
 
-    // init the char? We need this?
+    // TODO: init the char? We need this? useful for debug
     init: function() {
+        // Generate hit points
         this.hp = this.getMaxHP();
+
+        // Generate random items
+        var armor = new ZORPG.Ent("", ["item"]); armor.item.generate("armor"); armor.item.equiped = true;
+        var shield = new ZORPG.Ent("", ["item"]); shield.item.generate("shield"); shield.item.equiped = true;
+        var weapon = new ZORPG.Ent("", ["item"]); weapon.item.generate("weapon"); weapon.item.equiped = true;
+        this.items.push(armor, shield, weapon);
     },
 
     // Is actor alive

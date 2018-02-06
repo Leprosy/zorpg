@@ -86,5 +86,42 @@ Half-orc     +2     -2   10   10   10    0    0     0   -10 -
         if (stat >= 5) return {value: -3, name: "Poor"}
         if (stat >= 3) return {value: -4, name: "Very Poor"}
         if (stat >= 0) return {value: -5, name: "Nonexistant"}
+    },
+
+
+/**Items
+ * 
+ * 
+ */
+
+    item: {
+        "short sword": { ac: 0, dmg: "1d5+1", exclude: "", type: "weapon"},
+        "long sword": { ac: 0, dmg: "1d7+2", exclude: "", type: "weapon"},
+        "katana": { ac: 0, dmg: "1d9+3", exclude: "", type: "weapon"},
+
+        "boots": { ac: 1, dmg: "", exclude: "", type: "shoe"},
+        "cape": { ac: 1, dmg: "", exclude: "", type: "cape"},
+
+        "cap": { ac: 1, dmg: "", exclude: "", type: "helm"},
+        "helm": { ac: 2, dmg: "", exclude: "", type: "helm"},
+
+        "chain mail": { ac: 6, dmg: "", exclude: "", type: "armor"},
+        "plate armor": { ac: 8, dmg: "", exclude: "", type: "armor"},
+
+        "buckler": { ac: 2, dmg: "", exclude: "", type: "shield"},
+        "shield": { ac: 4, dmg: "", exclude: "", type: "shield"},
+
+        "belt": { ac: 0, dmg: "", exclude: "", type: "belt"},
+        "medal": { ac: 0, dmg: "", exclude: "", type: "medal"},
+        "amulet": { ac: 0, dmg: "", exclude: "", type: "amulet"},
+        "ring": { ac: 0, dmg: "", exclude: "", type: "ring"},
+    },
+
+    material: {
+        "leather": { dmg: -6, toHit: -4, ac: 0 },
+        "bronze": { dmg: -2, toHit: 2, ac: -1 },
+        "iron": { dmg: 2, toHit: 1, ac: 1 },
+        "gold": { dmg: 8, toHit: 4, ac: 6 },
+        "obsidian": { dmg: 50, toHit: 10, ac: 20 }
     }
 }

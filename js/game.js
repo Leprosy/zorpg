@@ -304,7 +304,8 @@ ZORPG.Ent = function(name, cmp) {
 // Adds a component to the entity
 ZORPG.Ent.prototype.addCmp = function(key) {
     if (ZORPG.Components.hasOwnProperty(key)) {
-        this[key] = Object.assign({}, ZORPG.Components[key]);
+        this[key] = {};
+        ZORPG.$.extend(this[key], ZORPG.Components[key]);
         return this;
     } else {
         throw Error("ZORPG.Ent: Component '" + key + "' not found");
@@ -1007,6 +1008,129 @@ Half-orc     +2     -2   10   10   10    0    0     0   -10 -
             value: -5,
             name: "Nonexistant"
         };
+    },
+    /**Items
+ * 
+ * 
+ */
+    item: {
+        "short sword": {
+            ac: 0,
+            dmg: "1d5+1",
+            exclude: "",
+            type: "weapon"
+        },
+        "long sword": {
+            ac: 0,
+            dmg: "1d7+2",
+            exclude: "",
+            type: "weapon"
+        },
+        katana: {
+            ac: 0,
+            dmg: "1d9+3",
+            exclude: "",
+            type: "weapon"
+        },
+        boots: {
+            ac: 1,
+            dmg: "",
+            exclude: "",
+            type: "shoe"
+        },
+        cape: {
+            ac: 1,
+            dmg: "",
+            exclude: "",
+            type: "cape"
+        },
+        cap: {
+            ac: 1,
+            dmg: "",
+            exclude: "",
+            type: "helm"
+        },
+        helm: {
+            ac: 2,
+            dmg: "",
+            exclude: "",
+            type: "helm"
+        },
+        "chain mail": {
+            ac: 6,
+            dmg: "",
+            exclude: "",
+            type: "armor"
+        },
+        "plate armor": {
+            ac: 8,
+            dmg: "",
+            exclude: "",
+            type: "armor"
+        },
+        buckler: {
+            ac: 2,
+            dmg: "",
+            exclude: "",
+            type: "shield"
+        },
+        shield: {
+            ac: 4,
+            dmg: "",
+            exclude: "",
+            type: "shield"
+        },
+        belt: {
+            ac: 0,
+            dmg: "",
+            exclude: "",
+            type: "belt"
+        },
+        medal: {
+            ac: 0,
+            dmg: "",
+            exclude: "",
+            type: "medal"
+        },
+        amulet: {
+            ac: 0,
+            dmg: "",
+            exclude: "",
+            type: "amulet"
+        },
+        ring: {
+            ac: 0,
+            dmg: "",
+            exclude: "",
+            type: "ring"
+        }
+    },
+    material: {
+        leather: {
+            dmg: -6,
+            toHit: -4,
+            ac: 0
+        },
+        bronze: {
+            dmg: -2,
+            toHit: 2,
+            ac: -1
+        },
+        iron: {
+            dmg: 2,
+            toHit: 1,
+            ac: 1
+        },
+        gold: {
+            dmg: 8,
+            toHit: 4,
+            ac: 6
+        },
+        obsidian: {
+            dmg: 50,
+            toHit: 10,
+            ac: 20
+        }
     }
 };
 
@@ -1065,6 +1189,12 @@ ZORPG.$ = {
             console.error("Game.Utils.die: Bad die string", str);
             return false;
         }
+    },
+    // Get a random object from a map
+    getRnd: function(obj) {
+        var keys = Object.keys(obj);
+        var index = Math.round(Math.random() * (keys.length - 1));
+        return keys[index];
     },
     // Output data to the game console
     log: function(str) {
@@ -1286,6 +1416,7 @@ ZORPG.State.add("main_menu", {
         ZORPG.Player.pos.x = ZORPG.Map.properties.startX;
         ZORPG.Player.pos.y = ZORPG.Map.properties.startY;
         ZORPG.Player.party.generateDefaultParty();
+        ZORPG.Canvas.renderMap();
     }
 });
 
@@ -1383,7 +1514,6 @@ ZORPG.State.add("play", {
     //???
     init: function() {
         ZORPG.Canvas.setHUD("play");
-        ZORPG.Canvas.renderMap();
         // Set key handlers
         var _this = this;
         ZORPG.Key.setPre(function(ev) {
@@ -1503,6 +1633,7 @@ ZORPG.Components.actor = {
     lck: 1,
     "int": 1,
     per: 1,
+    items: [],
     // Debug component
     toString: function() {
         return "<b>" + this.name + "</b>:" + this.hp + "/" + this.getMaxHP() + "hp " + this.spd + "spd " + this.str + "str " + this.getAC() + "ac";
@@ -1517,8 +1648,10 @@ ZORPG.Components.actor = {
     // Gets the toHit value => Acc bonus + weapon bonus + buffs
     getToHit: function() {
         var accBonus = ZORPG.Tables.getStatBonus(this.acc).value;
-        var weaponBonus = 1;
-        // This is for debug. Should be any weapon bonus
+        var weaponBonus = 0;
+        /* for (var i = 0; i < this.items.length; ++i) {
+            weaponBonus += this.items[i].getToHit();
+        } */
         return accBonus + weaponBonus;
     },
     // Gets actor AC => Total armor + speed attr bonus + buffs
@@ -1537,9 +1670,21 @@ ZORPG.Components.actor = {
         var buffsDamage = 0;
         return Math.max(weaponDamage + bonusDamage + buffsDamage, 1);
     },
-    // init the char? We need this?
+    // TODO: init the char? We need this? useful for debug
     init: function() {
+        // Generate hit points
         this.hp = this.getMaxHP();
+        // Generate random items
+        var armor = new ZORPG.Ent("", [ "item" ]);
+        armor.item.generate("armor");
+        armor.item.equiped = true;
+        var shield = new ZORPG.Ent("", [ "item" ]);
+        shield.item.generate("shield");
+        shield.item.equiped = true;
+        var weapon = new ZORPG.Ent("", [ "item" ]);
+        weapon.item.generate("weapon");
+        weapon.item.equiped = true;
+        this.items.push(armor, shield, weapon);
     },
     // Is actor alive
     isAlive: function() {
@@ -1582,6 +1727,51 @@ ZORPG.Components.actor = {
             console.log("ZORPG.Components.actor: Actor " + this.name + " dodge attack from " + ent.monster.name);
             ZORPG.$.log(this.name + " dodge attack from " + ent.monster.name);
         }
+    }
+};
+
+/**
+ * items
+ */
+ZORPG.Components.item = {
+    material: "",
+    //elemental: "",
+    //attribute: "",
+    name: "",
+    equiped: false,
+    getToHit: function() {
+        return ZORPG.Tables.material[this.material].toHit;
+    },
+    getDamage: function() {
+        return ZORPG.Tables.item[this.name].dmg + "+" + ZORPG.Tables.material[this.material].dmg;
+    },
+    getAC: function() {
+        return ZORPG.Tables.item[this.name].ac + ZORPG.Tables.material[this.material].ac;
+    },
+    // TODO: Debug? could be useful to generate random loot
+    generate: function(type) {
+        // lvl => future use
+        var ok = false;
+        var item = {
+            name: "",
+            material: ""
+        };
+        // Generate item
+        do {
+            item.name = ZORPG.$.getRnd(ZORPG.Tables.item);
+            item.material = ZORPG.$.getRnd(ZORPG.Tables.material);
+            // Check type if provided
+            if (typeof type !== "undefined") {
+                console.log("Comparing arg/type", type, ZORPG.Tables.item[item.name].type);
+                if (type === ZORPG.Tables.item[item.name].type) {
+                    ok = true;
+                }
+            } else {
+                ok = true;
+            }
+        } while (!ok);
+        // Get item!
+        ZORPG.$.extend(this, item);
     }
 };
 

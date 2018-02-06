@@ -63,6 +63,14 @@ ZORPG.$ = {
         }
     },
 
+    // Get a random object from a map
+    getRnd: function(obj) {
+        var keys = Object.keys(obj);
+        var index = Math.round(Math.random() * (keys.length - 1));
+
+        return keys[index];
+    },
+
     // Output data to the game console
     log: function(str) {
         $("#console").prepend("> " + str + "\n");

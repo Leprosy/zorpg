@@ -29,7 +29,8 @@ ZORPG.Ent = function(name, cmp) {
 // Adds a component to the entity
 ZORPG.Ent.prototype.addCmp = function(key) {
     if (ZORPG.Components.hasOwnProperty(key)) {
-        this[key] = Object.assign({}, ZORPG.Components[key]);
+        this[key] = {};
+        ZORPG.$.extend(this[key], ZORPG.Components[key]);
         return this;
     } else {
         throw Error("ZORPG.Ent: Component '" + key + "' not found");
