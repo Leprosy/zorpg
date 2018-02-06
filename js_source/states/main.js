@@ -30,5 +30,6 @@ ZORPG.State.add("main_menu", {
         ZORPG.Player.pos.x = ZORPG.Map.properties.startX;
         ZORPG.Player.pos.y = ZORPG.Map.properties.startY;
         ZORPG.Player.party.generateDefaultParty();
+        ZORPG.Canvas.renderMap();
     }
 });

@@ -6,7 +6,6 @@ ZORPG.State.add("play", {
 
     init: function() {
         ZORPG.Canvas.setHUD("play");
-        ZORPG.Canvas.renderMap();
 
         // Set key handlers
         var _this = this;
