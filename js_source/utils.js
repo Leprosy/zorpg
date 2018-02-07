@@ -56,14 +56,26 @@ ZORPG.$ = {
         try {
             //xdy+z => x dices of y faces, ie (random(y) * x) + z
             var plus = str.split("+");
+            var plusAdd = 0;
             var die = plus[0];
-            plus = 1 * plus[1] + 1 * plus[2] || 0;
+
+            for (var i = 1; i < plus.length; ++i) {
+                plusAdd += (1 * plus[i]);
+            }
 
             die = die.split("d");
             var factor = 1 * die[0];
             var faces = 1 * die[1];
-            var result = factor * Math.round(Math.random() * (faces - 1) + 1) + plus;
-            //console.log("Game.Utils.die: xdy+z:", factor, faces, plus, "=", result);
+            var result = 0;
+
+            for (var i = 0; i < factor; ++i) {
+                var addDie = Math.round(Math.random() * (faces - 1) + 1);
+                result += addDie;
+                console.log("Result adding", result, addDie)
+            }
+
+            result += plusAdd;
+            console.log("final result", result, plusAdd)
 
             return result;
         } catch(e) {
