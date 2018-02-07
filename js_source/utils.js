@@ -62,7 +62,7 @@ ZORPG.$ = {
             die = die.split("d");
             var factor = 1 * die[0];
             var faces = 1 * die[1];
-            var result = factor * Math.round(Math.random() * (faces - 1)) + 1 + plus;
+            var result = factor * Math.round(Math.random() * (faces - 1) + 1) + plus;
             //console.log("Game.Utils.die: xdy+z:", factor, faces, plus, "=", result);
 
             return result;
