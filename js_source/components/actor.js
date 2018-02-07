@@ -129,7 +129,7 @@ ZORPG.Components.actor = {
                 var ac = this.getAC() + 10; //(!_charsBlocked[charNum] ? 10 : c.getCurrentLevel() / 2 + 15);
 
                 if (ac > v) {
-                    sound.playFX(6);
+                    // Blocked
                 } else {
                     totalDamage += this.getDamage(ent);
                 }

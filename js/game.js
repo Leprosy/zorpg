@@ -1736,9 +1736,7 @@ ZORPG.Components.actor = {
                 v += ent.monster.toHit / 4 + ZORPG.$.die("1d" + ent.monster.toHit);
                 var ac = this.getAC() + 10;
                 //(!_charsBlocked[charNum] ? 10 : c.getCurrentLevel() / 2 + 15);
-                if (ac > v) {
-                    sound.playFX(6);
-                } else {
+                if (ac > v) {} else {
                     totalDamage += this.getDamage(ent);
                 }
             }
@@ -1942,7 +1940,7 @@ ZORPG.Components.party = {
         for (var i = 0; i < ent.monster.attacks; ++i) {
             var index = Math.round(Math.random() * (this.actors.length - 1));
             console.log("ZORPG.Component.party: Actor picked to be attacked:", index, this.actors[index]);
-            this.actors[index].actor.damage(ent);
+            this.actors[index].actor.getAttacked(ent);
         }
     },
     // Default party

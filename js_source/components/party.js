@@ -46,7 +46,7 @@ ZORPG.Components.party = {
         for (var i = 0; i < ent.monster.attacks; ++i) {
             var index = Math.round(Math.random() * (this.actors.length - 1));
             console.log("ZORPG.Component.party: Actor picked to be attacked:", index, this.actors[index]);
-            this.actors[index].actor.damage(ent);
+            this.actors[index].actor.getAttacked(ent);
         }
     },
 
