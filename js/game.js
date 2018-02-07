@@ -1185,13 +1185,22 @@ ZORPG.$ = {
         try {
             //xdy+z => x dices of y faces, ie (random(y) * x) + z
             var plus = str.split("+");
+            var plusAdd = 0;
             var die = plus[0];
-            plus = 1 * plus[1] + 1 * plus[2] || 0;
+            for (var i = 1; i < plus.length; ++i) {
+                plusAdd += 1 * plus[i];
+            }
             die = die.split("d");
             var factor = 1 * die[0];
             var faces = 1 * die[1];
-            var result = factor * Math.round(Math.random() * (faces - 1)) + 1 + plus;
-            //console.log("Game.Utils.die: xdy+z:", factor, faces, plus, "=", result);
+            var result = 0;
+            for (var i = 0; i < factor; ++i) {
+                var addDie = Math.round(Math.random() * (faces - 1) + 1);
+                result += addDie;
+                console.log("Result adding", result, addDie);
+            }
+            result += plusAdd;
+            console.log("final result", result, plusAdd);
             return result;
         } catch (e) {
             console.error("Game.Utils.die: Bad die string", str);
@@ -1678,13 +1687,18 @@ ZORPG.Components.actor = {
         }
         return armorAC + spdBonus + buffsAC;
     },
-    // Gets an attack damage with bonuses and all - "Bonuses" can't reduce this bellow 1
-    getAttackDamage: function() {
-        var weaponDamage = ZORPG.$.die("1d6");
-        // TODO: this die is debug only...items should provide this
-        var bonusDamage = ZORPG.Tables.getStatBonus(this.str).value;
-        var buffsDamage = 0;
-        return Math.max(weaponDamage + bonusDamage + buffsDamage, 1);
+    // Gets an attack damage die with bonuses and all - "Bonuses" can't reduce this bellow 1
+    getDmg: function() {
+        var strBonus = ZORPG.Tables.getStatBonus(this.str).value;
+        var buffsDmg = 0;
+        var weaponDmg = 0;
+        for (var i = 0; i < this.items.length; ++i) {
+            var item = items[i].item;
+            if (item.type === "weapon" && item.equiped) {
+                weaponDmg = item.getDmg(ZORPG.$.die);
+            }
+        }
+        return Math.max(weaponDmg + strBonus + buffsDmg, 1);
     },
     // TODO: init the char? We need this? useful for debug
     init: function() {
@@ -1706,27 +1720,26 @@ ZORPG.Components.actor = {
     isAlive: function() {
         return this.hp > 0;
     },
-    // Damages this actor
-    damage: function(ent) {
+    // this actor gets attacked
+    getAttacked: function(ent) {
         // Calculate attack success/damage/etc.
         // TODO: add resistances, spell buffs etc.
-        var damage = ZORPG.$.die(ent.monster.attackDie);
-        var totalDamage = 0;
         // If damage is physical -> AC
+        var totalDamage = 0;
         if (ent.monster.attackType === "physical") {
-            var check = ZORPG.$.die("1d20");
-            // Check die: 1 = Critical save, 20 = Critical fail(chance of double damage)
-            console.log("ZORPG.Component.actor: Check die/Damage", check, damage);
-            if (check > 1) {
-                if (check == 20) {
-                    totalDamage += damage;
+            var v = ZORPG.$.die("1d20");
+            if (v == 1) {} else {
+                if (v == 20) {
+                    // Critical fail
+                    totalDamage += this.getDamage(ent);
                 }
-                check += ent.monster.toHit / 4 + ZORPG.$.die("1d" + ent.monster.toHit);
-                var ac = this.getAC();
-                // TODO: Check if any chars have blocked
-                console.log("ZORPG.Component.actor: Corrected check die/Armor Class", check, ac);
-                if (ac <= check) {
-                    totalDamage += damage;
+                v += ent.monster.toHit / 4 + ZORPG.$.die("1d" + ent.monster.toHit);
+                var ac = this.getAC() + 10;
+                //(!_charsBlocked[charNum] ? 10 : c.getCurrentLevel() / 2 + 15);
+                if (ac > v) {
+                    sound.playFX(6);
+                } else {
+                    totalDamage += this.getDamage(ent);
                 }
             }
         } else {
@@ -1743,6 +1756,16 @@ ZORPG.Components.actor = {
             console.log("ZORPG.Components.actor: Actor " + this.name + " dodge attack from " + ent.monster.name);
             ZORPG.$.log(this.name + " dodge attack from " + ent.monster.name);
         }
+    },
+    getDamage: function(ent) {
+        var damage = ZORPG.$.die(ent.monster.attackDie);
+        /*if (charSavingThrow(monsterData._attackType))
+            damage /= 2;*/
+        // Some code related magic types of damage
+        /*while (damage > 0 && c.charSavingThrow(monsterData._attackType))
+            damage /= 2;*/
+        //damage -= party._powerShield;
+        return damage;
     }
 };
 
