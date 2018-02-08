@@ -49,20 +49,21 @@ ZORPG.Components.monster = {
 
     // Entity actor attacks this monster
     getAttacked: function(ent) {
-        var attacks = 1; // TODO: Calculate how many attacks per round has this char using tables
+        var attacks = 1; // TODO: calculate attacks per round using table
         var damage = 0;
+        var chance = 0;
 
         for (var i = 0; i < attacks; ++i) {
-            var check;
-            var divisor = 1; // TODO: That 1 depends on class...this should be on the tables
-            var chance = ent.actor.getToHit() + ent.actor.level / divisor; // TODO: substract cursed level of ent to this
-            console.log("ZORPG.Component.monster: Begining attack - divisor/chance", divisor, chance)
-            do {
-                check = ZORPG.$.die("1d20");
-                chance += check;
-            } while (check == 20);
+            chance = ent.actor.getToHit();
+            chance += ent.actor.level / 1 // TODO: That divisor is tabled: Kn/Ba: 1, Pa/Ar/Ro/Ni/Ra: 2, Cl/Dr: 3, So: 4
+            var v = 0;
 
-            if (chance >= this.ac) {
+            do {
+                v = ZORPG.$.die("1d20");
+                chance += v;
+            } while (v == 20);
+
+            if (chance >= (this.ac + 10)) {
                 damage += ent.actor.getAttackDamage();
             }
         }

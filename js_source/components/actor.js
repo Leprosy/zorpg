@@ -33,7 +33,7 @@ ZORPG.Components.actor = {
         return this.level * (attrBonus + classBonus + racialBonus); // + Bodybuilding
     },
 
-    // Gets the toHit value => Acc bonus + weapon bonus + buffs
+    // Gets the toHit value => Acc bonus + weapon bonus + buffs. TODO: substract curses, add buffs
     getToHit: function() {
         var accBonus = ZORPG.Tables.getStatBonus(this.acc).value;
         var weaponBonus = 0;
@@ -66,28 +66,21 @@ ZORPG.Components.actor = {
         return armorAC + spdBonus + buffsAC;
     },
 
-    // Gets an attack damage die with bonuses and all - "Bonuses" can't reduce this bellow 1
-    getDmg: function() {
+    // Gets an attack damage with bonuses and all - "Bonuses" can't reduce this bellow 1
+    getAttackDmg: function() {
         var strBonus = ZORPG.Tables.getStatBonus(this.str).value;
         var buffsDmg = 0;
         var weaponDmg = 0;
 
         for (var i = 0; i < this.items.length; ++i) {
-            var item = items[i].item;
+            var item = this.items[i].item;
 
             if (item.type === "weapon" && item.equiped) {
-                weaponDmg = item.getDmg(ZORPG.$.die);
+                weaponDmg = ZORPG.$.die(item.getDmg());
             }
         }
 
         return Math.max(weaponDmg + strBonus + buffsDmg, 1);
-
-        /*return accBonus + weaponBonus;
-        var weaponDamage = ZORPG.$.die("1d6") // TODO: this die is debug only...items should provide this
-        var bonusDamage = ZORPG.Tables.getStatBonus(this.str).value;
-        var buffsDamage = 0;
-
-        return Math.max(weaponDamage + bonusDamage + buffsDamage, 1);*/
     },
 
     // TODO: init the char? We need this? useful for debug

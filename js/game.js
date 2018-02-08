@@ -1662,7 +1662,7 @@ ZORPG.Components.actor = {
         var racialBonus = ZORPG.Tables.race[this.race].hp;
         return this.level * (attrBonus + classBonus + racialBonus);
     },
-    // Gets the toHit value => Acc bonus + weapon bonus + buffs
+    // Gets the toHit value => Acc bonus + weapon bonus + buffs. TODO: substract curses, add buffs
     getToHit: function() {
         var accBonus = ZORPG.Tables.getStatBonus(this.acc).value;
         var weaponBonus = 0;
@@ -1687,15 +1687,15 @@ ZORPG.Components.actor = {
         }
         return armorAC + spdBonus + buffsAC;
     },
-    // Gets an attack damage die with bonuses and all - "Bonuses" can't reduce this bellow 1
-    getDmg: function() {
+    // Gets an attack damage with bonuses and all - "Bonuses" can't reduce this bellow 1
+    getAttackDmg: function() {
         var strBonus = ZORPG.Tables.getStatBonus(this.str).value;
         var buffsDmg = 0;
         var weaponDmg = 0;
         for (var i = 0; i < this.items.length; ++i) {
-            var item = items[i].item;
+            var item = this.items[i].item;
             if (item.type === "weapon" && item.equiped) {
-                weaponDmg = item.getDmg(ZORPG.$.die);
+                weaponDmg = ZORPG.$.die(item.getDmg());
             }
         }
         return Math.max(weaponDmg + strBonus + buffsDmg, 1);
@@ -1867,20 +1867,19 @@ ZORPG.Components.monster = {
     // Entity actor attacks this monster
     getAttacked: function(ent) {
         var attacks = 1;
-        // TODO: Calculate how many attacks per round has this char using tables
+        // TODO: calculate attacks per round using table
         var damage = 0;
+        var chance = 0;
         for (var i = 0; i < attacks; ++i) {
-            var check;
-            var divisor = 1;
-            // TODO: That 1 depends on class...this should be on the tables
-            var chance = ent.actor.getToHit() + ent.actor.level / divisor;
-            // TODO: substract cursed level of ent to this
-            console.log("ZORPG.Component.monster: Begining attack - divisor/chance", divisor, chance);
+            chance = ent.actor.getToHit();
+            chance += ent.actor.level / 1;
+            // TODO: That divisor is tabled: Kn/Ba: 1, Pa/Ar/Ro/Ni/Ra: 2, Cl/Dr: 3, So: 4
+            var v = 0;
             do {
-                check = ZORPG.$.die("1d20");
-                chance += check;
-            } while (check == 20);
-            if (chance >= this.ac) {
+                v = ZORPG.$.die("1d20");
+                chance += v;
+            } while (v == 20);
+            if (chance >= this.ac + 10) {
                 damage += ent.actor.getAttackDamage();
             }
         }
