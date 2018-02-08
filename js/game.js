@@ -1662,6 +1662,7 @@ ZORPG.Components.actor = {
                 weaponBonus += item.getToHit();
             }
         }
+        console.log("ZORPG.Component.actor: toHit from", this.name, "toHit/bonus", weaponBonus, accBonus);
         return accBonus + weaponBonus;
     },
     // Gets actor AC => Total armor + speed attr bonus + buffs
@@ -1675,6 +1676,7 @@ ZORPG.Components.actor = {
                 armorAC += item.getAC();
             }
         }
+        console.log("ZORPG.Component.actor: AC from", this.name, "AC/bonus/buff", armorAC, spdBonus, buffsAC);
         return armorAC + spdBonus + buffsAC;
     },
     // Gets an attack damage with bonuses and all - "Bonuses" can't reduce this bellow 1
@@ -1688,6 +1690,7 @@ ZORPG.Components.actor = {
                 weaponDmg = ZORPG.$.die(item.getDmg());
             }
         }
+        console.log("ZORPG.Component.actor: Damage from", this.name, "die/dmg/bonus/buff", item.getDmg(), weaponDmg, strBonus, buffsDmg);
         return Math.max(weaponDmg + strBonus + buffsDmg, 1);
     },
     // TODO: init the char? We need this? useful for debug
@@ -1869,6 +1872,7 @@ ZORPG.Components.monster = {
                 v = ZORPG.$.die("1d20");
                 chance += v;
             } while (v == 20);
+            console.log("ZORPG.Components.monster: Chance roll/monster ac for ", this.name, chance, this.ac + 10);
             if (chance >= this.ac + 10) {
                 damage += ent.actor.getAttackDmg();
             }

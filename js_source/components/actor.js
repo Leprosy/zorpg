@@ -46,6 +46,7 @@ ZORPG.Components.actor = {
             }
         }
 
+        console.log("ZORPG.Component.actor: toHit from", this.name, "toHit/bonus", weaponBonus, accBonus);
         return accBonus + weaponBonus;
     },
 
@@ -62,7 +63,7 @@ ZORPG.Components.actor = {
                 armorAC += item.getAC();
             }
         }
-
+        console.log("ZORPG.Component.actor: AC from", this.name, "AC/bonus/buff", armorAC, spdBonus, buffsAC);
         return armorAC + spdBonus + buffsAC;
     },
 
@@ -80,6 +81,7 @@ ZORPG.Components.actor = {
             }
         }
 
+        console.log("ZORPG.Component.actor: Damage from", this.name, "die/dmg/bonus/buff", item.getDmg(), weaponDmg, strBonus, buffsDmg);
         return Math.max(weaponDmg + strBonus + buffsDmg, 1);
     },
 

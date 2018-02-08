@@ -63,6 +63,7 @@ ZORPG.Components.monster = {
                 chance += v;
             } while (v == 20);
 
+            console.log("ZORPG.Components.monster: Chance roll/monster ac for ", this.name, chance, this.ac + 10);
             if (chance >= (this.ac + 10)) {
                 damage += ent.actor.getAttackDmg();
             }
