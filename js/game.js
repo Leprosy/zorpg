@@ -1307,7 +1307,7 @@ ZORPG.State.add("combat", {
             var monster = this.getTargetedMonster();
             switch (action) {
               case "attack":
-                monster.monster.damage(fighter);
+                monster.monster.getAttacked(fighter);
                 if (!monster.monster.isAlive()) {
                     // Killed monster -> removed
                     console.log("ZORPG.State.combat: Monster killed", monster);
@@ -1667,7 +1667,7 @@ ZORPG.Components.actor = {
         var accBonus = ZORPG.Tables.getStatBonus(this.acc).value;
         var weaponBonus = 0;
         for (var i = 0; i < this.items.length; ++i) {
-            var item = items[i].item;
+            var item = this.items[i].item;
             if (item.type === "weapon" && item.equiped) {
                 weaponBonus += item.getToHit();
             }
@@ -1731,13 +1731,13 @@ ZORPG.Components.actor = {
             if (v == 1) {} else {
                 if (v == 20) {
                     // Critical fail
-                    totalDamage += this.getDamage(ent);
+                    totalDamage += this.getActorDamage(ent);
                 }
                 v += ent.monster.toHit / 4 + ZORPG.$.die("1d" + ent.monster.toHit);
                 var ac = this.getAC() + 10;
                 //(!_charsBlocked[charNum] ? 10 : c.getCurrentLevel() / 2 + 15);
                 if (ac > v) {} else {
-                    totalDamage += this.getDamage(ent);
+                    totalDamage += this.getActorDamage(ent);
                 }
             }
         } else {
@@ -1755,7 +1755,7 @@ ZORPG.Components.actor = {
             ZORPG.$.log(this.name + " dodge attack from " + ent.monster.name);
         }
     },
-    getDamage: function(ent) {
+    getActorDamage: function(ent) {
         var damage = ZORPG.$.die(ent.monster.attackDie);
         /*if (charSavingThrow(monsterData._attackType))
             damage /= 2;*/
@@ -1865,7 +1865,7 @@ ZORPG.Components.monster = {
         return this.hp > 0;
     },
     // Entity actor attacks this monster
-    damage: function(ent) {
+    getAttacked: function(ent) {
         var attacks = 1;
         // TODO: Calculate how many attacks per round has this char using tables
         var damage = 0;

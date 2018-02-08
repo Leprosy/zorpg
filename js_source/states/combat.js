@@ -88,7 +88,7 @@ ZORPG.State.add("combat", {
 
             switch(action) {
                 case "attack":
-                    monster.monster.damage(fighter);
+                    monster.monster.getAttacked(fighter);
 
                     if (!monster.monster.isAlive()) { // Killed monster -> removed
                         console.log("ZORPG.State.combat: Monster killed", monster)

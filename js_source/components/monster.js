@@ -48,7 +48,7 @@ ZORPG.Components.monster = {
     },
 
     // Entity actor attacks this monster
-    damage: function(ent) {
+    getAttacked: function(ent) {
         var attacks = 1; // TODO: Calculate how many attacks per round has this char using tables
         var damage = 0;
 

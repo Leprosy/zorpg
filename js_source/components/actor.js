@@ -39,7 +39,7 @@ ZORPG.Components.actor = {
         var weaponBonus = 0;
 
         for (var i = 0; i < this.items.length; ++i) {
-            var item = items[i].item;
+            var item = this.items[i].item;
 
             if (item.type === "weapon" && item.equiped) {
                 weaponBonus += item.getToHit();
@@ -122,7 +122,7 @@ ZORPG.Components.actor = {
                 // Blocked
             } else {
                 if (v == 20) { // Critical fail
-                    totalDamage += this.getDamage(ent);
+                    totalDamage += this.getActorDamage(ent);
                 }
 
                 v += ent.monster.toHit / 4 + ZORPG.$.die("1d" + ent.monster.toHit);
@@ -131,7 +131,7 @@ ZORPG.Components.actor = {
                 if (ac > v) {
                     // Blocked
                 } else {
-                    totalDamage += this.getDamage(ent);
+                    totalDamage += this.getActorDamage(ent);
                 }
             }
         } else {
@@ -151,7 +151,7 @@ ZORPG.Components.actor = {
         }
     },
 
-    getDamage: function(ent) {
+    getActorDamage: function(ent) {
         var damage = ZORPG.$.die(ent.monster.attackDie);
 
         /*if (charSavingThrow(monsterData._attackType))
