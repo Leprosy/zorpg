@@ -71,11 +71,9 @@ ZORPG.$ = {
             for (var i = 0; i < factor; ++i) {
                 var addDie = Math.round(Math.random() * (faces - 1) + 1);
                 result += addDie;
-                console.log("Result adding", result, addDie)
             }
 
             result += plusAdd;
-            console.log("final result", result, plusAdd)
 
             return result;
         } catch(e) {

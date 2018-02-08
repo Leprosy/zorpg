@@ -51,7 +51,7 @@ ZORPG.Components.pos = {
         // TODO: add blocks for monsters(can swim? can enter certain tiles?)
         var angle = pos.ang % Math.PI / 2;
         var threshold = 3;
-        console.log("ZORPG.Component.pos: Seeking from", this.x, this.y, " to ", pos.x, pos.y, "angle", angle)
+        //console.log("ZORPG.Component.pos: Seeking from", this.x, this.y, " to ", pos.x, pos.y, "angle", angle)
 
        // If not near, forget it
        if (Math.abs(pos.x - this.x) <= threshold && Math.abs(pos.y - this.y) <= threshold) {
