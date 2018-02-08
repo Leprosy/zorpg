@@ -64,7 +64,7 @@ ZORPG.Components.monster = {
             } while (v == 20);
 
             if (chance >= (this.ac + 10)) {
-                damage += ent.actor.getAttackDamage();
+                damage += ent.actor.getAttackDmg();
             }
         }
 

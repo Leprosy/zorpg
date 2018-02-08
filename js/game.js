@@ -1120,16 +1120,6 @@ Half-orc     +2     -2   10   10   10    0    0     0   -10 -
             dmg: 2,
             toHit: 1,
             ac: 1
-        },
-        gold: {
-            dmg: 8,
-            toHit: 4,
-            ac: 6
-        },
-        obsidian: {
-            dmg: 50,
-            toHit: 10,
-            ac: 20
         }
     }
 };
@@ -1880,7 +1870,7 @@ ZORPG.Components.monster = {
                 chance += v;
             } while (v == 20);
             if (chance >= this.ac + 10) {
-                damage += ent.actor.getAttackDamage();
+                damage += ent.actor.getAttackDmg();
             }
         }
         console.log("ZORPG.Component.monster: Total attack damage", damage);

@@ -120,8 +120,8 @@ Half-orc     +2     -2   10   10   10    0    0     0   -10 -
     material: {
         "leather": { dmg: -6, toHit: -4, ac: 0 },
         "bronze": { dmg: -2, toHit: 2, ac: -1 },
-        "iron": { dmg: 2, toHit: 1, ac: 1 },
-        "gold": { dmg: 8, toHit: 4, ac: 6 },
-        "obsidian": { dmg: 50, toHit: 10, ac: 20 }
+        "iron": { dmg: 2, toHit: 1, ac: 1 }
+        //"gold": { dmg: 8, toHit: 4, ac: 6 },
+        //"obsidian": { dmg: 50, toHit: 10, ac: 20 }
     }
 }
