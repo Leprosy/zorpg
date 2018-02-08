@@ -1187,10 +1187,8 @@ ZORPG.$ = {
             for (var i = 0; i < factor; ++i) {
                 var addDie = Math.round(Math.random() * (faces - 1) + 1);
                 result += addDie;
-                console.log("Result adding", result, addDie);
             }
             result += plusAdd;
-            console.log("final result", result, plusAdd);
             return result;
         } catch (e) {
             console.error("Game.Utils.die: Bad die string", str);
@@ -2040,7 +2038,7 @@ ZORPG.Components.pos = {
         // TODO: add blocks for monsters(can swim? can enter certain tiles?)
         var angle = pos.ang % Math.PI / 2;
         var threshold = 3;
-        console.log("ZORPG.Component.pos: Seeking from", this.x, this.y, " to ", pos.x, pos.y, "angle", angle);
+        //console.log("ZORPG.Component.pos: Seeking from", this.x, this.y, " to ", pos.x, pos.y, "angle", angle)
         // If not near, forget it
         if (Math.abs(pos.x - this.x) <= threshold && Math.abs(pos.y - this.y) <= threshold) {
             console.log("ZORPG.Component.pos: position near, start chasing.");
