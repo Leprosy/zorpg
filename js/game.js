@@ -31,6 +31,7 @@ ZORPG.Canvas = function() {
         engine: null,
         scene: null,
         camera: null,
+        light: null,
         GUI: null,
         speed: 10,
         // Init everything
@@ -53,8 +54,8 @@ ZORPG.Canvas = function() {
             this.camera = new BABYLON.ArcRotateCamera("camera1", 0, 0, this.tileSize * .8, new BABYLON.Vector3(0, 0, 0), this.scene);
             this.camera.attachControl(canvas, true);
             // Light
-            var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), this.scene);
-            light.intensity = .5;
+            this.light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), this.scene);
+            this.light.intensity = .5;
             // Skybox
             //this.skyBox = this.scene.createDefaultSkybox(new BABYLON.Texture("img/sky1.png", this.scene), true, 10);
             // GUI
@@ -1215,6 +1216,16 @@ var ZORPG = ZORPG || {};
 ZORPG.__version__ = .01;
 
 ZORPG.__name__ = "ZORPG demo";
+
+// Script run state
+ZORPG.State.add("char", {
+    name: "Character Status",
+    init: function() {
+        // Init vars
+        var _this = this;
+    },
+    destroy: function() {}
+});
 
 // Play loop state
 ZORPG.State.add("combat", {

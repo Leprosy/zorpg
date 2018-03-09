@@ -13,6 +13,7 @@ ZORPG.Canvas = (function() {
         engine: null,
         scene: null,
         camera: null,
+        light: null,
         GUI: null,
         speed: 10,
 
@@ -39,8 +40,8 @@ ZORPG.Canvas = (function() {
             this.camera.attachControl(canvas, true);
 
             // Light
-            var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), this.scene);
-            light.intensity = 0.5;
+            this.light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), this.scene);
+            this.light.intensity = 0.5;
 
             // Skybox
             //this.skyBox = this.scene.createDefaultSkybox(new BABYLON.Texture("img/sky1.png", this.scene), true, 10);
