@@ -38,6 +38,7 @@ ZORPG.Canvas = (function() {
             // Camera
             this.camera = new BABYLON.ArcRotateCamera("camera1", 0, 0, this.tileSize * 0.8, new BABYLON.Vector3(0, 0, 0), this.scene)
             this.camera.attachControl(canvas, true);
+            this.camera.fov = 0.55;
 
             // Light
             this.light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), this.scene);

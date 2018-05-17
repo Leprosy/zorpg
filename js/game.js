@@ -53,6 +53,7 @@ ZORPG.Canvas = function() {
             // Camera
             this.camera = new BABYLON.ArcRotateCamera("camera1", 0, 0, this.tileSize * .8, new BABYLON.Vector3(0, 0, 0), this.scene);
             this.camera.attachControl(canvas, true);
+            this.camera.fov = .55;
             // Light
             this.light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), this.scene);
             this.light.intensity = .5;
@@ -614,12 +615,10 @@ ZORPG.Monsters.data = [ {
     name: "Goblin",
     xp: 150,
     hp: 20,
-    ac: 6,
-    spd: 15,
+    dex: 5,
     attacks: 1,
     attackDie: "1d12",
-    attackType: "physical",
-    toHit: 2,
+    attackType: "dex",
     rangeAttack: false,
     gold: 5,
     gems: 5
@@ -627,12 +626,10 @@ ZORPG.Monsters.data = [ {
     name: "Orc",
     xp: 200,
     hp: 25,
-    ac: 5,
-    spd: 17,
-    attacks: 1,
+    dex: 6,
+    attacks: 2,
     attackDie: "1d10",
-    attackType: "physical",
-    toHit: 5,
+    attackType: "dex",
     rangeAttack: true,
     gold: 10,
     gems: 0
@@ -640,12 +637,10 @@ ZORPG.Monsters.data = [ {
     name: "Slime",
     xp: 50,
     hp: 2,
-    ac: 0,
-    spd: 25,
-    attacks: 2,
+    dex: 8,
+    attacks: 1,
     attackDie: "1d2",
-    attackType: "physical",
-    toHit: 0,
+    attackType: "dex",
     rangeAttack: false,
     gold: 0,
     gems: 0
@@ -1286,8 +1281,8 @@ ZORPG.State.add("combat", {
         // Check if are fightable monsters & build combat queue
         if (ZORPG.Monsters.willFight()) {
             this.combatQ = ZORPG.Monsters.getFightReady().concat(this.getAliveChars()).sort(function(a, b) {
-                var spdA = a.hasCmp("actor") ? a.actor.spd : a.monster.spd;
-                var spdB = b.hasCmp("actor") ? b.actor.spd : b.monster.spd;
+                var spdA = a.hasCmp("actor") ? a.actor.dex : a.monster.dex;
+                var spdB = b.hasCmp("actor") ? b.actor.dex : b.monster.dex;
                 if (spdA < spdB) return 1;
                 if (spdA > spdB) return -1;
                 return 0;
@@ -1559,10 +1554,10 @@ ZORPG.State.add("play", {
             ZORPG.Player.pos.rotR();
         });
         ZORPG.Key.add("Space", function(ev) {
-            var data = ZORPG.Map.getScript(ZORPG.Player.pos.x, ZORPG.Player.pos.y);
-            if (data) {
+            var script = ZORPG.Map.getScript(ZORPG.Player.pos.x, ZORPG.Player.pos.y);
+            if (script) {
                 ZORPG.State.set("script", {
-                    script: data
+                    script: script
                 });
             } else {
                 _this.turnPass = true;
@@ -1638,134 +1633,44 @@ ZORPG.State.add("script", {
 ZORPG.Components.actor = {
     hp: 0,
     xp: 0,
-    level: 1,
-    cls: "",
-    race: "",
-    name: "",
+    name: "unknown_actor",
     str: 1,
     end: 1,
-    acc: 1,
-    spd: 1,
-    lck: 1,
+    dex: 1,
     "int": 1,
+    car: 1,
     per: 1,
     items: [],
     // Debug component
     toString: function() {
-        return "<b>" + this.name + "</b>:" + this.hp + "/" + this.getMaxHP() + "hp " + this.spd + "spd " + this.str + "str " + this.getAC() + "ac";
+        return "<b>" + this.name + "</b>:" + this.hp + "/" + this.getMaxHP() + "hp " + this.dex + "dex " + this.str + "str";
     },
-    // Gets max HP => Level * (Endurance bonus + racial bonus + class bonus)
+    // Gets max HP => str + end
     getMaxHP: function() {
-        var attrBonus = ZORPG.Tables.getStatBonus(this.end).value;
-        var classBonus = ZORPG.Tables.cls[this.cls].hp;
-        var racialBonus = ZORPG.Tables.race[this.race].hp;
-        return this.level * (attrBonus + classBonus + racialBonus);
+        return this.str + this.end;
     },
-    // Gets the toHit value => Acc bonus + weapon bonus + buffs. TODO: substract curses, add buffs
-    getToHit: function() {
-        var accBonus = ZORPG.Tables.getStatBonus(this.acc).value;
-        var weaponBonus = 0;
-        for (var i = 0; i < this.items.length; ++i) {
-            var item = this.items[i].item;
-            if (item.type === "weapon" && item.equiped) {
-                weaponBonus += item.getToHit();
-            }
-        }
-        console.log("ZORPG.Component.actor: toHit from", this.name, "toHit/bonus", weaponBonus, accBonus);
-        return accBonus + weaponBonus;
-    },
-    // Gets actor AC => Total armor + speed attr bonus + buffs
-    getAC: function() {
-        var spdBonus = ZORPG.Tables.getStatBonus(this.spd).value;
-        var buffsAC = 0;
-        var armorAC = 0;
-        for (var i = 0; i < this.items.length; ++i) {
-            var item = this.items[i].item;
-            if (item.equiped) {
-                armorAC += item.getAC();
-            }
-        }
-        console.log("ZORPG.Component.actor: AC from", this.name, "AC/bonus/buff", armorAC, spdBonus, buffsAC);
-        return armorAC + spdBonus + buffsAC;
-    },
-    // Gets an attack damage with bonuses and all - "Bonuses" can't reduce this bellow 1
-    getAttackDmg: function() {
-        var strBonus = ZORPG.Tables.getStatBonus(this.str).value;
-        var buffsDmg = 0;
-        var weaponDmg = 0;
-        for (var i = 0; i < this.items.length; ++i) {
-            var item = this.items[i].item;
-            if (item.type === "weapon" && item.equiped) {
-                weaponDmg = ZORPG.$.die(item.getDmg());
-            }
-        }
-        console.log("ZORPG.Component.actor: Damage from", this.name, "die/dmg/bonus/buff", item.getDmg(), weaponDmg, strBonus, buffsDmg);
-        return Math.max(weaponDmg + strBonus + buffsDmg, 1);
-    },
-    // TODO: init the char? We need this? useful for debug
-    init: function() {
-        // Generate hit points
-        this.hp = this.getMaxHP();
-        // Generate random items
-        var armor = new ZORPG.Ent("", [ "item" ]);
-        armor.item.generate("armor");
-        armor.item.equiped = true;
-        var shield = new ZORPG.Ent("", [ "item" ]);
-        shield.item.generate("shield");
-        shield.item.equiped = true;
-        var weapon = new ZORPG.Ent("", [ "item" ]);
-        weapon.item.generate("weapon");
-        weapon.item.equiped = true;
-        this.items.push(armor, shield, weapon);
+    // Check an attribute
+    checkThrow: function(name) {
+        var die = ZORPG.$.die("1d10");
+        console.log("ZORPG.Component.actor: Check throw '" + name + "' own/die:", this[name], die);
+        return die <= this[name];
     },
     // Is actor alive
     isAlive: function() {
         return this.hp > 0;
     },
-    // this actor gets attacked
+    // This actor gets attacked
     getAttacked: function(ent) {
-        // Calculate attack success/damage/etc.
-        // TODO: add resistances, spell buffs etc.
-        // If damage is physical -> AC
-        var totalDamage = 0;
-        if (ent.monster.attackType === "physical") {
-            var v = ZORPG.$.die("1d20");
-            if (v == 1) {} else {
-                if (v == 20) {
-                    // Critical fail
-                    totalDamage += this.getActorDamage(ent);
-                }
-                v += ent.monster.toHit / 4 + ZORPG.$.die("1d" + ent.monster.toHit);
-                var ac = this.getAC() + 10;
-                //(!_charsBlocked[charNum] ? 10 : c.getCurrentLevel() / 2 + 15);
-                if (ac > v) {} else {
-                    totalDamage += this.getActorDamage(ent);
-                }
-            }
+        if (!this.checkThrow(ent.attackType)) {
+            console.log("ZORPG.Component.actor: Actor receives attack", this.toString());
         } else {
-            // If damage is magical -> saving throw
-            // NOT IMPLEMENTED YET!
-            alert("MAGIC! OAW!");
-        }
-        if (totalDamage > 0) {
-            this.hp -= totalDamage;
-            console.log("ZORPG.Components.actor: Actor " + this.name + " gets " + totalDamage + " damage from " + ent.monster.name);
-            ZORPG.$.log(this.name + " gets " + totalDamage + " damage from " + ent.monster.name);
-            ZORPG.Canvas.shake(totalDamage * .01);
-        } else {
-            console.log("ZORPG.Components.actor: Actor " + this.name + " dodge attack from " + ent.monster.name);
-            ZORPG.$.log(this.name + " dodge attack from " + ent.monster.name);
+            console.log("ZORPG.Component.actor: Actor dodges", this.toString());
         }
     },
-    getActorDamage: function(ent) {
-        var damage = ZORPG.$.die(ent.monster.attackDie);
-        /*if (charSavingThrow(monsterData._attackType))
-            damage /= 2;*/
-        // Some code related magic types of damage
-        /*while (damage > 0 && c.charSavingThrow(monsterData._attackType))
-            damage /= 2;*/
-        //damage -= party._powerShield;
-        return damage;
+    // Init actor
+    init: function() {
+        // Generate hit points
+        this.hp = this.getMaxHP();
     }
 };
 
@@ -1828,27 +1733,11 @@ ZORPG.Components.monster = {
     name: "",
     xp: 0,
     hp: 0,
-    ac: 0,
-    spd: 0,
+    dex: 0,
     attacks: 1,
-    //hatesClass -> not implemented
     attackDie: "1d12",
-    // This replaces this?
-    //strikes 1   The 'X' in the XdY equation
-    //dmgPerStrike    12  The 'Y' in the XdY equation
-    attackType: "physical",
-    //specialAttack   None    Special effects caused by attack
-    toHit: 2,
+    attackType: "dex",
     rangeAttack: false,
-    /*monsterType Unique  Certain monster types are affected differently by some spells
-    res_fire    0   Resistance to fire based attacks
-    res_elec    0   Resistance to electricity based attacks
-    res_cold    0   Resistance to cold based attacks
-    res_poison  0   Resistance to poison based attacks
-    res_energy  0   Resistance to energy based attacks
-    res_magic   0   Resistance to magic based attacks
-    res_physical    0   Resistance to physical attacks
-    field_29    0   unknown! Doesn't seem to be used anywhere*/
     gold: 0,
     gems: 0,
     //itemDrop    1   probability that monster drops an item
@@ -1860,7 +1749,7 @@ ZORPG.Components.monster = {
     //attackVoc   unnh    xxx.VOC file played when monster attacks
     // Debug
     toString: function() {
-        return "<b>" + this.name + "</b>:" + this.hp + "hp " + this.spd + "spd " + this.attackDie + "die " + this.ac + "ac";
+        return "<b>" + this.name + "</b>:" + this.hp + "hp " + this.dex + "dex " + this.attackDie + "die";
     },
     // Is the monster alive?
     isAlive: function() {
@@ -1868,32 +1757,12 @@ ZORPG.Components.monster = {
     },
     // Entity actor attacks this monster
     getAttacked: function(ent) {
-        var attacks = 1;
-        // TODO: calculate attacks per round using table
-        var damage = 0;
-        var chance = 0;
-        for (var i = 0; i < attacks; ++i) {
-            chance = ent.actor.getToHit();
-            chance += ent.actor.level / 1;
-            // TODO: That divisor is tabled: Kn/Ba: 1, Pa/Ar/Ro/Ni/Ra: 2, Cl/Dr: 3, So: 4
-            var v = 0;
-            do {
-                v = ZORPG.$.die("1d20");
-                chance += v;
-            } while (v == 20);
-            console.log("ZORPG.Components.monster: Chance roll/monster ac for ", this.name, chance, this.ac + 10);
-            if (chance >= this.ac + 10) {
-                damage += ent.actor.getAttackDmg();
-            }
-        }
-        console.log("ZORPG.Component.monster: Total attack damage", damage);
-        if (damage > 0) {
-            console.log("ZORPG.Component.monster: " + this.name + " receives " + damage + " from " + ent.actor.name);
-            ZORPG.$.log(this.name + " receives " + damage + " from " + ent.actor.name);
-            this.hp -= damage;
+        var die = ZORPG.$.die("1d10");
+        console.log("ZORPG.Component.monster: Check throw 'dex' own/die:", this.dex, die);
+        if (die > this.dex) {
+            console.log("ZORPG.Component.monster: Monster receives attack", this.toString());
         } else {
-            console.log("ZORPG.Component.monster: " + this.name + " dodges attack from " + ent.actor.name);
-            ZORPG.$.log(this.name + " dodges attack from " + ent.actor.name);
+            console.log("ZORPG.Component.monster: Monster dodges", this.toString());
         }
     }
 };
@@ -1942,49 +1811,38 @@ ZORPG.Components.party = {
         for (var i = 0; i < ent.monster.attacks; ++i) {
             var index = Math.round(Math.random() * (this.actors.length - 1));
             console.log("ZORPG.Component.party: Actor picked to be attacked:", index, this.actors[index]);
-            this.actors[index].actor.getAttacked(ent);
+            this.actors[index].actor.getAttacked(ent.monster);
         }
     },
     // Default party
     generateDefaultParty: function() {
         var data = [ {
-            name: "Sir Lepro",
-            cls: "knight",
-            race: "human",
-            //hp: 12,
-            str: 17,
-            "int": 13,
-            per: 13,
-            end: 19,
-            spd: 16,
-            acc: 15,
-            lck: 12
+            name: "Lepro",
+            // The ninja
+            str: 3,
+            "int": 2,
+            per: 5,
+            end: 3,
+            dex: 6,
+            car: 2
         }, {
-            name: "CragHack",
-            // Dwarf, barb
-            cls: "barbarian",
-            race: "dwarf",
-            //hp: 23,
-            str: 18,
-            "int": 7,
-            per: 12,
-            end: 21,
-            spd: 16,
-            acc: 17,
-            lck: 14
+            name: "Dandelion",
+            // The rogue
+            str: 2,
+            "int": 5,
+            per: 2,
+            end: 3,
+            dex: 4,
+            car: 5
         }, {
             name: "Tyro",
-            // H.orc knight
-            cls: "knight",
-            race: "half-orc",
-            //hp: 16,
-            str: 19,
-            "int": 10,
-            per: 8,
-            end: 19,
-            spd: 16,
-            acc: 16,
-            lck: 14
+            // The tank
+            str: 5,
+            "int": 2,
+            per: 3,
+            end: 5,
+            dex: 4,
+            car: 2
         } ];
         for (var i = 0; i < 3; ++i) {
             var ent = new ZORPG.Ent("character" + i, [ "actor" ]);

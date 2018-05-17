@@ -37,10 +37,10 @@ ZORPG.State.add("play", {
             ZORPG.Player.pos.rotR()
         });
         ZORPG.Key.add("Space", function(ev) {
-            var data = ZORPG.Map.getScript(ZORPG.Player.pos.x, ZORPG.Player.pos.y);
+            var script = ZORPG.Map.getScript(ZORPG.Player.pos.x, ZORPG.Player.pos.y);
 
-            if (data) {
-                ZORPG.State.set("script", {script: data});
+            if (script) {
+                ZORPG.State.set("script", { script: script });
             } else {
                 _this.turnPass = true;
             }

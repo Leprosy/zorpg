@@ -65,8 +65,8 @@ ZORPG.State.add("combat", {
         // Check if are fightable monsters & build combat queue
         if (ZORPG.Monsters.willFight()) {
             this.combatQ = ZORPG.Monsters.getFightReady().concat(this.getAliveChars()).sort(function(a, b) {
-                var spdA = a.hasCmp("actor") ? a.actor.spd : a.monster.spd;
-                var spdB = b.hasCmp("actor") ? b.actor.spd : b.monster.spd;
+                var spdA = a.hasCmp("actor") ? a.actor.dex : a.monster.dex;
+                var spdB = b.hasCmp("actor") ? b.actor.dex : b.monster.dex;
                 if (spdA < spdB) return 1;
                 if (spdA > spdB) return -1;
                 return 0;

@@ -38,7 +38,7 @@ ZORPG.Monsters = (function() {
         // Get how many monsters are in the monster pos
         setGroups: function() {
             // Clear
-            for (var i = 0; i < monsters.length; ++i) { monsters[i].pos.group = ""};
+            for (var i = 0; i < monsters.length; ++i) { monsters[i].pos.group = ""}
 
             for (var i = 0; i < monsters.length; ++i) {
                 var monster = monsters[i];
@@ -102,12 +102,10 @@ ZORPG.Monsters.data = [{
     name: "Goblin",
     xp: 150,
     hp: 20,
-    ac: 6,
-    spd: 15,
+    dex: 5,
     attacks: 1,
     attackDie: "1d12",
-    attackType: "physical",
-    toHit: 2,
+    attackType: "dex",
     rangeAttack: false,
     gold: 5,
     gems: 5
@@ -115,12 +113,10 @@ ZORPG.Monsters.data = [{
     name: "Orc",
     xp: 200,
     hp: 25,
-    ac: 5,
-    spd: 17,
-    attacks: 1,
+    dex: 6,
+    attacks: 2,
     attackDie: "1d10",
-    attackType: "physical",
-    toHit: 5,
+    attackType: "dex",
     rangeAttack: true,
     gold: 10,
     gems: 0
@@ -128,12 +124,10 @@ ZORPG.Monsters.data = [{
     name: "Slime",
     xp: 50,
     hp: 2,
-    ac: 0,
-    spd: 25,
-    attacks: 2,
+    dex: 8,
+    attacks: 1,
     attackDie: "1d2",
-    attackType: "physical",
-    toHit: 0,
+    attackType: "dex",
     rangeAttack: false,
     gold: 0,
     gems: 0
