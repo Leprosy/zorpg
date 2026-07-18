@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://bu42wly4vtjn"]
+
+[ext_resource type="PackedScene" uid="uid://baqrauc5wdur2" path="res://components/message-panel.tscn" id="1_pq8q7"]
+[ext_resource type="Script" uid="uid://gc6q4vhdmh7m" path="res://root.gd" id="1_pyidc"]
+
+[node name="Root" type="Node"]
+script = ExtResource("1_pyidc")
+
+[node name="MessagePanel" parent="." instance=ExtResource("1_pq8q7")]
+
+[node name="CurrentScreen" type="Node" parent="."]

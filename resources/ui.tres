@@ -1,0 +1,21 @@
+[gd_resource type="Theme" load_steps=4 format=3 uid="uid://dey76iekniio"]
+
+[ext_resource type="FontFile" uid="uid://c0iq8q7nfxrti" path="res://assets/fonts/main.ttf" id="1_pxeie"]
+
+[sub_resource type="FontVariation" id="FontVariation_pxeie"]
+
+[sub_resource type="FontVariation" id="FontVariation_puq7a"]
+base_font = ExtResource("1_pxeie")
+spacing_glyph = -2
+
+[resource]
+default_font = SubResource("FontVariation_puq7a")
+Label/colors/font_shadow_color = Color(0, 0, 0, 1)
+Label/constants/shadow_offset_x = 2
+Label/constants/shadow_offset_y = 2
+LabelBig/base_type = &"Label"
+LabelBig/colors/font_color = Color(1, 0.866667, 0, 1)
+LabelBig/font_sizes/font_size = 22
+LabelSmall/base_type = &"Label"
+LabelSmall/font_sizes/font_size = 10
+LabelSmall/fonts/font = SubResource("FontVariation_pxeie")
