@@ -1,0 +1,124 @@
+[gd_scene load_steps=11 format=3 uid="uid://dwjf5fixke64t"]
+
+[ext_resource type="Script" uid="uid://b2q136ikl0ha7" path="res://screens/main_menu.gd" id="1_ocono"]
+[ext_resource type="Texture2D" uid="uid://t7akh1p4bd8h" path="res://assets/img/icons/undo.png" id="2_p3cyw"]
+[ext_resource type="Texture2D" uid="uid://cgegnmqr5hh1r" path="res://assets/img/icons/rem.png" id="3_t3bh0"]
+[ext_resource type="Texture2D" uid="uid://dg2ktt8e0kb2s" path="res://assets/img/npc/npc1.png" id="4_5mnfb"]
+[ext_resource type="Texture2D" uid="uid://bc4o31x0rv7al" path="res://assets/img/npc/npc_portrait.png" id="4_wu0qq"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wu0qq"]
+atlas = ExtResource("4_5mnfb")
+region = Rect2(864, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_odldw"]
+atlas = ExtResource("4_5mnfb")
+region = Rect2(864, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tl0qj"]
+atlas = ExtResource("4_5mnfb")
+region = Rect2(864, 64, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_td6ux"]
+atlas = ExtResource("4_5mnfb")
+region = Rect2(864, 96, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_c7uke"]
+animations = [{
+"frames": [],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wu0qq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_odldw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tl0qj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_td6ux")
+}],
+"loop": true,
+"name": &"new_animation",
+"speed": 10.0
+}]
+
+[node name="MainMenu" type="Node"]
+script = ExtResource("1_ocono")
+
+[node name="Label" type="Label" parent="."]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 128.0
+offset_bottom = 31.0
+text = "Main Menu"
+
+[node name="Button" type="Button" parent="."]
+offset_left = 64.0
+offset_top = 128.0
+offset_right = 320.0
+offset_bottom = 160.0
+theme_type_variation = &"Z_ButtonDialog"
+text = "This is button 1"
+
+[node name="Button2" type="Button" parent="."]
+offset_left = 64.0
+offset_top = 168.0
+offset_right = 320.0
+offset_bottom = 200.0
+theme_type_variation = &"Z_ButtonAction"
+text = "This is button 2"
+
+[node name="Button3" type="Button" parent="."]
+offset_left = 64.0
+offset_top = 208.0
+offset_right = 128.0
+offset_bottom = 272.0
+theme_type_variation = &"Z_ButtonDialog"
+icon = ExtResource("2_p3cyw")
+icon_alignment = 1
+expand_icon = true
+
+[node name="Button4" type="Button" parent="."]
+offset_left = 136.0
+offset_top = 208.0
+offset_right = 200.0
+offset_bottom = 272.0
+theme_type_variation = &"Z_ButtonAction"
+icon = ExtResource("3_t3bh0")
+icon_alignment = 1
+expand_icon = true
+
+[node name="Panel" type="Panel" parent="."]
+offset_left = 64.0
+offset_top = 288.0
+offset_right = 320.0
+offset_bottom = 456.0
+theme_type_variation = &"Z_Dialog"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Panel"]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 240.0
+offset_bottom = 152.0
+theme_type_variation = &"Z_DialogText"
+text = "This is a dialog for the game...
+
+Style the text accordingly..."
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(272, 408)
+scale = Vector2(1.29348, 1.34091)
+texture = ExtResource("4_wu0qq")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Sprite2D"]
+scale = Vector2(1, 1)
+sprite_frames = SubResource("SpriteFrames_c7uke")
+animation = &"new_animation"
+autoplay = "new_animation"
+frame_progress = 0.501424

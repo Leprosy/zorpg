@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bxfi6rtwqqcw"
-path="res://.godot/imported/Spritesheet_UI_Flat_Animated.png-1be47c778d5d27e5d0d0ab7f65cf7cc8.ctex"
+uid="uid://bc4o31x0rv7al"
+path="res://.godot/imported/npc_portrait.png-db693969df0734eedc4a3a21a721e640.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/img/ui/Spritesheets/Spritesheet_UI_Flat_Animated.png"
-dest_files=["res://.godot/imported/Spritesheet_UI_Flat_Animated.png-1be47c778d5d27e5d0d0ab7f65cf7cc8.ctex"]
+source_file="res://assets/img/npc/npc_portrait.png"
+dest_files=["res://.godot/imported/npc_portrait.png-db693969df0734eedc4a3a21a721e640.ctex"]
 
 [params]
 

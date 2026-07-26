@@ -1,8 +1,74 @@
-[gd_resource type="Theme" load_steps=4 format=3 uid="uid://dey76iekniio"]
+[gd_resource type="Theme" load_steps=12 format=3 uid="uid://dey76iekniio"]
 
+[ext_resource type="Texture2D" uid="uid://cy60tpxvsxqfk" path="res://assets/img/ui/button_action.png" id="1_nr324"]
+[ext_resource type="Texture2D" uid="uid://dunmgcvpfad6j" path="res://assets/img/ui/button_dialog.png" id="1_puq7a"]
 [ext_resource type="FontFile" uid="uid://c0iq8q7nfxrti" path="res://assets/fonts/main.ttf" id="1_pxeie"]
+[ext_resource type="Texture2D" uid="uid://bhlv3sxxne311" path="res://assets/img/ui/scroll.png" id="3_rb7da"]
 
 [sub_resource type="FontVariation" id="FontVariation_pxeie"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_qa6oi"]
+texture = ExtResource("1_nr324")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+modulate_color = Color(0.72549, 0.72549, 0.72549, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_rb7da"]
+texture = ExtResource("1_nr324")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_nr324"]
+texture = ExtResource("1_puq7a")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+modulate_color = Color(0.72549, 0.72549, 0.72549, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_puq7a"]
+texture = ExtResource("1_puq7a")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_8yfhb"]
+texture = ExtResource("3_rb7da")
+texture_margin_left = 20.0
+texture_margin_top = 20.0
+texture_margin_right = 20.0
+texture_margin_bottom = 20.0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
 
 [sub_resource type="FontVariation" id="FontVariation_puq7a"]
 base_font = ExtResource("1_pxeie")
@@ -19,3 +85,13 @@ LabelBig/font_sizes/font_size = 22
 LabelSmall/base_type = &"Label"
 LabelSmall/font_sizes/font_size = 10
 LabelSmall/fonts/font = SubResource("FontVariation_pxeie")
+Z_ButtonAction/base_type = &"Button"
+Z_ButtonAction/styles/hover = SubResource("StyleBoxTexture_qa6oi")
+Z_ButtonAction/styles/normal = SubResource("StyleBoxTexture_rb7da")
+Z_ButtonDialog/base_type = &"Button"
+Z_ButtonDialog/styles/hover = SubResource("StyleBoxTexture_nr324")
+Z_ButtonDialog/styles/normal = SubResource("StyleBoxTexture_puq7a")
+Z_Dialog/base_type = &"Panel"
+Z_Dialog/styles/panel = SubResource("StyleBoxTexture_8yfhb")
+Z_DialogText/base_type = &"RichTextLabel"
+Z_DialogText/colors/default_color = Color(0.235294, 0.235294, 0.235294, 1)

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://xppetxct36fa"
-path="res://.godot/imported/Spritesheet_UI_Flat.png-9f5bfbe613ded743eab56ac33893263a.ctex"
+uid="uid://buw6c73gpixwl"
+path="res://.godot/imported/chars.png-6970f97202e7c3a3a8d87c38ec66afb8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/img/ui/Spritesheets/Spritesheet_UI_Flat.png"
-dest_files=["res://.godot/imported/Spritesheet_UI_Flat.png-9f5bfbe613ded743eab56ac33893263a.ctex"]
+source_file="res://assets/img/chars/chars.png"
+dest_files=["res://.godot/imported/chars.png-6970f97202e7c3a3a8d87c38ec66afb8.ctex"]
 
 [params]
 
