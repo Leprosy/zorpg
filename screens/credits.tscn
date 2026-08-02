@@ -11,3 +11,13 @@ offset_top = 46.0
 offset_right = 127.0
 offset_bottom = 61.0
 text = "Credits"
+
+[node name="Button" type="Button" parent="."]
+offset_left = 256.0
+offset_top = 256.0
+offset_right = 576.0
+offset_bottom = 295.0
+theme_type_variation = &"Z_ButtonAction"
+text = "Go back to Main Menu"
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

@@ -1,0 +1,220 @@
+[gd_scene load_steps=16 format=3 uid="uid://cjw7nosu4yuix"]
+
+[ext_resource type="Script" uid="uid://cahccvix1vocc" path="res://screens/game.gd" id="1_6ydpi"]
+[ext_resource type="Texture2D" uid="uid://cgegnmqr5hh1r" path="res://assets/img/icons/rem.png" id="2_3ciuf"]
+[ext_resource type="Texture2D" uid="uid://dijmh15iwks1s" path="res://assets/img/map/textures.png" id="3_6nlyh"]
+[ext_resource type="Texture2D" uid="uid://b1xycaauepa4y" path="res://assets/img/icons/rotate-right.png" id="3_dpnst"]
+[ext_resource type="Texture2D" uid="uid://vy3p1b130feg" path="res://assets/img/icons/forward.png" id="4_okr7b"]
+[ext_resource type="Texture2D" uid="uid://2n626fct2ewc" path="res://assets/img/map/floor.png" id="4_rypym"]
+[ext_resource type="Texture2D" uid="uid://d1x31xhwulnt6" path="res://assets/img/icons/rotate-left.png" id="5_s1lue"]
+[ext_resource type="Texture2D" uid="uid://4gqi1t0etue2" path="res://assets/img/icons/strafe-right.png" id="6_w0xem"]
+[ext_resource type="Texture2D" uid="uid://bsee02nrbpijk" path="res://assets/img/icons/backwards.png" id="7_w4cu3"]
+[ext_resource type="Texture2D" uid="uid://ddmtfhjeqc58j" path="res://assets/img/icons/strafe-left.png" id="8_l3exe"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6nlyh"]
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="BoxMesh" id="BoxMesh_rypym"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_he66p"]
+albedo_texture = ExtResource("3_6nlyh")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5kag3"]
+albedo_texture = ExtResource("4_rypym")
+uv1_scale = Vector3(15, 15, 15)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_gfkhe"]
+material = SubResource("StandardMaterial3D_5kag3")
+size = Vector2(12, 12)
+
+[node name="Game" type="Node"]
+script = ExtResource("1_6ydpi")
+metadata/_custom_type_script = "uid://ck3nsip2wk2a2"
+
+[node name="CommandButtons" type="Node" parent="."]
+
+[node name="Button7" type="Button" parent="CommandButtons"]
+offset_left = 720.0
+offset_top = 224.0
+offset_right = 784.0
+offset_bottom = 288.0
+theme_type_variation = &"Z_ButtonAction"
+icon = ExtResource("2_3ciuf")
+expand_icon = true
+
+[node name="Button8" type="Button" parent="CommandButtons"]
+offset_left = 648.0
+offset_top = 224.0
+offset_right = 712.0
+offset_bottom = 288.0
+theme_type_variation = &"Z_ButtonAction"
+icon = ExtResource("2_3ciuf")
+expand_icon = true
+
+[node name="Button9" type="Button" parent="CommandButtons"]
+offset_left = 576.0
+offset_top = 224.0
+offset_right = 640.0
+offset_bottom = 288.0
+theme_type_variation = &"Z_ButtonAction"
+icon = ExtResource("2_3ciuf")
+expand_icon = true
+
+[node name="Button10" type="Button" parent="CommandButtons"]
+offset_left = 720.0
+offset_top = 296.0
+offset_right = 784.0
+offset_bottom = 360.0
+theme_type_variation = &"Z_ButtonAction"
+icon = ExtResource("2_3ciuf")
+expand_icon = true
+
+[node name="Button11" type="Button" parent="CommandButtons"]
+offset_left = 648.0
+offset_top = 296.0
+offset_right = 712.0
+offset_bottom = 360.0
+theme_type_variation = &"Z_ButtonAction"
+icon = ExtResource("2_3ciuf")
+expand_icon = true
+
+[node name="Button12" type="Button" parent="CommandButtons"]
+offset_left = 576.0
+offset_top = 296.0
+offset_right = 640.0
+offset_bottom = 360.0
+theme_type_variation = &"Z_ButtonAction"
+icon = ExtResource("2_3ciuf")
+expand_icon = true
+
+[node name="Button13" type="Button" parent="CommandButtons"]
+offset_left = 720.0
+offset_top = 368.0
+offset_right = 784.0
+offset_bottom = 432.0
+theme_type_variation = &"Z_ButtonAction"
+icon = ExtResource("2_3ciuf")
+expand_icon = true
+
+[node name="Button14" type="Button" parent="CommandButtons"]
+offset_left = 648.0
+offset_top = 368.0
+offset_right = 712.0
+offset_bottom = 432.0
+theme_type_variation = &"Z_ButtonAction"
+icon = ExtResource("2_3ciuf")
+expand_icon = true
+
+[node name="Button15" type="Button" parent="CommandButtons"]
+offset_left = 576.0
+offset_top = 368.0
+offset_right = 640.0
+offset_bottom = 432.0
+theme_type_variation = &"Z_ButtonAction"
+icon = ExtResource("2_3ciuf")
+expand_icon = true
+
+[node name="MovementButtons" type="Node" parent="."]
+
+[node name="TurnRight" type="Button" parent="MovementButtons"]
+offset_left = 720.0
+offset_top = 448.0
+offset_right = 784.0
+offset_bottom = 512.0
+theme_type_variation = &"Z_ButtonAction"
+icon = ExtResource("3_dpnst")
+expand_icon = true
+
+[node name="Forward" type="Button" parent="MovementButtons"]
+offset_left = 648.0
+offset_top = 448.0
+offset_right = 712.0
+offset_bottom = 512.0
+theme_type_variation = &"Z_ButtonAction"
+icon = ExtResource("4_okr7b")
+expand_icon = true
+
+[node name="TurnLeft" type="Button" parent="MovementButtons"]
+offset_left = 576.0
+offset_top = 448.0
+offset_right = 640.0
+offset_bottom = 512.0
+theme_type_variation = &"Z_ButtonAction"
+icon = ExtResource("5_s1lue")
+expand_icon = true
+
+[node name="StrafeRight" type="Button" parent="MovementButtons"]
+offset_left = 720.0
+offset_top = 520.0
+offset_right = 784.0
+offset_bottom = 584.0
+theme_type_variation = &"Z_ButtonAction"
+icon = ExtResource("6_w0xem")
+expand_icon = true
+
+[node name="Backwards" type="Button" parent="MovementButtons"]
+offset_left = 648.0
+offset_top = 520.0
+offset_right = 712.0
+offset_bottom = 584.0
+theme_type_variation = &"Z_ButtonAction"
+icon = ExtResource("7_w4cu3")
+expand_icon = true
+
+[node name="StrafeLeft" type="Button" parent="MovementButtons"]
+offset_left = 576.0
+offset_top = 520.0
+offset_right = 640.0
+offset_bottom = 584.0
+theme_type_variation = &"Z_ButtonAction"
+icon = ExtResource("8_l3exe")
+expand_icon = true
+
+[node name="PC" type="PanelContainer" parent="."]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 560.0
+offset_bottom = 432.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_6nlyh")
+
+[node name="VC" type="SubViewportContainer" parent="PC"]
+layout_mode = 2
+stretch = true
+
+[node name="V" type="SubViewport" parent="PC/VC"]
+handle_input_locally = false
+size = Vector2i(540, 412)
+render_target_update_mode = 4
+
+[node name="Party" type="Marker3D" parent="PC/VC/V"]
+
+[node name="Camera3D" type="Camera3D" parent="PC/VC/V/Party"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+
+[node name="OmniLight3D" type="OmniLight3D" parent="PC/VC/V/Party"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.27953, 0)
+light_energy = 5.0
+omni_range = 50.0
+omni_attenuation = 2.0
+
+[node name="World" type="Node3D" parent="PC/VC/V"]
+
+[node name="Wall" type="MeshInstance3D" parent="PC/VC/V/World"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
+mesh = SubResource("BoxMesh_rypym")
+skeleton = NodePath("../../../../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_he66p")
+
+[node name="Floor" type="MeshInstance3D" parent="PC/VC/V/World"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+mesh = SubResource("PlaneMesh_gfkhe")
+
+[connection signal="pressed" from="MovementButtons/TurnRight" to="." method="_on_turn_right_pressed"]
+[connection signal="pressed" from="MovementButtons/Forward" to="." method="_on_forward_pressed"]
+[connection signal="pressed" from="MovementButtons/TurnLeft" to="." method="_on_turn_left_pressed"]
+[connection signal="pressed" from="MovementButtons/StrafeRight" to="." method="_on_strafe_right_pressed"]
+[connection signal="pressed" from="MovementButtons/Backwards" to="." method="_on_backwards_pressed"]
+[connection signal="pressed" from="MovementButtons/StrafeLeft" to="." method="_on_strafe_left_pressed"]

@@ -2,11 +2,12 @@ class_name Root
 extends Node
 
 # Scene register
-enum ScreenName { MAIN_MENU, CREDITS, HELP }
+enum ScreenName { MAIN_MENU, CREDITS, HELP, GAME }
 
 var scenes = {
     ScreenName.CREDITS: preload("res://screens/credits.tscn"),
-    ScreenName.MAIN_MENU: preload("res://screens/main_menu.tscn")
+    ScreenName.MAIN_MENU: preload("res://screens/main_menu.tscn"),
+    ScreenName.GAME: preload("res://screens/game.tscn")
 }
 
 func _ready() -> void:
