@@ -1,0 +1,75 @@
+[gd_scene load_steps=15 format=3 uid="uid://bguwt7pa77flo"]
+
+[ext_resource type="Texture2D" uid="uid://dxvtsq44ygite" path="res://assets/img/map/wall1.png" id="1_tcf2h"]
+[ext_resource type="Texture2D" uid="uid://2n626fct2ewc" path="res://assets/img/map/floor1.png" id="2_4717r"]
+[ext_resource type="Texture2D" uid="uid://bkujhe5goo4re" path="res://assets/img/map/wall2.png" id="2_h5o24"]
+[ext_resource type="Texture2D" uid="uid://d31macltiywxu" path="res://assets/img/map/wall3.png" id="3_mmdvd"]
+[ext_resource type="Texture2D" uid="uid://bbsdbtybuwg51" path="res://assets/img/map/floor2.png" id="5_fn3g3"]
+[ext_resource type="Texture2D" uid="uid://bk1u6k2k4banu" path="res://assets/img/map/floor3.png" id="6_sc4t8"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_rypym"]
+size = Vector3(1, 0.5, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_okr7b"]
+albedo_texture = ExtResource("1_tcf2h")
+uv1_scale = Vector3(5, 2, 5)
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fn3g3"]
+albedo_texture = ExtResource("2_h5o24")
+uv1_scale = Vector3(5, 2, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sc4t8"]
+albedo_texture = ExtResource("3_mmdvd")
+uv1_scale = Vector3(5, 2, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_gfkhe"]
+size = Vector2(1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ai45w"]
+albedo_texture = ExtResource("2_4717r")
+texture_filter = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4papg"]
+albedo_texture = ExtResource("5_fn3g3")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fyhu2"]
+albedo_texture = ExtResource("6_sc4t8")
+
+[node name="World" type="Node3D"]
+
+[node name="Wall1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+visible = false
+mesh = SubResource("BoxMesh_rypym")
+skeleton = NodePath("../../../../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_okr7b")
+
+[node name="Wall2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+visible = false
+mesh = SubResource("BoxMesh_rypym")
+skeleton = NodePath("../../../../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_fn3g3")
+
+[node name="Wall3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+mesh = SubResource("BoxMesh_rypym")
+skeleton = NodePath("../../../../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_sc4t8")
+
+[node name="Floor1" type="MeshInstance3D" parent="."]
+visible = false
+mesh = SubResource("PlaneMesh_gfkhe")
+surface_material_override/0 = SubResource("StandardMaterial3D_ai45w")
+
+[node name="Floor2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.999988, 0, -0.00499162, 0, 1, 0, 0.00499162, 0, 0.999988, 0, 0, 0)
+visible = false
+mesh = SubResource("PlaneMesh_gfkhe")
+surface_material_override/0 = SubResource("StandardMaterial3D_4papg")
+
+[node name="Floor3" type="MeshInstance3D" parent="."]
+visible = false
+mesh = SubResource("PlaneMesh_gfkhe")
+surface_material_override/0 = SubResource("StandardMaterial3D_fyhu2")

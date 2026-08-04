@@ -1,50 +1,20 @@
-[gd_scene load_steps=20 format=3 uid="uid://cjw7nosu4yuix"]
+[gd_scene load_steps=11 format=3 uid="uid://cjw7nosu4yuix"]
 
 [ext_resource type="Script" uid="uid://cahccvix1vocc" path="res://screens/game.gd" id="1_6ydpi"]
 [ext_resource type="Texture2D" uid="uid://cgegnmqr5hh1r" path="res://assets/img/icons/rem.png" id="2_3ciuf"]
 [ext_resource type="Texture2D" uid="uid://b1xycaauepa4y" path="res://assets/img/icons/rotate-right.png" id="3_dpnst"]
 [ext_resource type="Texture2D" uid="uid://vy3p1b130feg" path="res://assets/img/icons/forward.png" id="4_okr7b"]
-[ext_resource type="Texture2D" uid="uid://2n626fct2ewc" path="res://assets/img/map/floor.png" id="4_rypym"]
 [ext_resource type="Texture2D" uid="uid://d1x31xhwulnt6" path="res://assets/img/icons/rotate-left.png" id="5_s1lue"]
 [ext_resource type="Texture2D" uid="uid://4gqi1t0etue2" path="res://assets/img/icons/strafe-right.png" id="6_w0xem"]
 [ext_resource type="Texture2D" uid="uid://bsee02nrbpijk" path="res://assets/img/icons/backwards.png" id="7_w4cu3"]
 [ext_resource type="Texture2D" uid="uid://ddmtfhjeqc58j" path="res://assets/img/icons/strafe-left.png" id="8_l3exe"]
-[ext_resource type="Texture2D" uid="uid://dxvtsq44ygite" path="res://assets/img/map/wall.png" id="9_dpnst"]
-[ext_resource type="Texture2D" uid="uid://b2phc61suhsnm" path="res://assets/img/map/sky.jpeg" id="11_okr7b"]
+[ext_resource type="MeshLibrary" uid="uid://by7gc2lqkqr3w" path="res://world/data.meshlib" id="10_dpnst"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6nlyh"]
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-
-[sub_resource type="BoxMesh" id="BoxMesh_rypym"]
-size = Vector3(1, 0.5, 1)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_okr7b"]
-albedo_texture = ExtResource("9_dpnst")
-uv1_scale = Vector3(5, 2, 5)
-texture_filter = 0
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5kag3"]
-albedo_texture = ExtResource("4_rypym")
-uv1_scale = Vector3(15, 15, 15)
-texture_filter = 0
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_gfkhe"]
-material = SubResource("StandardMaterial3D_5kag3")
-size = Vector2(12, 12)
-
-[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_s1lue"]
-panorama = ExtResource("11_okr7b")
-filter = false
-
-[sub_resource type="Sky" id="Sky_w0xem"]
-sky_material = SubResource("PanoramaSkyMaterial_s1lue")
-
-[sub_resource type="Environment" id="Environment_dpnst"]
-background_mode = 2
-sky = SubResource("Sky_w0xem")
 
 [node name="Game" type="Node"]
 script = ExtResource("1_6ydpi")
@@ -206,55 +176,25 @@ size = Vector2i(540, 412)
 render_target_update_mode = 4
 
 [node name="Party" type="Marker3D" parent="PC/VC/V"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
 
 [node name="Camera3D" type="Camera3D" parent="PC/VC/V/Party"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.2)
+keep_aspect = 0
 
 [node name="OmniLight3D" type="OmniLight3D" parent="PC/VC/V/Party"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.27953, 0)
-light_energy = 5.0
-omni_range = 50.0
-omni_attenuation = 2.0
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+light_specular = 0.0
+omni_range = 2.752
+omni_attenuation = 1.043
 
-[node name="World" type="Node3D" parent="PC/VC/V"]
-
-[node name="Wall" type="MeshInstance3D" parent="PC/VC/V/World"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
-mesh = SubResource("BoxMesh_rypym")
-skeleton = NodePath("../../../../..")
-surface_material_override/0 = SubResource("StandardMaterial3D_okr7b")
-
-[node name="Wall2" type="MeshInstance3D" parent="PC/VC/V/World"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -3)
-mesh = SubResource("BoxMesh_rypym")
-skeleton = NodePath("../../../..")
-surface_material_override/0 = SubResource("StandardMaterial3D_okr7b")
-
-[node name="Wall3" type="MeshInstance3D" parent="PC/VC/V/World"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
-mesh = SubResource("BoxMesh_rypym")
-skeleton = NodePath("../../../../..")
-surface_material_override/0 = SubResource("StandardMaterial3D_okr7b")
-
-[node name="Wall4" type="MeshInstance3D" parent="PC/VC/V/World"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
-mesh = SubResource("BoxMesh_rypym")
-skeleton = NodePath("../../../../..")
-surface_material_override/0 = SubResource("StandardMaterial3D_okr7b")
-
-[node name="Wall5" type="MeshInstance3D" parent="PC/VC/V/World"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -3)
-mesh = SubResource("BoxMesh_rypym")
-skeleton = NodePath("../../../../..")
-surface_material_override/0 = SubResource("StandardMaterial3D_okr7b")
-
-[node name="Floor" type="MeshInstance3D" parent="PC/VC/V/World"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.240914, 0)
-mesh = SubResource("PlaneMesh_gfkhe")
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="PC/VC/V/World"]
-environment = SubResource("Environment_dpnst")
+[node name="GridMap" type="GridMap" parent="PC/VC/V"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, -0.5, 0.5)
+mesh_library = ExtResource("10_dpnst")
+cell_size = Vector3(1, 1, 1)
+data = {
+"cells": PackedInt32Array(1, 65533, 3, 0, 65533, 5, 65535, 65533, 5, 65534, 65533, 3, 65533, 65533, 4, 65533, 65532, 4, 65534, 65532, 3, 65535, 65532, 5, 0, 65532, 5, 1, 65532, 3, 2, 65532, 4, 2, 65533, 4, 3, 65533, 3, 3, 65532, 3, 65532, 65532, 3, 65532, 65533, 3, 3, 65531, 2, 2, 65531, 2, 1, 65531, 2, 0, 65531, 2, 65535, 65531, 2, 65534, 65531, 2, 65533, 65531, 2, 65532, 65531, 2, 4, 65532, 0, 4, 65533, 0, 65531, 65532, 0, 65531, 65533, 0, 65530, 65533, 0, 5, 65533, 0, 2, 65534, 1, 3, 65534, 1, 3, 65535, 1, 3, 0, 1, 3, 1, 1, 2, 1, 1, 1, 1, 1, 0, 1, 1, 65535, 1, 1, 65534, 1, 1, 65533, 1, 1, 65532, 1, 1, 65534, 0, 1, 65531, 1, 1, 65531, 0, 1, 65531, 65535, 1, 65530, 65535, 1, 65529, 1, 1, 65528, 2, 1, 65528, 3, 1, 65528, 4, 1, 65528, 1, 1, 65528, 0, 1, 65528, 65535, 1, 65529, 3, 1, 65530, 3, 1, 65531, 3, 1, 65532, 2, 5, 65529, 65534, 5, 65529, 65535, 5, 65529, 0, 5, 65530, 0, 5, 65530, 1, 5, 65530, 2, 5, 65529, 2, 5, 65531, 2, 5, 65532, 3, 5, 65533, 2, 0, 65533, 3, 0, 65533, 4, 0, 65532, 4, 0, 65535, 65535, 3, 0, 65535, 3, 0, 65534, 2, 65535, 65534, 2, 65535, 0, 3, 0, 0, 3, 1, 65534, 3, 65534, 65534, 3)
+}
 
 [connection signal="pressed" from="MovementButtons/TurnRight" to="." method="_on_turn_right_pressed"]
 [connection signal="pressed" from="MovementButtons/Forward" to="." method="_on_forward_pressed"]
