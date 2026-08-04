@@ -4,10 +4,17 @@ extends Screen
 const SPEED = 1
 
 func debug() -> void:
-    print($PC/VC/V/Party.position)
-    print($PC/VC/V/Party.rotation)
-    print($PC/VC/V/Party.basis)
-    print($PC/VC/V/Party.global_basis)
+    var grid = $PC/VC/V/GridMap
+    var local_pos = grid.to_local($PC/VC/V/Party.position)
+    print(local_pos)
+    var map_pos = grid.local_to_map(local_pos)
+    print(map_pos)
+    var cell_id = grid.get_cell_item(map_pos)
+    print(cell_id)
+    var mesh = grid.mesh_library.get_item_navigation_layers(cell_id)
+    print(mesh)
+
+
 
 func _on_forward_pressed() -> void:
     var tween = get_tree().create_tween()
