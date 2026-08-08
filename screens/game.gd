@@ -3,7 +3,7 @@ extends Screen
 const SPEED = 1 # All geometries are 1m width/tall/depth
 const CAMERA_SHAKE_BLOCKED_MOVE = 0.005
 const CAMERA_SHAKE_PERIOD = 0.15
-const MOVE_DURATION = 0.15
+const MOVE_DURATION = 0.075
 
 enum NavigationLayers {
     DEFAULT = 1,

@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://bguwt7pa77flo"]
+[gd_scene load_steps=18 format=3 uid="uid://bguwt7pa77flo"]
 
 [ext_resource type="Texture2D" uid="uid://dxvtsq44ygite" path="res://assets/img/map/wall1.png" id="1_tcf2h"]
 [ext_resource type="Texture2D" uid="uid://2n626fct2ewc" path="res://assets/img/map/floor1.png" id="2_4717r"]
@@ -6,6 +6,8 @@
 [ext_resource type="Texture2D" uid="uid://d31macltiywxu" path="res://assets/img/map/wall3.png" id="3_mmdvd"]
 [ext_resource type="Texture2D" uid="uid://bbsdbtybuwg51" path="res://assets/img/map/floor2.png" id="5_fn3g3"]
 [ext_resource type="Texture2D" uid="uid://bk1u6k2k4banu" path="res://assets/img/map/floor3.png" id="6_sc4t8"]
+[ext_resource type="Shader" uid="uid://bokwwq8d8pdiv" path="res://resources/shaders/animated_texture.gdshader" id="7_sc4t8"]
+[ext_resource type="Texture2D" uid="uid://b384tjthnvotq" path="res://assets/img/map/floor4.png" id="8_ai45w"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_rypym"]
 size = Vector3(1, 0.5, 1)
@@ -38,6 +40,15 @@ albedo_texture = ExtResource("5_fn3g3")
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fyhu2"]
 cull_mode = 2
 albedo_texture = ExtResource("6_sc4t8")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ai45w"]
+render_priority = 0
+shader = ExtResource("7_sc4t8")
+shader_parameter/tileset_texture = ExtResource("8_ai45w")
+shader_parameter/columns = 3
+shader_parameter/rows = 1
+shader_parameter/frames_per_second = 3.0
+shader_parameter/total_frames = 20
 
 [node name="World" type="Node3D"]
 
@@ -77,3 +88,8 @@ surface_material_override/0 = SubResource("StandardMaterial3D_4papg")
 visible = false
 mesh = SubResource("PlaneMesh_gfkhe")
 surface_material_override/0 = SubResource("StandardMaterial3D_fyhu2")
+
+[node name="Floor4" type="MeshInstance3D" parent="."]
+visible = false
+mesh = SubResource("PlaneMesh_gfkhe")
+surface_material_override/0 = SubResource("ShaderMaterial_ai45w")

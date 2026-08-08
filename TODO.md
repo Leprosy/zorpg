@@ -6,3 +6,8 @@
   - Dialog Icon Button (brown stone, dark brown icon) - DONE
   - Action Button (grey stone, dark gray icon) -  DONE
   - 3D Viewport needs style/variant?
+
+- GridMap
+    - Animated floors/ceils - DONE
+    - Create maps as GridMap scenes
+    - Textures must be pixelated
