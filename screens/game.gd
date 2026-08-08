@@ -5,29 +5,16 @@ const CAMERA_SHAKE_BLOCKED_MOVE = 0.005
 const CAMERA_SHAKE_PERIOD = 0.15
 const MOVE_DURATION = 0.075
 
-enum NavigationLayers {
-    DEFAULT = 1,
-    IMPASSABLE = 2,
-}
 
-# Check if the move is valid using the navigation layers
-# The navigation layers are:
-# 1: Default
-# 2: Impassable
-func _check_move_valid(position: Vector3) -> bool:
-    var grid: ScriptedGridMap = $PC/VC/V/LayoutGridMap
-    var local_pos = grid.to_local(position)
-    var map_pos = grid.local_to_map(local_pos)
-    var cell_id = grid.get_cell_item(map_pos)
-    if cell_id == -1:
-        return false
-    var mesh = grid.mesh_library.get_item_navigation_layers(cell_id)
-    print(mesh)
-    return mesh == NavigationLayers.DEFAULT
+
+func get_map() -> GameMap:
+    var map_holder = $PC/VC/V/CurrentMap
+    return map_holder.get_children()[0]
 
 func _execute_move(direction: Vector3) -> void:
     var new_position = $PC/VC/V/Party.global_position + direction * SPEED
-    if not self._check_move_valid(new_position):
+    var is_passable = self.get_map().is_cell_passable(new_position)
+    if not is_passable:
         self._camera_shake(CAMERA_SHAKE_BLOCKED_MOVE)
         return
     var tween = get_tree().create_tween()
