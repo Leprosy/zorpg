@@ -6,8 +6,17 @@
   - Dialog Icon Button (brown stone, dark brown icon) - DONE
   - Action Button (grey stone, dark gray icon) -  DONE
   - 3D Viewport needs style/variant?
-
-- GridMap
-    - Animated floors/ceils - DONE
-    - Create maps as GridMap scenes
-    - Textures must be pixelated
+- Layout GridMap
+  - Animated floors/ceils - DONE
+  - Create maps as GridMap scenes
+  - Textures must be pixelated - DONE
+  - Gridmap can have metadata? (ie scripting)
+- Things GridMap
+  - Things should be 256 x 128? animated can only have 4 frames?
+  - Things can have light?
+  - Animated things(sprite sheet of 4 128x128 tiles) - DONE
+- Sky
+  - Sprite size?
+  - Time cycle?
+Misc
+  - Is billboard_sprite_texture shader used?

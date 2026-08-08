@@ -15,7 +15,7 @@ enum NavigationLayers {
 # 1: Default
 # 2: Impassable
 func _check_move_valid(position: Vector3) -> bool:
-    var grid = $PC/VC/V/GridMap
+    var grid: ScriptedGridMap = $PC/VC/V/LayoutGridMap
     var local_pos = grid.to_local(position)
     var map_pos = grid.local_to_map(local_pos)
     var cell_id = grid.get_cell_item(map_pos)

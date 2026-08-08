@@ -1,0 +1,52 @@
+[gd_scene load_steps=10 format=3 uid="uid://dna3p70giokes"]
+
+[ext_resource type="Texture2D" uid="uid://ksc8yinmnao5" path="res://assets/img/map/thing3.png" id="1_0gyqg"]
+[ext_resource type="Texture2D" uid="uid://dg1j28nasxqk5" path="res://assets/img/map/thing1.png" id="2_0gyqg"]
+[ext_resource type="Texture2D" uid="uid://61rfdlppai6o" path="res://assets/img/map/thing2.png" id="2_2w0fq"]
+[ext_resource type="Shader" uid="uid://c1m4gvwkms5t4" path="res://resources/shaders/animated_sprite.gdshader" id="3_2w0fq"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_vmnmm"]
+size = Vector2(0.5, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gh27h"]
+transparency = 1
+cull_mode = 2
+albedo_texture = ExtResource("2_0gyqg")
+billboard_mode = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6ss0v"]
+transparency = 1
+cull_mode = 2
+albedo_texture = ExtResource("2_2w0fq")
+texture_filter = 0
+billboard_mode = 1
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6ss0v"]
+render_priority = 0
+shader = ExtResource("3_2w0fq")
+shader_parameter/tileset_texture = ExtResource("1_0gyqg")
+shader_parameter/columns = 4
+shader_parameter/rows = 1
+shader_parameter/frames_per_second = 3.0
+shader_parameter/total_frames = 20
+
+[sub_resource type="QuadMesh" id="QuadMesh_gh27h"]
+material = SubResource("ShaderMaterial_6ss0v")
+size = Vector2(0.5, 0.5)
+
+[node name="Things" type="Node3D"]
+
+[node name="Thing1" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0.25, 0)
+mesh = SubResource("QuadMesh_vmnmm")
+surface_material_override/0 = SubResource("StandardMaterial3D_gh27h")
+
+[node name="Thing2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0.25, 0)
+visible = false
+mesh = SubResource("QuadMesh_vmnmm")
+surface_material_override/0 = SubResource("StandardMaterial3D_6ss0v")
+
+[node name="Thing3" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0.25, 0)
+mesh = SubResource("QuadMesh_gh27h")

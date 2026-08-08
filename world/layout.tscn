@@ -1,56 +1,60 @@
 [gd_scene load_steps=18 format=3 uid="uid://bguwt7pa77flo"]
 
-[ext_resource type="Texture2D" uid="uid://dxvtsq44ygite" path="res://assets/img/map/wall1.png" id="1_tcf2h"]
-[ext_resource type="Texture2D" uid="uid://2n626fct2ewc" path="res://assets/img/map/floor1.png" id="2_4717r"]
-[ext_resource type="Texture2D" uid="uid://bkujhe5goo4re" path="res://assets/img/map/wall2.png" id="2_h5o24"]
-[ext_resource type="Texture2D" uid="uid://d31macltiywxu" path="res://assets/img/map/wall3.png" id="3_mmdvd"]
-[ext_resource type="Texture2D" uid="uid://bbsdbtybuwg51" path="res://assets/img/map/floor2.png" id="5_fn3g3"]
-[ext_resource type="Texture2D" uid="uid://bk1u6k2k4banu" path="res://assets/img/map/floor3.png" id="6_sc4t8"]
-[ext_resource type="Shader" uid="uid://bokwwq8d8pdiv" path="res://resources/shaders/animated_texture.gdshader" id="7_sc4t8"]
-[ext_resource type="Texture2D" uid="uid://b384tjthnvotq" path="res://assets/img/map/floor4.png" id="8_ai45w"]
+[ext_resource type="Texture2D" uid="uid://dxvtsq44ygite" path="res://assets/img/map/wall1.png" id="1_f5baf"]
+[ext_resource type="Texture2D" uid="uid://bkujhe5goo4re" path="res://assets/img/map/wall2.png" id="2_r60jb"]
+[ext_resource type="Texture2D" uid="uid://d31macltiywxu" path="res://assets/img/map/wall3.png" id="3_83dmd"]
+[ext_resource type="Texture2D" uid="uid://2n626fct2ewc" path="res://assets/img/map/floor1.png" id="4_na0wf"]
+[ext_resource type="Texture2D" uid="uid://bbsdbtybuwg51" path="res://assets/img/map/floor2.png" id="5_0x827"]
+[ext_resource type="Texture2D" uid="uid://bk1u6k2k4banu" path="res://assets/img/map/floor3.png" id="6_x1guw"]
+[ext_resource type="Shader" uid="uid://bokwwq8d8pdiv" path="res://resources/shaders/animated_texture.gdshader" id="7_iav0a"]
+[ext_resource type="Texture2D" uid="uid://b384tjthnvotq" path="res://assets/img/map/floor4.png" id="8_86xsb"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_rypym"]
 size = Vector3(1, 0.5, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_okr7b"]
-albedo_texture = ExtResource("1_tcf2h")
+albedo_texture = ExtResource("1_f5baf")
 uv1_scale = Vector3(5, 2, 5)
 texture_filter = 0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fn3g3"]
-albedo_texture = ExtResource("2_h5o24")
+albedo_texture = ExtResource("2_r60jb")
 uv1_scale = Vector3(5, 2, 1)
+texture_filter = 0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sc4t8"]
-albedo_texture = ExtResource("3_mmdvd")
+albedo_texture = ExtResource("3_83dmd")
 uv1_scale = Vector3(5, 2, 1)
+texture_filter = 0
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_gfkhe"]
 size = Vector2(1, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ai45w"]
 cull_mode = 2
-albedo_texture = ExtResource("2_4717r")
+albedo_texture = ExtResource("4_na0wf")
 texture_filter = 0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4papg"]
 cull_mode = 2
-albedo_texture = ExtResource("5_fn3g3")
+albedo_texture = ExtResource("5_0x827")
+texture_filter = 0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fyhu2"]
 cull_mode = 2
-albedo_texture = ExtResource("6_sc4t8")
+albedo_texture = ExtResource("6_x1guw")
+texture_filter = 0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ai45w"]
 render_priority = 0
-shader = ExtResource("7_sc4t8")
-shader_parameter/tileset_texture = ExtResource("8_ai45w")
+shader = ExtResource("7_iav0a")
+shader_parameter/tileset_texture = ExtResource("8_86xsb")
 shader_parameter/columns = 3
 shader_parameter/rows = 1
 shader_parameter/frames_per_second = 3.0
 shader_parameter/total_frames = 20
 
-[node name="World" type="Node3D"]
+[node name="Layout" type="Node3D"]
 
 [node name="Wall1" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
