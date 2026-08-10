@@ -21,6 +21,7 @@ func _execute_move(direction: Vector3) -> void:
     tween.tween_property($PC/VC/V/Party, "position", new_position , MOVE_DURATION)
     tween.play()
     await tween.finished
+    get_map().get_cell_script(new_position)
 
 func _camera_shake(magnitude: float) -> void:
     var camera = $PC/VC/V/Party/Camera3D

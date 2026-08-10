@@ -20,3 +20,4 @@
   - Time cycle?
 - Misc
   - Is billboard_sprite_texture shader used?
+  - Is there a way to check if a GameMap instance has a Layout and Things grid maps?

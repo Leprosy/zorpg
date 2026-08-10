@@ -19,6 +19,7 @@ func trans_pos(pos: Vector3, grid: GridMap) -> Vector3i:
 func get_layers(grid: GridMap, id: int) -> int:
     if id == -1:
         return 0
+
     return grid.mesh_library.get_item_navigation_layers(id)
 
 func is_cell_passable(pos: Vector3) -> bool:
@@ -29,10 +30,12 @@ func is_cell_passable(pos: Vector3) -> bool:
     var cell = self.get_layers(cells, cell_id)
     var thing = self.get_layers(things, thing_id)
     var passable = cell != NavigationLayers.IMPASSABLE and thing != NavigationLayers.IMPASSABLE
-    if passable:
-        self.get_cell_script(self.trans_pos(pos, cells))
     return passable
 
 func get_cell_script(pos: Vector3) -> void:
     var cells: GridMap = $LayoutGridMap
-    print(self.trans_pos(pos, cells))
+    var vals = self.trans_pos(pos, cells)
+    var key = "%dx%d" % [vals[0], vals[2]]
+
+    if self.script_data.has(key):
+        print(self.script_data.get(key))
