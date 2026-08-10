@@ -1,0 +1,38 @@
+[gd_scene load_steps=3 format=3 uid="uid://cy2xfaroim1vl"]
+
+[ext_resource type="Texture2D" uid="uid://bc4o31x0rv7al" path="res://assets/img/npc/npc_portrait.png" id="1_5hn00"]
+[ext_resource type="Script" uid="uid://dtdrhv53guunm" path="res://components/npc_dialog.gd" id="1_ksgmm"]
+
+[node name="NpcDialog" type="Panel"]
+offset_right = 448.0
+offset_bottom = 320.0
+theme_type_variation = &"Z_Dialog"
+script = ExtResource("1_ksgmm")
+
+[node name="NpcPortrait" type="Sprite2D" parent="."]
+position = Vector2(64, 64)
+scale = Vector2(1.71739, 1.77273)
+texture = ExtResource("1_5hn00")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="NpcPortrait"]
+autoplay = "default"
+speed_scale = 1.5
+
+[node name="Title" type="RichTextLabel" parent="."]
+layout_mode = 0
+offset_left = 192.0
+offset_top = 40.0
+offset_right = 384.0
+offset_bottom = 88.0
+theme_type_variation = &"Z_DialogText"
+text = "This is Title"
+horizontal_alignment = 1
+
+[node name="Content" type="RichTextLabel" parent="."]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 120.0
+offset_right = 424.0
+offset_bottom = 296.0
+theme_type_variation = &"Z_DialogText"
+text = "This is the content of the dialog"

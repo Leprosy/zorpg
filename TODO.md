@@ -6,6 +6,10 @@
   - Dialog Icon Button (brown stone, dark brown icon) - DONE
   - Action Button (grey stone, dark gray icon) -  DONE
   - 3D Viewport needs style/variant?
+  - Messages
+    - Prompt under map(who will drink?)
+    - NPC talking
+    - Full screen width on roster
 - Layout GridMap
   - Animated floors/ceils - DONE
   - Create maps as GridMap scenes
