@@ -30,3 +30,6 @@ func show(title: String, content: String, npc: int) -> void:
     
     portrait.animation = NPC_ANIM
     portrait.play()
+
+func hide() -> void:
+    self.visible = false

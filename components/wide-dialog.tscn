@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3 uid="uid://dbl3cy7660stb"]
+
+[ext_resource type="Script" uid="uid://cujmfkcg5od66" path="res://components/wide_dialog.gd" id="1_kxyul"]
+
+[node name="WideDialog" type="Panel"]
+offset_left = 32.0
+offset_top = 424.0
+offset_right = 800.0
+offset_bottom = 584.0
+theme_type_variation = &"Z_Dialog"
+script = ExtResource("1_kxyul")
+
+[node name="Content" type="RichTextLabel" parent="."]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 744.0
+offset_bottom = 136.0
+theme_type_variation = &"Z_DialogText"
+text = "This is the content of the dialog"
+horizontal_alignment = 1

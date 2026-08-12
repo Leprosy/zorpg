@@ -70,8 +70,13 @@ func _execute_turn(direction: int) -> void:
 func show_npc_dialog(title: String, content: String, npc: int) -> void:
     $NpcDialog.show(title, content, npc)
 
+func show_wide_dialog(content: String) -> void:
+    $WideDialog.show(content)
+
 func _on_button_9_pressed() -> void:
     if $NpcDialog.visible:
-        $NpcDialog.visible = false
+        $NpcDialog.hide()
+        $WideDialog.hide()
     else:
         self.show_npc_dialog("Sir Leprosy", "This is a test dialog created to test this", 10)
+        self.show_wide_dialog("Mmmm...this is working")
