@@ -1,4 +1,4 @@
-extends Node
+extends Panel
 
 const NPC_SIZE = 32
 const NPC_ANIM = 'npc'
@@ -7,8 +7,7 @@ const NPC_SPEED = 5
 func oaw():
     print("oaw")
 
-func show(title: String, content: String, npc: int) -> void:
-    self.visible = true
+func show_content(title: String, content: String, npc: int) -> void:
     $Title.text = title
     $Content.text = content
 
@@ -30,6 +29,5 @@ func show(title: String, content: String, npc: int) -> void:
     
     portrait.animation = NPC_ANIM
     portrait.play()
-
-func hide() -> void:
-    self.visible = false
+    
+    super.show()

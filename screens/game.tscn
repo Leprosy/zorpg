@@ -195,6 +195,12 @@ omni_attenuation = 1.043
 
 [node name="TestMap" parent="PC/VC/V/CurrentMap" instance=ExtResource("9_4v2gu")]
 
+[node name="Characters" type="Panel" parent="."]
+offset_left = 16.0
+offset_top = 448.0
+offset_right = 560.0
+offset_bottom = 584.0
+
 [node name="NpcDialog" parent="." instance=ExtResource("10_dpnst")]
 visible = false
 offset_left = 24.0

@@ -3,7 +3,7 @@ extends Node
 
 # Scene register
 enum ScreenName { MAIN_MENU, CREDITS, HELP, GAME }
-
+var state = State.new()
 var scenes = {
     ScreenName.CREDITS: preload("res://screens/credits.tscn"),
     ScreenName.MAIN_MENU: preload("res://screens/main_menu.tscn"),

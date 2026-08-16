@@ -1,8 +1,5 @@
-extends Node
+extends Panel
 
-func show(content: String) -> void:
-    self.visible = true
+func show_content(content: String) -> void:
     $Content.text = content
-
-func hide() -> void:
-    self.visible = false
+    super.show()

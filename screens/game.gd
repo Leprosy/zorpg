@@ -5,6 +5,18 @@ const CAMERA_SHAKE_BLOCKED_MOVE = 0.005
 const CAMERA_SHAKE_PERIOD = 0.15
 const MOVE_DURATION = 0.075
 
+var char_portrait_scene = preload("res://components/char-portrait.tscn")
+
+func _ready() -> void:
+    var state = self.app_root.state
+    var x = 0
+    for character: Character in state.party.chars:
+        var portrait: CharPortrait = char_portrait_scene.instantiate()
+        portrait.position.x = x
+        $Characters.add_child(portrait)
+        portrait.set_face(character.portrait)
+        x += 90
+
 
 ## Helpers
 func get_map() -> GameMap:
@@ -68,10 +80,10 @@ func _execute_turn(direction: int) -> void:
 
 ## Script calls?
 func show_npc_dialog(title: String, content: String, npc: int) -> void:
-    $NpcDialog.show(title, content, npc)
+    $NpcDialog.show_content(title, content, npc)
 
 func show_wide_dialog(content: String) -> void:
-    $WideDialog.show(content)
+    $WideDialog.show_content(content)
 
 func _on_button_9_pressed() -> void:
     if $NpcDialog.visible:
