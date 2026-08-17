@@ -1,0 +1,172 @@
+[gd_scene load_steps=4 format=3 uid="uid://c1n1on7n7yp3d"]
+
+[ext_resource type="Texture2D" uid="uid://cv8oaouowkoqn" path="res://assets/img/chars/stats-icons.png" id="1_jil1c"]
+[ext_resource type="Script" uid="uid://cx4cyvbt1hh57" path="res://components/character_view.gd" id="1_kmbgf"]
+[ext_resource type="Texture2D" uid="uid://cgegnmqr5hh1r" path="res://assets/img/icons/rem.png" id="2_x1jy8"]
+
+[node name="CharacterView" type="Panel"]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 560.0
+offset_bottom = 432.0
+theme_type_variation = &"Z_Dialog"
+script = ExtResource("1_kmbgf")
+
+[node name="Name" type="RichTextLabel" parent="."]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 488.0
+offset_bottom = 40.0
+theme_type_variation = &"Z_DialogText"
+text = "Name"
+
+[node name="Mgt" type="Node2D" parent="."]
+position = Vector2(24, 64)
+
+[node name="Icon" type="Sprite2D" parent="Mgt"]
+position = Vector2(24, 24)
+scale = Vector2(2, 2.4)
+texture = ExtResource("1_jil1c")
+hframes = 4
+vframes = 5
+
+[node name="Name" type="RichTextLabel" parent="Mgt"]
+offset_left = 56.0
+offset_right = 96.0
+offset_bottom = 16.0
+theme_type_variation = &"Z_DialogText"
+text = "Mgt"
+metadata/_edit_use_anchors_ = true
+
+[node name="Value" type="RichTextLabel" parent="Mgt"]
+offset_left = 56.0
+offset_top = 24.0
+offset_right = 96.0
+offset_bottom = 40.0
+text = "10"
+metadata/_edit_use_anchors_ = true
+
+[node name="Int" type="Node2D" parent="."]
+position = Vector2(24, 120)
+
+[node name="Icon" type="Sprite2D" parent="Int"]
+position = Vector2(24, 32)
+scale = Vector2(2, 2.4)
+texture = ExtResource("1_jil1c")
+hframes = 4
+vframes = 5
+frame = 4
+
+[node name="Name" type="RichTextLabel" parent="Int"]
+offset_left = 56.0
+offset_top = 8.0
+offset_right = 96.0
+offset_bottom = 24.0
+theme_type_variation = &"Z_DialogText"
+text = "Int"
+metadata/_edit_use_anchors_ = true
+
+[node name="Value" type="RichTextLabel" parent="Int"]
+offset_left = 56.0
+offset_top = 32.0
+offset_right = 96.0
+offset_bottom = 48.0
+text = "10"
+metadata/_edit_use_anchors_ = true
+
+[node name="Per" type="Node2D" parent="."]
+position = Vector2(24, 176)
+
+[node name="Icon" type="Sprite2D" parent="Per"]
+position = Vector2(24, 40)
+scale = Vector2(2, 2.4)
+texture = ExtResource("1_jil1c")
+hframes = 4
+vframes = 5
+frame = 8
+
+[node name="Name" type="RichTextLabel" parent="Per"]
+offset_left = 56.0
+offset_top = 16.0
+offset_right = 96.0
+offset_bottom = 32.0
+theme_type_variation = &"Z_DialogText"
+text = "Per"
+metadata/_edit_use_anchors_ = true
+
+[node name="Value" type="RichTextLabel" parent="Per"]
+offset_left = 56.0
+offset_top = 40.0
+offset_right = 96.0
+offset_bottom = 56.0
+text = "10"
+metadata/_edit_use_anchors_ = true
+
+[node name="End" type="Node2D" parent="."]
+position = Vector2(24, 232)
+
+[node name="Icon" type="Sprite2D" parent="End"]
+position = Vector2(24, 48)
+scale = Vector2(2, 2.4)
+texture = ExtResource("1_jil1c")
+hframes = 4
+vframes = 5
+frame = 12
+
+[node name="Name" type="RichTextLabel" parent="End"]
+offset_left = 56.0
+offset_top = 24.0
+offset_right = 96.0
+offset_bottom = 40.0
+theme_type_variation = &"Z_DialogText"
+text = "End"
+metadata/_edit_use_anchors_ = true
+
+[node name="Value" type="RichTextLabel" parent="End"]
+offset_left = 56.0
+offset_top = 48.0
+offset_right = 96.0
+offset_bottom = 64.0
+text = "10"
+metadata/_edit_use_anchors_ = true
+
+[node name="Spd" type="Node2D" parent="."]
+position = Vector2(24, 288)
+
+[node name="Icon" type="Sprite2D" parent="Spd"]
+position = Vector2(24, 56)
+scale = Vector2(2, 2.4)
+texture = ExtResource("1_jil1c")
+hframes = 4
+vframes = 5
+frame = 16
+
+[node name="Name" type="RichTextLabel" parent="Spd"]
+offset_left = 56.0
+offset_top = 32.0
+offset_right = 96.0
+offset_bottom = 48.0
+theme_type_variation = &"Z_DialogText"
+text = "Spd"
+metadata/_edit_use_anchors_ = true
+
+[node name="Value" type="RichTextLabel" parent="Spd"]
+offset_left = 56.0
+offset_top = 56.0
+offset_right = 96.0
+offset_bottom = 72.0
+text = "10"
+metadata/_edit_use_anchors_ = true
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 0
+offset_left = 472.0
+offset_top = 336.0
+offset_right = 520.0
+offset_bottom = 388.0
+theme_type_variation = &"Z_ButtonAction"
+icon = ExtResource("2_x1jy8")
+expand_icon = true
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

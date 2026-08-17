@@ -15,8 +15,13 @@ func _ready() -> void:
         portrait.position.x = x
         $Characters.add_child(portrait)
         portrait.set_face(character.portrait)
+        portrait.connect("gui_input", self._on_portrait_click.bind(character))
         x += 90
 
+func _on_portrait_click(event: InputEvent, data: Character):
+    if event is InputEventMouseButton and not event.pressed:
+        $CharacterView.visible = true
+        $CharacterView.set_data(data)
 
 ## Helpers
 func get_map() -> GameMap:

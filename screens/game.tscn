@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://cjw7nosu4yuix"]
+[gd_scene load_steps=14 format=3 uid="uid://cjw7nosu4yuix"]
 
 [ext_resource type="Script" uid="uid://cahccvix1vocc" path="res://screens/game.gd" id="1_6ydpi"]
 [ext_resource type="Texture2D" uid="uid://cgegnmqr5hh1r" path="res://assets/img/icons/rem.png" id="2_3ciuf"]
@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://uh72re3odpk6" path="res://data/maps/test_map.tscn" id="9_4v2gu"]
 [ext_resource type="PackedScene" uid="uid://cy2xfaroim1vl" path="res://components/npc-dialog.tscn" id="10_dpnst"]
 [ext_resource type="PackedScene" uid="uid://dbl3cy7660stb" path="res://components/wide-dialog.tscn" id="11_okr7b"]
+[ext_resource type="PackedScene" uid="uid://c1n1on7n7yp3d" path="res://components/character_view.tscn" id="12_s1lue"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6nlyh"]
 border_width_left = 2
@@ -213,6 +214,9 @@ visible = false
 offset_left = 16.0
 offset_top = 440.0
 offset_right = 784.0
+
+[node name="CharacterView" parent="." instance=ExtResource("12_s1lue")]
+visible = false
 
 [connection signal="pressed" from="CommandButtons/Button9" to="." method="_on_button_9_pressed"]
 [connection signal="pressed" from="MovementButtons/TurnRight" to="." method="_on_turn_right_pressed"]
