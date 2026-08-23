@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://c1n1on7n7yp3d"]
+[gd_scene load_steps=5 format=3 uid="uid://c1n1on7n7yp3d"]
 
 [ext_resource type="Texture2D" uid="uid://cv8oaouowkoqn" path="res://assets/img/chars/stats-icons.png" id="1_jil1c"]
 [ext_resource type="Script" uid="uid://cx4cyvbt1hh57" path="res://components/character_view.gd" id="1_kmbgf"]
 [ext_resource type="Texture2D" uid="uid://cgegnmqr5hh1r" path="res://assets/img/icons/rem.png" id="2_x1jy8"]
+[ext_resource type="Texture2D" uid="uid://t7akh1p4bd8h" path="res://assets/img/icons/undo.png" id="4_sl3kw"]
 
 [node name="CharacterView" type="Panel"]
 offset_left = 16.0
@@ -15,9 +16,9 @@ script = ExtResource("1_kmbgf")
 [node name="Name" type="RichTextLabel" parent="."]
 layout_mode = 0
 offset_left = 24.0
-offset_top = 24.0
-offset_right = 488.0
-offset_bottom = 40.0
+offset_top = 32.0
+offset_right = 448.0
+offset_bottom = 48.0
 theme_type_variation = &"Z_DialogText"
 text = "Name"
 
@@ -48,10 +49,10 @@ text = "10"
 metadata/_edit_use_anchors_ = true
 
 [node name="Int" type="Node2D" parent="."]
-position = Vector2(24, 120)
+position = Vector2(24, 128)
 
 [node name="Icon" type="Sprite2D" parent="Int"]
-position = Vector2(24, 32)
+position = Vector2(24, 24)
 scale = Vector2(2, 2.4)
 texture = ExtResource("1_jil1c")
 hframes = 4
@@ -60,26 +61,25 @@ frame = 4
 
 [node name="Name" type="RichTextLabel" parent="Int"]
 offset_left = 56.0
-offset_top = 8.0
 offset_right = 96.0
-offset_bottom = 24.0
+offset_bottom = 16.0
 theme_type_variation = &"Z_DialogText"
 text = "Int"
 metadata/_edit_use_anchors_ = true
 
 [node name="Value" type="RichTextLabel" parent="Int"]
 offset_left = 56.0
-offset_top = 32.0
+offset_top = 24.0
 offset_right = 96.0
-offset_bottom = 48.0
+offset_bottom = 40.0
 text = "10"
 metadata/_edit_use_anchors_ = true
 
 [node name="Per" type="Node2D" parent="."]
-position = Vector2(24, 176)
+position = Vector2(24, 192)
 
 [node name="Icon" type="Sprite2D" parent="Per"]
-position = Vector2(24, 40)
+position = Vector2(24, 24)
 scale = Vector2(2, 2.4)
 texture = ExtResource("1_jil1c")
 hframes = 4
@@ -88,26 +88,25 @@ frame = 8
 
 [node name="Name" type="RichTextLabel" parent="Per"]
 offset_left = 56.0
-offset_top = 16.0
 offset_right = 96.0
-offset_bottom = 32.0
+offset_bottom = 16.0
 theme_type_variation = &"Z_DialogText"
 text = "Per"
 metadata/_edit_use_anchors_ = true
 
 [node name="Value" type="RichTextLabel" parent="Per"]
 offset_left = 56.0
-offset_top = 40.0
+offset_top = 24.0
 offset_right = 96.0
-offset_bottom = 56.0
+offset_bottom = 40.0
 text = "10"
 metadata/_edit_use_anchors_ = true
 
 [node name="End" type="Node2D" parent="."]
-position = Vector2(24, 232)
+position = Vector2(24, 256)
 
 [node name="Icon" type="Sprite2D" parent="End"]
-position = Vector2(24, 48)
+position = Vector2(24, 24)
 scale = Vector2(2, 2.4)
 texture = ExtResource("1_jil1c")
 hframes = 4
@@ -116,26 +115,25 @@ frame = 12
 
 [node name="Name" type="RichTextLabel" parent="End"]
 offset_left = 56.0
-offset_top = 24.0
 offset_right = 96.0
-offset_bottom = 40.0
+offset_bottom = 16.0
 theme_type_variation = &"Z_DialogText"
 text = "End"
 metadata/_edit_use_anchors_ = true
 
 [node name="Value" type="RichTextLabel" parent="End"]
 offset_left = 56.0
-offset_top = 48.0
+offset_top = 24.0
 offset_right = 96.0
-offset_bottom = 64.0
+offset_bottom = 40.0
 text = "10"
 metadata/_edit_use_anchors_ = true
 
 [node name="Spd" type="Node2D" parent="."]
-position = Vector2(24, 288)
+position = Vector2(24, 320)
 
 [node name="Icon" type="Sprite2D" parent="Spd"]
-position = Vector2(24, 56)
+position = Vector2(24, 24)
 scale = Vector2(2, 2.4)
 texture = ExtResource("1_jil1c")
 hframes = 4
@@ -144,29 +142,56 @@ frame = 16
 
 [node name="Name" type="RichTextLabel" parent="Spd"]
 offset_left = 56.0
-offset_top = 32.0
 offset_right = 96.0
-offset_bottom = 48.0
+offset_bottom = 16.0
 theme_type_variation = &"Z_DialogText"
 text = "Spd"
 metadata/_edit_use_anchors_ = true
 
 [node name="Value" type="RichTextLabel" parent="Spd"]
 offset_left = 56.0
-offset_top = 56.0
+offset_top = 24.0
 offset_right = 96.0
-offset_bottom = 72.0
+offset_bottom = 40.0
 text = "10"
 metadata/_edit_use_anchors_ = true
 
-[node name="Button" type="Button" parent="."]
+[node name="Close" type="Button" parent="."]
 layout_mode = 0
-offset_left = 472.0
-offset_top = 336.0
-offset_right = 520.0
-offset_bottom = 388.0
-theme_type_variation = &"Z_ButtonAction"
+offset_left = 464.0
+offset_top = 320.0
+offset_right = 512.0
+offset_bottom = 368.0
+theme_type_variation = &"Z_ButtonDialog"
 icon = ExtResource("2_x1jy8")
 expand_icon = true
 
-[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
+[node name="Items" type="Button" parent="."]
+layout_mode = 0
+offset_left = 464.0
+offset_top = 64.0
+offset_right = 512.0
+offset_bottom = 112.0
+theme_type_variation = &"Z_ButtonDialog"
+icon = ExtResource("4_sl3kw")
+expand_icon = true
+
+[node name="ItemsView" type="Panel" parent="."]
+layout_mode = 0
+offset_right = 544.0
+offset_bottom = 416.0
+theme_type_variation = &"Z_Dialog"
+
+[node name="Close" type="Button" parent="ItemsView"]
+layout_mode = 0
+offset_left = 464.0
+offset_top = 336.0
+offset_right = 512.0
+offset_bottom = 384.0
+theme_type_variation = &"Z_ButtonDialog"
+icon = ExtResource("2_x1jy8")
+expand_icon = true
+
+[connection signal="pressed" from="Close" to="." method="_on_close_pressed"]
+[connection signal="pressed" from="Items" to="." method="_on_items_pressed"]
+[connection signal="pressed" from="ItemsView/Close" to="." method="_on_items_view_close_pressed"]

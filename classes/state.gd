@@ -1,6 +1,7 @@
 class_name State
 
 var party: Party
+var quests: Array[Quest]
 var gold: int
 var gems: int
 
