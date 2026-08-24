@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=13 format=3 uid="uid://dey76iekniio"]
+[gd_resource type="Theme" load_steps=19 format=3 uid="uid://dey76iekniio"]
 
 [ext_resource type="Texture2D" uid="uid://cy60tpxvsxqfk" path="res://assets/img/ui/button_action.png" id="1_nr324"]
 [ext_resource type="Texture2D" uid="uid://dunmgcvpfad6j" path="res://assets/img/ui/button_dialog.png" id="1_puq7a"]
@@ -82,6 +82,52 @@ corner_radius_top_right = 2
 corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rb7da"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_mo0i0"]
+texture = ExtResource("3_rb7da")
+texture_margin_left = 20.0
+texture_margin_top = 20.0
+texture_margin_right = 20.0
+texture_margin_bottom = 20.0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qa6oi"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mo0i0"]
+content_margin_left = 12.0
+content_margin_top = 4.0
+content_margin_right = 12.0
+content_margin_bottom = 4.0
+bg_color = Color(0.764706, 0.529412, 0.372549, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qa6oi"]
+content_margin_left = 12.0
+content_margin_top = 4.0
+content_margin_right = 12.0
+content_margin_bottom = 4.0
+bg_color = Color(0.835294, 0.623529, 0.501961, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_color = Color(0.372549, 0.247059, 0.141176, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8yfhb"]
+content_margin_left = 12.0
+content_margin_top = 4.0
+content_margin_right = 12.0
+content_margin_bottom = 4.0
+bg_color = Color(0.529412, 0.407843, 0.341176, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_color = Color(0.372549, 0.247059, 0.141176, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+
 [sub_resource type="FontVariation" id="FontVariation_puq7a"]
 base_font = ExtResource("1_pxeie")
 spacing_glyph = -2
@@ -109,3 +155,11 @@ Z_DialogSubPanel/base_type = &"Panel"
 Z_DialogSubPanel/styles/panel = SubResource("StyleBoxFlat_rb7da")
 Z_DialogText/base_type = &"RichTextLabel"
 Z_DialogText/colors/default_color = Color(0.235294, 0.235294, 0.235294, 1)
+Z_NoStyle/base_type = &"Panel"
+Z_NoStyle/styles/panel = SubResource("StyleBoxEmpty_rb7da")
+Z_TabDialog/base_type = &"TabContainer"
+Z_TabDialog/styles/panel = SubResource("StyleBoxTexture_mo0i0")
+Z_TabDialog/styles/tab_focus = SubResource("StyleBoxEmpty_qa6oi")
+Z_TabDialog/styles/tab_hovered = SubResource("StyleBoxFlat_mo0i0")
+Z_TabDialog/styles/tab_selected = SubResource("StyleBoxFlat_qa6oi")
+Z_TabDialog/styles/tab_unselected = SubResource("StyleBoxFlat_8yfhb")
