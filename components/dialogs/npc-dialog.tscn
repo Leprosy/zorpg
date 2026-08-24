@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://cy2xfaroim1vl"]
 
 [ext_resource type="Texture2D" uid="uid://bc4o31x0rv7al" path="res://assets/img/npc/npc_portrait.png" id="1_5hn00"]
-[ext_resource type="Script" uid="uid://dtdrhv53guunm" path="res://components/npc_dialog.gd" id="1_ksgmm"]
+[ext_resource type="Script" uid="uid://dtdrhv53guunm" path="res://components/dialogs/npc_dialog.gd" id="1_ksgmm"]
 
 [node name="NpcDialog" type="Panel"]
 offset_right = 448.0

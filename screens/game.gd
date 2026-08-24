@@ -5,7 +5,7 @@ const CAMERA_SHAKE_BLOCKED_MOVE = 0.005
 const CAMERA_SHAKE_PERIOD = 0.15
 const MOVE_DURATION = 0.075
 
-var char_portrait_scene = preload("res://components/char-portrait.tscn")
+var char_portrait_scene = preload("res://components/chars/char-portrait.tscn")
 
 func _ready() -> void:
     var state = self.app_root.state

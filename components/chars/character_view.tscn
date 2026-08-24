@@ -1,9 +1,12 @@
-[gd_scene load_steps=5 format=3 uid="uid://c1n1on7n7yp3d"]
+[gd_scene load_steps=8 format=3 uid="uid://c1n1on7n7yp3d"]
 
 [ext_resource type="Texture2D" uid="uid://cv8oaouowkoqn" path="res://assets/img/chars/stats-icons.png" id="1_jil1c"]
-[ext_resource type="Script" uid="uid://cx4cyvbt1hh57" path="res://components/character_view.gd" id="1_kmbgf"]
+[ext_resource type="Script" uid="uid://cx4cyvbt1hh57" path="res://components/chars/character_view.gd" id="1_kmbgf"]
 [ext_resource type="Texture2D" uid="uid://cgegnmqr5hh1r" path="res://assets/img/icons/rem.png" id="2_x1jy8"]
 [ext_resource type="Texture2D" uid="uid://t7akh1p4bd8h" path="res://assets/img/icons/undo.png" id="4_sl3kw"]
+[ext_resource type="Texture2D" uid="uid://cfwakcydb8ymn" path="res://assets/img/icons/plus.png" id="5_niocs"]
+[ext_resource type="Texture2D" uid="uid://bnrs337jf6xu1" path="res://assets/img/chars/items-icons.png" id="5_wyb6m"]
+[ext_resource type="Texture2D" uid="uid://bsee02nrbpijk" path="res://assets/img/icons/backwards.png" id="6_wyb6m"]
 
 [node name="CharacterView" type="Panel"]
 offset_left = 16.0
@@ -192,6 +195,89 @@ theme_type_variation = &"Z_ButtonDialog"
 icon = ExtResource("2_x1jy8")
 expand_icon = true
 
+[node name="ItemsName" type="RichTextLabel" parent="ItemsView"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 32.0
+offset_right = 496.0
+offset_bottom = 48.0
+theme_type_variation = &"Z_DialogText"
+text = "Items for XXX the YYY"
+
+[node name="ItemsGrid" type="GridContainer" parent="ItemsView"]
+layout_direction = 2
+layout_mode = 0
+offset_left = 24.0
+offset_top = 64.0
+offset_right = 344.0
+offset_bottom = 344.0
+columns = 5
+
+[node name="ItemDetails" type="Panel" parent="ItemsView"]
+layout_mode = 0
+offset_left = 360.0
+offset_top = 64.0
+offset_right = 512.0
+offset_bottom = 320.0
+
+[node name="Name" type="RichTextLabel" parent="ItemsView/ItemDetails"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 144.0
+offset_bottom = 48.0
+text = "Item Name"
+horizontal_alignment = 1
+
+[node name="Icon" type="Sprite2D" parent="ItemsView/ItemDetails"]
+position = Vector2(72, 88)
+scale = Vector2(4, 4.26667)
+texture = ExtResource("5_wyb6m")
+hframes = 36
+vframes = 36
+
+[node name="Data" type="RichTextLabel" parent="ItemsView/ItemDetails"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 128.0
+offset_right = 144.0
+offset_bottom = 200.0
+text = "This is item data"
+
+[node name="Equip" type="Button" parent="ItemsView/ItemDetails"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 208.0
+offset_right = 48.0
+offset_bottom = 248.0
+tooltip_text = "Equip/Remove Item"
+theme_type_variation = &"Z_ButtonDialog"
+icon = ExtResource("5_niocs")
+expand_icon = true
+
+[node name="Use" type="Button" parent="ItemsView/ItemDetails"]
+layout_mode = 0
+offset_left = 56.0
+offset_top = 208.0
+offset_right = 96.0
+offset_bottom = 248.0
+tooltip_text = "Use Item"
+theme_type_variation = &"Z_ButtonDialog"
+icon = ExtResource("4_sl3kw")
+expand_icon = true
+
+[node name="Drop" type="Button" parent="ItemsView/ItemDetails"]
+layout_mode = 0
+offset_left = 104.0
+offset_top = 208.0
+offset_right = 144.0
+offset_bottom = 248.0
+tooltip_text = "Drop Item"
+theme_type_variation = &"Z_ButtonDialog"
+icon = ExtResource("6_wyb6m")
+expand_icon = true
+
 [connection signal="pressed" from="Close" to="." method="_on_close_pressed"]
 [connection signal="pressed" from="Items" to="." method="_on_items_pressed"]
 [connection signal="pressed" from="ItemsView/Close" to="." method="_on_items_view_close_pressed"]
+[connection signal="pressed" from="ItemsView/ItemDetails/Equip" to="." method="_on_equip_pressed"]

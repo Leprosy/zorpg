@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://dbl3cy7660stb"]
 
-[ext_resource type="Script" uid="uid://cujmfkcg5od66" path="res://components/wide_dialog.gd" id="1_kxyul"]
+[ext_resource type="Script" uid="uid://cujmfkcg5od66" path="res://components/dialogs/wide_dialog.gd" id="1_kxyul"]
 
 [node name="WideDialog" type="Panel"]
 offset_left = 32.0
