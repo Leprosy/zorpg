@@ -15,6 +15,13 @@ size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_331qn")
 script = ExtResource("1_leyvk")
 
+[node name="Selected" type="ColorRect" parent="."]
+visible = false
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+color = Color(1, 1, 1, 0.329412)
+
 [node name="Icon" type="Sprite2D" parent="."]
 position = Vector2(32, 31.9375)
 scale = Vector2(3, 3.19166)

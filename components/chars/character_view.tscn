@@ -214,11 +214,13 @@ offset_bottom = 344.0
 columns = 5
 
 [node name="ItemDetails" type="Panel" parent="ItemsView"]
+visible = false
 layout_mode = 0
 offset_left = 360.0
 offset_top = 64.0
 offset_right = 512.0
 offset_bottom = 320.0
+theme_type_variation = &"Z_DialogSubPanel"
 
 [node name="Name" type="RichTextLabel" parent="ItemsView/ItemDetails"]
 layout_mode = 0
@@ -226,7 +228,6 @@ offset_left = 8.0
 offset_top = 8.0
 offset_right = 144.0
 offset_bottom = 48.0
-text = "Item Name"
 horizontal_alignment = 1
 
 [node name="Icon" type="Sprite2D" parent="ItemsView/ItemDetails"]
@@ -242,7 +243,6 @@ offset_left = 8.0
 offset_top = 128.0
 offset_right = 144.0
 offset_bottom = 200.0
-text = "This is item data"
 
 [node name="Equip" type="Button" parent="ItemsView/ItemDetails"]
 layout_mode = 0

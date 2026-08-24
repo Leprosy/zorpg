@@ -15,3 +15,6 @@ func setup(type: int, equiped: bool) -> void:
         $Icon.hide()
     else:
         $Icon.show()
+
+func set_selected(val: bool):
+    $Selected.visible = val

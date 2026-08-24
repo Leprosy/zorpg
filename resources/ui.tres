@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=12 format=3 uid="uid://dey76iekniio"]
+[gd_resource type="Theme" load_steps=13 format=3 uid="uid://dey76iekniio"]
 
 [ext_resource type="Texture2D" uid="uid://cy60tpxvsxqfk" path="res://assets/img/ui/button_action.png" id="1_nr324"]
 [ext_resource type="Texture2D" uid="uid://dunmgcvpfad6j" path="res://assets/img/ui/button_dialog.png" id="1_puq7a"]
@@ -70,6 +70,18 @@ texture_margin_bottom = 20.0
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rb7da"]
+bg_color = Color(0, 0, 0, 0.403922)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 0.611765)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
 [sub_resource type="FontVariation" id="FontVariation_puq7a"]
 base_font = ExtResource("1_pxeie")
 spacing_glyph = -2
@@ -93,5 +105,7 @@ Z_ButtonDialog/styles/hover = SubResource("StyleBoxTexture_nr324")
 Z_ButtonDialog/styles/normal = SubResource("StyleBoxTexture_puq7a")
 Z_Dialog/base_type = &"Panel"
 Z_Dialog/styles/panel = SubResource("StyleBoxTexture_8yfhb")
+Z_DialogSubPanel/base_type = &"Panel"
+Z_DialogSubPanel/styles/panel = SubResource("StyleBoxFlat_rb7da")
 Z_DialogText/base_type = &"RichTextLabel"
 Z_DialogText/colors/default_color = Color(0.235294, 0.235294, 0.235294, 1)
