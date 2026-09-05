@@ -98,13 +98,13 @@ func show_wide_dialog(content: String) -> void:
 func hide_wide_dialog() -> void:
     $WideDialog.hide()
 
-func load_map(name: String) -> void:
+func load_map(id: String) -> void:
     self.show_wide_dialog("Loading map...")
     var map = $PC/VC/V/CurrentMap.get_children() as Array[GameMap]
     if len(map):
         map[0].queue_free()
 
-    var res = load("res://data/maps/%s.tscn" % name)
+    var res = load("res://data/maps/%s.tscn" % id)
     var inst = res.instantiate()
     $PC/VC/V/CurrentMap.add_child(inst)
     # Position of the party. TODO: this can come from map metadata?
