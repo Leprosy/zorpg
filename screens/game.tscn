@@ -218,6 +218,8 @@ offset_right = 784.0
 [node name="CharacterView" parent="." instance=ExtResource("12_s1lue")]
 visible = false
 
+[connection signal="pressed" from="CommandButtons/Button7" to="." method="_on_button_7_pressed"]
+[connection signal="pressed" from="CommandButtons/Button8" to="." method="_on_button_8_pressed"]
 [connection signal="pressed" from="CommandButtons/Button9" to="." method="_on_button_9_pressed"]
 [connection signal="pressed" from="MovementButtons/TurnRight" to="." method="_on_turn_right_pressed"]
 [connection signal="pressed" from="MovementButtons/Forward" to="." method="_on_forward_pressed"]

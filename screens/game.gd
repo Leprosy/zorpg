@@ -18,6 +18,8 @@ func _ready() -> void:
         portrait.connect("gui_input", self._on_portrait_click.bind(character))
         x += 90
 
+    self.load_map("test_map")
+
 func _on_portrait_click(event: InputEvent, data: Character):
     if event is InputEventMouseButton and not event.pressed:
         $CharacterView.visible = true
@@ -83,17 +85,45 @@ func _execute_turn(direction: int) -> void:
     await tween.finished
 
 
-## Script calls?
+## Script calls - TODO refactor these into another module?
 func show_npc_dialog(title: String, content: String, npc: int) -> void:
     $NpcDialog.show_content(title, content, npc)
+
+func hide_npc_dialog() -> void:
+    $NpcDialog.hide()
 
 func show_wide_dialog(content: String) -> void:
     $WideDialog.show_content(content)
 
+func hide_wide_dialog() -> void:
+    $WideDialog.hide()
+
+func load_map(name: String) -> void:
+    self.show_wide_dialog("Loading map...")
+    var map = $PC/VC/V/CurrentMap.get_children() as Array[GameMap]
+    if len(map):
+        map[0].queue_free()
+
+    var res = load("res://data/maps/%s.tscn" % name)
+    var inst = res.instantiate()
+    $PC/VC/V/CurrentMap.add_child(inst)
+    # Position of the party. TODO: this can come from map metadata?
+    $PC/VC/V/Party.position.x = 0
+    $PC/VC/V/Party.position.z = 0
+    self.hide_wide_dialog()
+
+# Debug
 func _on_button_9_pressed() -> void:
     if $NpcDialog.visible:
-        $NpcDialog.hide()
-        $WideDialog.hide()
+        self.hide_npc_dialog()
+        self.hide_wide_dialog()
     else:
         self.show_npc_dialog("Sir Leprosy", "This is a test dialog created to test this", 10)
         self.show_wide_dialog("Mmmm...this is working")
+
+func _on_button_8_pressed() -> void:
+    self.load_map("taldo")
+
+
+func _on_button_7_pressed() -> void:
+    self.load_map("test_map")
