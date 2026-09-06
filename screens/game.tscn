@@ -205,6 +205,7 @@ offset_left = 24.0
 offset_top = 24.0
 offset_right = 552.0
 offset_bottom = 424.0
+mouse_filter = 1
 
 [node name="WideDialog" parent="." instance=ExtResource("11_okr7b")]
 visible = false
@@ -224,3 +225,6 @@ visible = false
 [connection signal="pressed" from="MovementButtons/StrafeRight" to="." method="_on_strafe_right_pressed"]
 [connection signal="pressed" from="MovementButtons/Backwards" to="." method="_on_backwards_pressed"]
 [connection signal="pressed" from="MovementButtons/StrafeLeft" to="." method="_on_strafe_left_pressed"]
+[connection signal="gui_input" from="PC" to="." method="_on_pc_gui_input"]
+[connection signal="gui_input" from="NpcDialog" to="." method="_on_pc_gui_input"]
+[connection signal="gui_input" from="WideDialog" to="." method="_on_pc_gui_input"]

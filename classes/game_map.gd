@@ -32,10 +32,12 @@ func is_cell_passable(pos: Vector3) -> bool:
     var passable = cell != NavigationLayers.IMPASSABLE and thing != NavigationLayers.IMPASSABLE
     return passable
 
-func get_cell_script(pos: Vector3) -> void:
+func get_cell_script(pos: Vector3) -> Array:
     var cells: GridMap = $LayoutGridMap
     var vals = self.trans_pos(pos, cells)
     var key = "%dx%d" % [vals[0], vals[2]]
 
     if self.script_data.has(key):
-        print(self.script_data.get(key))
+        return self.script_data.get(key)
+    else:
+        return []

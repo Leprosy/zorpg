@@ -6,6 +6,8 @@ const CAMERA_SHAKE_PERIOD = 0.15
 const MOVE_DURATION = 0.075
 
 var char_portrait_scene = preload("res://components/chars/char-portrait.tscn")
+var is_scripting = false
+var script_runner: Runner
 
 func _ready() -> void:
     var state = self.app_root.state
@@ -17,13 +19,13 @@ func _ready() -> void:
         portrait.set_face(character.portrait)
         portrait.connect("gui_input", self._on_portrait_click.bind(character))
         x += 90
-
     self.load_map("test_map")
 
 func _on_portrait_click(event: InputEvent, data: Character):
     if event is InputEventMouseButton and not event.pressed:
         $CharacterView.visible = true
         $CharacterView.set_data(data)
+
 
 ## Helpers
 func get_map() -> GameMap:
@@ -64,6 +66,8 @@ func _on_turn_right_pressed() -> void:
     self._execute_turn(-1)
 
 func _execute_move(direction: Vector3) -> void:
+    if is_scripting:
+        return
     var party = $PC/VC/V/Party
     var new_position = party.global_position + direction * SPEED
     var is_passable = self.get_map().is_cell_passable(new_position)
@@ -74,15 +78,29 @@ func _execute_move(direction: Vector3) -> void:
     tween.tween_property(party, "position", new_position , MOVE_DURATION)
     tween.play()
     await tween.finished
-    get_map().get_cell_script(new_position)
-    
+    var script = get_map().get_cell_script(new_position)
+    if len(script):
+        #self.is_scripting = true
+        self.script_runner = Runner.new(script, self)
+    else:
+        self.script_runner = null
+
 func _execute_turn(direction: int) -> void:
+    if is_scripting:
+        return
     var party = $PC/VC/V/Party
     var tween = get_tree().create_tween()
     var new_position = party.rotation + Vector3(0, direction * PI / 2, 0)
     tween.tween_property(party, "rotation", new_position , MOVE_DURATION)
     tween.play()
     await tween.finished
+
+func _on_pc_gui_input(event: InputEvent) -> void:
+    if event is InputEventMouseButton and not event.pressed:
+        if self.script_runner:
+            if not self.is_scripting:
+                self.is_scripting = true
+            self.script_runner.run()
 
 
 ## Script calls - TODO refactor these into another module?
@@ -103,7 +121,6 @@ func load_map(id: String) -> void:
     var map = $PC/VC/V/CurrentMap.get_children() as Array[GameMap]
     if len(map):
         map[0].queue_free()
-
     var res = load("res://data/maps/%s.tscn" % id)
     var inst = res.instantiate()
     $PC/VC/V/CurrentMap.add_child(inst)
@@ -111,6 +128,7 @@ func load_map(id: String) -> void:
     $PC/VC/V/Party.position.x = 0
     $PC/VC/V/Party.position.z = 0
     self.hide_wide_dialog()
+
 
 # Debug
 func _on_button_9_pressed() -> void:
@@ -123,7 +141,6 @@ func _on_button_9_pressed() -> void:
 
 func _on_button_8_pressed() -> void:
     self.load_map("taldo")
-
 
 func _on_button_7_pressed() -> void:
     self.load_map("test_map")

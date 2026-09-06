@@ -16,6 +16,7 @@ offset_left = 24.0
 offset_top = 24.0
 offset_right = 744.0
 offset_bottom = 136.0
+mouse_filter = 2
 theme_type_variation = &"Z_DialogText"
 text = "This is the content of the dialog"
 horizontal_alignment = 1
