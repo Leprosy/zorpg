@@ -1,8 +1,9 @@
-[gd_scene load_steps=13 format=3 uid="uid://cjw7nosu4yuix"]
+[gd_scene load_steps=14 format=3 uid="uid://cjw7nosu4yuix"]
 
 [ext_resource type="Script" uid="uid://cahccvix1vocc" path="res://screens/game.gd" id="1_6ydpi"]
 [ext_resource type="Texture2D" uid="uid://cgegnmqr5hh1r" path="res://assets/img/icons/rem.png" id="2_3ciuf"]
 [ext_resource type="Texture2D" uid="uid://b1xycaauepa4y" path="res://assets/img/icons/rotate-right.png" id="3_dpnst"]
+[ext_resource type="Texture2D" uid="uid://cfwakcydb8ymn" path="res://assets/img/icons/plus.png" id="3_s1lue"]
 [ext_resource type="Texture2D" uid="uid://vy3p1b130feg" path="res://assets/img/icons/forward.png" id="4_okr7b"]
 [ext_resource type="Texture2D" uid="uid://d1x31xhwulnt6" path="res://assets/img/icons/rotate-left.png" id="5_s1lue"]
 [ext_resource type="Texture2D" uid="uid://4gqi1t0etue2" path="res://assets/img/icons/strafe-right.png" id="6_w0xem"]
@@ -22,7 +23,7 @@ border_width_bottom = 2
 script = ExtResource("1_6ydpi")
 metadata/_custom_type_script = "uid://ck3nsip2wk2a2"
 
-[node name="CommandButtons" type="Node" parent="."]
+[node name="CommandButtons" type="Node2D" parent="."]
 
 [node name="Button7" type="Button" parent="CommandButtons"]
 offset_left = 720.0
@@ -101,6 +102,27 @@ offset_left = 576.0
 offset_top = 368.0
 offset_right = 640.0
 offset_bottom = 432.0
+theme_type_variation = &"Z_ButtonAction"
+icon = ExtResource("2_3ciuf")
+expand_icon = true
+
+[node name="ConfirmButtons" type="Node2D" parent="."]
+visible = false
+
+[node name="Yes" type="Button" parent="ConfirmButtons"]
+offset_left = 576.0
+offset_top = 224.0
+offset_right = 640.0
+offset_bottom = 288.0
+theme_type_variation = &"Z_ButtonAction"
+icon = ExtResource("3_s1lue")
+expand_icon = true
+
+[node name="No" type="Button" parent="ConfirmButtons"]
+offset_left = 648.0
+offset_top = 224.0
+offset_right = 712.0
+offset_bottom = 288.0
 theme_type_variation = &"Z_ButtonAction"
 icon = ExtResource("2_3ciuf")
 expand_icon = true
@@ -219,6 +241,8 @@ visible = false
 [connection signal="pressed" from="CommandButtons/Button7" to="." method="_on_button_7_pressed"]
 [connection signal="pressed" from="CommandButtons/Button8" to="." method="_on_button_8_pressed"]
 [connection signal="pressed" from="CommandButtons/Button9" to="." method="_on_button_9_pressed"]
+[connection signal="pressed" from="ConfirmButtons/Yes" to="." method="_on_yes_pressed"]
+[connection signal="pressed" from="ConfirmButtons/No" to="." method="_on_no_pressed"]
 [connection signal="pressed" from="MovementButtons/TurnRight" to="." method="_on_turn_right_pressed"]
 [connection signal="pressed" from="MovementButtons/Forward" to="." method="_on_forward_pressed"]
 [connection signal="pressed" from="MovementButtons/TurnLeft" to="." method="_on_turn_left_pressed"]

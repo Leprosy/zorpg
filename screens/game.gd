@@ -95,6 +95,16 @@ func _execute_turn(direction: int) -> void:
     tween.play()
     await tween.finished
 
+
+# Commands
+func _on_yes_pressed() -> void:
+    self.script_runner.set_cond(true)
+    self.script_runner.run()
+
+func _on_no_pressed() -> void:
+    self.script_runner.set_cond(false)
+    self.script_runner.run()
+
 func _on_pc_gui_input(event: InputEvent) -> void:
     if event is InputEventMouseButton and not event.pressed:
         if self.script_runner:
@@ -116,6 +126,14 @@ func show_wide_dialog(content: String) -> void:
 func hide_wide_dialog() -> void:
     $WideDialog.hide()
 
+func show_confirm_dialog() -> void:
+    $CommandButtons.hide()
+    $ConfirmButtons.show()
+
+func hide_confirm_dialog() -> void:
+    $CommandButtons.show()
+    $ConfirmButtons.hide()
+
 func load_map(id: String) -> void:
     self.show_wide_dialog("Loading map...")
     var map = $PC/VC/V/CurrentMap.get_children() as Array[GameMap]
@@ -129,6 +147,14 @@ func load_map(id: String) -> void:
     $PC/VC/V/Party.position.z = 0
     self.hide_wide_dialog()
 
+func if_confirm(yes: int, no: int) -> void:
+    if self.script_runner.current_cond:
+        self.script_runner.set_pointer(yes)
+    else:
+        self.script_runner.set_pointer(no)
+
+func exit_script() -> void:
+    self.script_runner.set_pointer(-1)
 
 # Debug
 func _on_button_9_pressed() -> void:

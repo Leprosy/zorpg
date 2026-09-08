@@ -4,7 +4,7 @@
 [ext_resource type="MeshLibrary" uid="uid://353pgv30d4ph" path="res://world/layout.tres" id="2_xjtjx"]
 [ext_resource type="MeshLibrary" uid="uid://caepsqciric2w" path="res://world/things.tres" id="3_vj6rn"]
 
-[node name="TestMap" type="Node3D"]
+[node name="SuperTaldoLair" type="Node3D"]
 script = ExtResource("1_ikyao")
 metadata/_custom_type_script = "uid://dy203nncdbfq1"
 
