@@ -6,12 +6,16 @@ var run_next: bool
 var pointer: int
 var current_cond: bool
 
-static var inmediate = [
+static var inmediate = [ # TODO: Maybe inmediate is the default?
     "hide_npc_dialog", 
     "hide_wide_dialog",
     "hide_confirm_dialog", 
     "if_confirm",
-    "exit_script"
+    "exit_script",
+    "has_quest",
+    "has_completed_quest",
+    "add_quest",
+    "update_quest"
 ]
 
 func _init(new_script_data: Array, new_game: Screen) -> void:

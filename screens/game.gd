@@ -80,7 +80,6 @@ func _execute_move(direction: Vector3) -> void:
     await tween.finished
     var script = get_map().get_cell_script(new_position)
     if len(script):
-        #self.is_scripting = true
         self.script_runner = Runner.new(script, self)
     else:
         self.script_runner = null
@@ -133,6 +132,28 @@ func show_confirm_dialog() -> void:
 func hide_confirm_dialog() -> void:
     $CommandButtons.show()
     $ConfirmButtons.hide()
+
+func add_quest(id: String, desc: String) -> void:
+    var state = self.app_root.state
+    state.add_quest(id, desc)
+
+func has_quest(id: String, yes: int, no: int) -> void:
+    var state = self.app_root.state
+    if state.has_quest(id):
+        self.script_runner.set_pointer(yes)
+    else:
+        self.script_runner.set_pointer(no)
+
+func has_completed_quest(id: String, yes: int, no: int) -> void:
+    var state = self.app_root.state
+    if state.has_completed_quest(id):
+        self.script_runner.set_pointer(yes)
+    else:
+        self.script_runner.set_pointer(no)
+
+func update_quest(id: String, status: Quest.Status) -> void:
+    var state = self.app_root.state
+    state.update_quest(id, status)
 
 func load_map(id: String) -> void:
     self.show_wide_dialog("Loading map...")

@@ -36,6 +36,7 @@ func get_cell_script(pos: Vector3) -> Array:
     var cells: GridMap = $LayoutGridMap
     var vals = self.trans_pos(pos, cells)
     var key = "%dx%d" % [vals[0], vals[2]]
+    print(key)
 
     if self.script_data.has(key):
         return self.script_data.get(key)
