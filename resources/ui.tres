@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=19 format=3 uid="uid://dey76iekniio"]
+[gd_resource type="Theme" load_steps=20 format=3 uid="uid://dey76iekniio"]
 
 [ext_resource type="Texture2D" uid="uid://cy60tpxvsxqfk" path="res://assets/img/ui/button_action.png" id="1_nr324"]
 [ext_resource type="Texture2D" uid="uid://dunmgcvpfad6j" path="res://assets/img/ui/button_dialog.png" id="1_puq7a"]
@@ -6,6 +6,8 @@
 [ext_resource type="Texture2D" uid="uid://bhlv3sxxne311" path="res://assets/img/ui/scroll.png" id="3_rb7da"]
 
 [sub_resource type="FontVariation" id="FontVariation_pxeie"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8yfhb"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_qa6oi"]
 texture = ExtResource("1_nr324")
@@ -144,6 +146,7 @@ LabelSmall/base_type = &"Label"
 LabelSmall/font_sizes/font_size = 10
 LabelSmall/fonts/font = SubResource("FontVariation_pxeie")
 Z_ButtonAction/base_type = &"Button"
+Z_ButtonAction/styles/focus = SubResource("StyleBoxEmpty_8yfhb")
 Z_ButtonAction/styles/hover = SubResource("StyleBoxTexture_qa6oi")
 Z_ButtonAction/styles/normal = SubResource("StyleBoxTexture_rb7da")
 Z_ButtonDialog/base_type = &"Button"

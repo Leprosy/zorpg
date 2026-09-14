@@ -11,20 +11,13 @@ var script_runner: Runner
 
 func _ready() -> void:
     var state = self.app_root.state
-    var x = 0
     for character: Character in state.party.chars:
         var portrait: CharPortrait = char_portrait_scene.instantiate()
-        portrait.position.x = x
+        portrait.custom_minimum_size.x = 84
         $Characters.add_child(portrait)
         portrait.set_face(character.portrait)
         portrait.connect("gui_input", self._on_portrait_click.bind(character))
-        x += 90
     self.load_map("test_map")
-
-func _on_portrait_click(event: InputEvent, data: Character):
-    if event is InputEventMouseButton and not event.pressed:
-        $CharacterView.visible = true
-        $CharacterView.set_data(data)
 
 
 ## Helpers
@@ -44,6 +37,9 @@ func camera_shake(magnitude: float) -> void:
         elapsed_time += get_process_delta_time()
         await get_tree().process_frame
     camera.transform = initial_transform # Reset back to the original transform
+
+func is_viewing_stats() -> bool:
+    return $CharacterView.visible or $QuestView.visible
 
 
 ## Movement functions
@@ -66,7 +62,7 @@ func _on_turn_right_pressed() -> void:
     self._execute_turn(-1)
 
 func _execute_move(direction: Vector3) -> void:
-    if is_scripting:
+    if is_scripting or self.is_viewing_stats():
         return
     var party = $PC/VC/V/Party
     var new_position = party.global_position + direction * SPEED
@@ -85,7 +81,7 @@ func _execute_move(direction: Vector3) -> void:
         self.script_runner = null
 
 func _execute_turn(direction: int) -> void:
-    if is_scripting:
+    if is_scripting or self.is_viewing_stats():
         return
     var party = $PC/VC/V/Party
     var tween = get_tree().create_tween()
@@ -95,7 +91,7 @@ func _execute_turn(direction: int) -> void:
     await tween.finished
 
 
-# Commands
+# Commands buttons & similar stuff
 func _on_yes_pressed() -> void:
     self.script_runner.set_cond(true)
     self.script_runner.run()
@@ -111,6 +107,18 @@ func _on_pc_gui_input(event: InputEvent) -> void:
                 self.is_scripting = true
             self.script_runner.run()
 
+func _on_portrait_click(event: InputEvent, data: Character):
+    if is_scripting or $QuestView.visible:
+        return
+    if event is InputEventMouseButton and not event.pressed:
+        $CharacterView.show()
+        $CharacterView.set_data(data)
+
+func _on_quests_pressed() -> void:
+    if is_scripting or self.is_viewing_stats():
+        return
+    $QuestView.show()
+    $QuestView.set_data(self.app_root.state)
 
 ## Script calls - TODO refactor these into another module?
 func show_npc_dialog(title: String, content: String, npc: int) -> void:
@@ -155,6 +163,28 @@ func update_quest(id: String, status: Quest.Status) -> void:
     var state = self.app_root.state
     state.update_quest(id, status)
 
+func add_quest_item(id: String, desc: String) -> void:
+    var state = self.app_root.state
+    state.add_quest_item(id, desc)
+
+func has_quest_item(id: String, yes: int, no: int) -> void:
+    var state = self.app_root.state
+    if state.has_quest_item(id):
+        self.script_runner.set_pointer(yes)
+    else:
+        self.script_runner.set_pointer(no)
+
+func has_quest_item_count(id: String, count: int, yes: int, no: int) -> void:
+    var state = self.app_root.state
+    if state.has_quest_item_count(id, count):
+        self.script_runner.set_pointer(yes)
+    else:
+        self.script_runner.set_pointer(no)
+
+func update_quest_item(id: String, count: int) -> void:
+    var state = self.app_root.state
+    state.update_quest_item(id, count)
+
 func load_map(id: String) -> void:
     self.show_wide_dialog("Loading map...")
     var map = $PC/VC/V/CurrentMap.get_children() as Array[GameMap]
@@ -178,14 +208,6 @@ func exit_script() -> void:
     self.script_runner.set_pointer(-1)
 
 # Debug
-func _on_button_9_pressed() -> void:
-    if $NpcDialog.visible:
-        self.hide_npc_dialog()
-        self.hide_wide_dialog()
-    else:
-        self.show_npc_dialog("Sir Leprosy", "This is a test dialog created to test this", 10)
-        self.show_wide_dialog("Mmmm...this is working")
-
 func _on_button_8_pressed() -> void:
     self.load_map("taldo")
 

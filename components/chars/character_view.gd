@@ -55,4 +55,4 @@ func _on_equip_pressed() -> void:
     self.render_items()
 
 func _on_close_pressed() -> void:
-    self.visible = false
+    self.hide()
