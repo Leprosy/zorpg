@@ -1,0 +1,237 @@
+[gd_scene load_steps=7 format=3 uid="uid://dtgtfrqvw07rn"]
+
+[ext_resource type="Script" uid="uid://cdkmooj1cd5xb" path="res://components/quests/quest_view.gd" id="1_0u3pk"]
+[ext_resource type="Texture2D" uid="uid://cgegnmqr5hh1r" path="res://assets/img/icons/rem.png" id="3_xce11"]
+[ext_resource type="Texture2D" uid="uid://bnrs337jf6xu1" path="res://assets/img/chars/items-icons.png" id="4_dxpby"]
+[ext_resource type="Texture2D" uid="uid://cfwakcydb8ymn" path="res://assets/img/icons/plus.png" id="5_pq7t8"]
+[ext_resource type="Texture2D" uid="uid://t7akh1p4bd8h" path="res://assets/img/icons/undo.png" id="6_we4sb"]
+[ext_resource type="Texture2D" uid="uid://bsee02nrbpijk" path="res://assets/img/icons/backwards.png" id="7_834ey"]
+
+[node name="QuestView" type="TabContainer"]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 560.0
+offset_bottom = 432.0
+theme_type_variation = &"Z_TabDialog"
+current_tab = 0
+script = ExtResource("1_0u3pk")
+
+[node name="Quest" type="Panel" parent="."]
+layout_mode = 2
+theme_type_variation = &"Z_NoStyle"
+metadata/_tab_index = 0
+
+[node name="Name" type="RichTextLabel" parent="Quest"]
+layout_mode = 2
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 5.0
+offset_right = -4.0
+offset_bottom = -332.0
+theme_type_variation = &"Z_DialogText"
+text = "Active Quests"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Quest"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 45.0
+offset_right = 484.0
+offset_bottom = 261.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Quest/ScrollContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="Quest/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "This is ab iuten"
+
+[node name="Label2" type="Label" parent="Quest/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "This is ab iuten"
+
+[node name="Label3" type="Label" parent="Quest/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "This is ab iuten"
+
+[node name="Label4" type="Label" parent="Quest/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "This is ab iuten"
+
+[node name="Label5" type="Label" parent="Quest/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "This is ab iuten"
+
+[node name="Label6" type="Label" parent="Quest/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "This is ab iuten"
+
+[node name="Label7" type="Label" parent="Quest/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "This is ab iuten"
+
+[node name="Label8" type="Label" parent="Quest/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "This is ab iuten"
+
+[node name="Label9" type="Label" parent="Quest/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "This is ab iuten"
+
+[node name="Label10" type="Label" parent="Quest/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "This is ab iuten"
+
+[node name="Label11" type="Label" parent="Quest/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "This is ab iuten"
+
+[node name="Label12" type="Label" parent="Quest/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "This is ab iuten"
+
+[node name="Label13" type="Label" parent="Quest/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "This is ab iuten"
+
+[node name="Label14" type="Label" parent="Quest/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "This is ab iuten"
+
+[node name="Label15" type="Label" parent="Quest/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "This is ab iuten"
+
+[node name="Close" type="Button" parent="Quest"]
+layout_mode = 0
+offset_left = 444.0
+offset_top = 293.0
+offset_right = 492.0
+offset_bottom = 341.0
+theme_type_variation = &"Z_ButtonDialog"
+icon = ExtResource("3_xce11")
+expand_icon = true
+
+[node name="All" type="Button" parent="Quest"]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 293.0
+offset_right = 124.0
+offset_bottom = 341.0
+theme_type_variation = &"Z_ButtonDialog"
+icon = ExtResource("6_we4sb")
+expand_icon = true
+
+[node name="Active" type="Button" parent="Quest"]
+layout_mode = 2
+offset_left = 12.0
+offset_top = 293.0
+offset_right = 60.0
+offset_bottom = 341.0
+theme_type_variation = &"Z_ButtonDialog"
+icon = ExtResource("5_pq7t8")
+expand_icon = true
+
+[node name="Items" type="Panel" parent="."]
+visible = false
+layout_mode = 2
+theme_type_variation = &"Z_NoStyle"
+metadata/_tab_index = 1
+
+[node name="Name" type="RichTextLabel" parent="Items"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 5.0
+offset_right = 476.0
+offset_bottom = 21.0
+theme_type_variation = &"Z_DialogText"
+text = "Quest Items"
+
+[node name="Grid" type="GridContainer" parent="Items"]
+layout_direction = 2
+layout_mode = 0
+offset_left = 4.0
+offset_top = 37.0
+offset_right = 324.0
+offset_bottom = 317.0
+columns = 5
+
+[node name="Details" type="Panel" parent="Items"]
+layout_mode = 0
+offset_left = 340.0
+offset_top = 37.0
+offset_right = 492.0
+offset_bottom = 285.0
+theme_type_variation = &"Z_DialogSubPanel"
+
+[node name="Name" type="RichTextLabel" parent="Items/Details"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 144.0
+offset_bottom = 48.0
+horizontal_alignment = 1
+
+[node name="Icon" type="Sprite2D" parent="Items/Details"]
+position = Vector2(72, 88)
+scale = Vector2(4, 4.26667)
+texture = ExtResource("4_dxpby")
+hframes = 36
+vframes = 36
+
+[node name="Data" type="RichTextLabel" parent="Items/Details"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 128.0
+offset_right = 144.0
+offset_bottom = 200.0
+
+[node name="Equip" type="Button" parent="Items/Details"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 200.0
+offset_right = 48.0
+offset_bottom = 240.0
+tooltip_text = "Equip/Remove Item"
+theme_type_variation = &"Z_ButtonDialog"
+icon = ExtResource("5_pq7t8")
+expand_icon = true
+
+[node name="Use" type="Button" parent="Items/Details"]
+layout_mode = 0
+offset_left = 56.0
+offset_top = 200.0
+offset_right = 96.0
+offset_bottom = 240.0
+tooltip_text = "Use Item"
+theme_type_variation = &"Z_ButtonDialog"
+icon = ExtResource("6_we4sb")
+expand_icon = true
+
+[node name="Drop" type="Button" parent="Items/Details"]
+layout_mode = 0
+offset_left = 104.0
+offset_top = 200.0
+offset_right = 144.0
+offset_bottom = 240.0
+tooltip_text = "Drop Item"
+theme_type_variation = &"Z_ButtonDialog"
+icon = ExtResource("7_834ey")
+expand_icon = true
+
+[node name="Close" type="Button" parent="Items"]
+layout_mode = 0
+offset_left = 444.0
+offset_top = 293.0
+offset_right = 492.0
+offset_bottom = 341.0
+theme_type_variation = &"Z_ButtonDialog"
+icon = ExtResource("3_xce11")
+expand_icon = true
+
+[connection signal="pressed" from="Quest/Close" to="." method="_on_close_pressed"]
+[connection signal="pressed" from="Quest/All" to="." method="_on_all_pressed"]
+[connection signal="pressed" from="Quest/Active" to="." method="_on_active_pressed"]
+[connection signal="pressed" from="Items/Details/Equip" to="." method="_on_equip_pressed"]
+[connection signal="pressed" from="Items/Close" to="." method="_on_close_pressed"]

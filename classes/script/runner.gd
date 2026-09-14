@@ -15,7 +15,11 @@ static var inmediate = [ # TODO: Maybe inmediate is the default?
     "has_quest",
     "has_completed_quest",
     "add_quest",
-    "update_quest"
+    "update_quest",
+    "has_quest_item",
+    "has_quest_item_count",
+    "add_quest_item",
+    "update_quest_item"
 ]
 
 func _init(new_script_data: Array, new_game: Screen) -> void:
