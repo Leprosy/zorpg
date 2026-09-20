@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://cv8oaouowkoqn" path="res://assets/img/chars/stats-icons.png" id="1_jil1c"]
 [ext_resource type="Script" uid="uid://cx4cyvbt1hh57" path="res://components/chars/character_view.gd" id="1_kmbgf"]
-[ext_resource type="Texture2D" uid="uid://cgegnmqr5hh1r" path="res://assets/img/icons/rem.png" id="2_x1jy8"]
+[ext_resource type="Texture2D" uid="uid://ditq3pesao5gj" path="res://assets/img/icons/cancel.png" id="3_wyb6m"]
 [ext_resource type="Texture2D" uid="uid://t7akh1p4bd8h" path="res://assets/img/icons/undo.png" id="4_sl3kw"]
 [ext_resource type="Texture2D" uid="uid://cfwakcydb8ymn" path="res://assets/img/icons/plus.png" id="5_niocs"]
 [ext_resource type="Texture2D" uid="uid://bnrs337jf6xu1" path="res://assets/img/chars/items-icons.png" id="5_wyb6m"]
@@ -174,7 +174,7 @@ offset_top = 293.0
 offset_right = 492.0
 offset_bottom = 341.0
 theme_type_variation = &"Z_ButtonDialog"
-icon = ExtResource("2_x1jy8")
+icon = ExtResource("3_wyb6m")
 expand_icon = true
 
 [node name="Items" type="Panel" parent="."]
@@ -271,7 +271,7 @@ offset_top = 293.0
 offset_right = 492.0
 offset_bottom = 341.0
 theme_type_variation = &"Z_ButtonDialog"
-icon = ExtResource("2_x1jy8")
+icon = ExtResource("3_wyb6m")
 expand_icon = true
 
 [connection signal="pressed" from="Stats/Close" to="." method="_on_close_pressed"]

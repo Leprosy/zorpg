@@ -9,6 +9,7 @@ static func create(type: int, equiped: bool):
     return instance
 
 func setup(type: int, equiped: bool) -> void:
+    self.custom_minimum_size = Vector2(56, 56)
     $Icon.frame = type * 4
     $Equiped.visible = equiped
     if type < 0:

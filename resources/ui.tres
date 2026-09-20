@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=20 format=3 uid="uid://dey76iekniio"]
+[gd_resource type="Theme" load_steps=23 format=3 uid="uid://dey76iekniio"]
 
 [ext_resource type="Texture2D" uid="uid://cy60tpxvsxqfk" path="res://assets/img/ui/button_action.png" id="1_nr324"]
 [ext_resource type="Texture2D" uid="uid://dunmgcvpfad6j" path="res://assets/img/ui/button_dialog.png" id="1_puq7a"]
@@ -36,6 +36,22 @@ expand_margin_bottom = 2.0
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_tyv3d"]
+texture = ExtResource("1_nr324")
+texture_margin_left = 4.0
+texture_margin_top = 4.0
+texture_margin_right = 4.0
+texture_margin_bottom = 4.0
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+modulate_color = Color(0.627635, 0.627635, 0.627635, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mo0i0"]
+
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_nr324"]
 texture = ExtResource("1_puq7a")
 texture_margin_left = 2.0
@@ -62,6 +78,20 @@ expand_margin_right = 2.0
 expand_margin_bottom = 2.0
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_wja67"]
+texture = ExtResource("1_puq7a")
+texture_margin_left = 4.0
+texture_margin_top = 4.0
+texture_margin_right = 4.0
+texture_margin_bottom = 4.0
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+modulate_color = Color(0.627451, 0.627451, 0.627451, 1)
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_8yfhb"]
 texture = ExtResource("3_rb7da")
@@ -149,9 +179,12 @@ Z_ButtonAction/base_type = &"Button"
 Z_ButtonAction/styles/focus = SubResource("StyleBoxEmpty_8yfhb")
 Z_ButtonAction/styles/hover = SubResource("StyleBoxTexture_qa6oi")
 Z_ButtonAction/styles/normal = SubResource("StyleBoxTexture_rb7da")
+Z_ButtonAction/styles/pressed = SubResource("StyleBoxTexture_tyv3d")
 Z_ButtonDialog/base_type = &"Button"
+Z_ButtonDialog/styles/focus = SubResource("StyleBoxEmpty_mo0i0")
 Z_ButtonDialog/styles/hover = SubResource("StyleBoxTexture_nr324")
 Z_ButtonDialog/styles/normal = SubResource("StyleBoxTexture_puq7a")
+Z_ButtonDialog/styles/pressed = SubResource("StyleBoxTexture_wja67")
 Z_Dialog/base_type = &"Panel"
 Z_Dialog/styles/panel = SubResource("StyleBoxTexture_8yfhb")
 Z_DialogSubPanel/base_type = &"Panel"

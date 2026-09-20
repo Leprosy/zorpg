@@ -1,11 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://dtgtfrqvw07rn"]
+[gd_scene load_steps=6 format=3 uid="uid://dtgtfrqvw07rn"]
 
 [ext_resource type="Script" uid="uid://cdkmooj1cd5xb" path="res://components/quests/quest_view.gd" id="1_0u3pk"]
-[ext_resource type="Texture2D" uid="uid://cgegnmqr5hh1r" path="res://assets/img/icons/rem.png" id="3_xce11"]
+[ext_resource type="Texture2D" uid="uid://ditq3pesao5gj" path="res://assets/img/icons/cancel.png" id="2_bvl0p"]
 [ext_resource type="Texture2D" uid="uid://bnrs337jf6xu1" path="res://assets/img/chars/items-icons.png" id="4_dxpby"]
 [ext_resource type="Texture2D" uid="uid://cfwakcydb8ymn" path="res://assets/img/icons/plus.png" id="5_pq7t8"]
 [ext_resource type="Texture2D" uid="uid://t7akh1p4bd8h" path="res://assets/img/icons/undo.png" id="6_we4sb"]
-[ext_resource type="Texture2D" uid="uid://bsee02nrbpijk" path="res://assets/img/icons/backwards.png" id="7_834ey"]
 
 [node name="QuestView" type="TabContainer"]
 offset_left = 16.0
@@ -110,7 +109,7 @@ offset_top = 293.0
 offset_right = 492.0
 offset_bottom = 341.0
 theme_type_variation = &"Z_ButtonDialog"
-icon = ExtResource("3_xce11")
+icon = ExtResource("2_bvl0p")
 expand_icon = true
 
 [node name="All" type="Button" parent="Quest"]
@@ -148,13 +147,21 @@ offset_bottom = 21.0
 theme_type_variation = &"Z_DialogText"
 text = "Quest Items"
 
-[node name="Grid" type="GridContainer" parent="Items"]
-layout_direction = 2
+[node name="ScrollContainer" type="ScrollContainer" parent="Items"]
 layout_mode = 0
 offset_left = 4.0
 offset_top = 37.0
 offset_right = 324.0
 offset_bottom = 317.0
+horizontal_scroll_mode = 0
+
+[node name="Grid" type="GridContainer" parent="Items/ScrollContainer"]
+layout_direction = 2
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
 columns = 5
 
 [node name="Details" type="Panel" parent="Items"]
@@ -185,40 +192,7 @@ layout_mode = 0
 offset_left = 8.0
 offset_top = 128.0
 offset_right = 144.0
-offset_bottom = 200.0
-
-[node name="Equip" type="Button" parent="Items/Details"]
-layout_mode = 0
-offset_left = 8.0
-offset_top = 200.0
-offset_right = 48.0
 offset_bottom = 240.0
-tooltip_text = "Equip/Remove Item"
-theme_type_variation = &"Z_ButtonDialog"
-icon = ExtResource("5_pq7t8")
-expand_icon = true
-
-[node name="Use" type="Button" parent="Items/Details"]
-layout_mode = 0
-offset_left = 56.0
-offset_top = 200.0
-offset_right = 96.0
-offset_bottom = 240.0
-tooltip_text = "Use Item"
-theme_type_variation = &"Z_ButtonDialog"
-icon = ExtResource("6_we4sb")
-expand_icon = true
-
-[node name="Drop" type="Button" parent="Items/Details"]
-layout_mode = 0
-offset_left = 104.0
-offset_top = 200.0
-offset_right = 144.0
-offset_bottom = 240.0
-tooltip_text = "Drop Item"
-theme_type_variation = &"Z_ButtonDialog"
-icon = ExtResource("7_834ey")
-expand_icon = true
 
 [node name="Close" type="Button" parent="Items"]
 layout_mode = 0
@@ -227,11 +201,10 @@ offset_top = 293.0
 offset_right = 492.0
 offset_bottom = 341.0
 theme_type_variation = &"Z_ButtonDialog"
-icon = ExtResource("3_xce11")
+icon = ExtResource("2_bvl0p")
 expand_icon = true
 
 [connection signal="pressed" from="Quest/Close" to="." method="_on_close_pressed"]
 [connection signal="pressed" from="Quest/All" to="." method="_on_all_pressed"]
 [connection signal="pressed" from="Quest/Active" to="." method="_on_active_pressed"]
-[connection signal="pressed" from="Items/Details/Equip" to="." method="_on_equip_pressed"]
 [connection signal="pressed" from="Items/Close" to="." method="_on_close_pressed"]

@@ -1,13 +1,14 @@
-[gd_scene load_steps=17 format=3 uid="uid://cjw7nosu4yuix"]
+[gd_scene load_steps=18 format=3 uid="uid://cjw7nosu4yuix"]
 
 [ext_resource type="Script" uid="uid://cahccvix1vocc" path="res://screens/game.gd" id="1_6ydpi"]
 [ext_resource type="Texture2D" uid="uid://cgegnmqr5hh1r" path="res://assets/img/icons/rem.png" id="2_3ciuf"]
 [ext_resource type="Texture2D" uid="uid://dg5exgqncdwm0" path="res://assets/img/ui/debug-bg.jpg" id="2_w4cu3"]
-[ext_resource type="Texture2D" uid="uid://b1xycaauepa4y" path="res://assets/img/icons/rotate-right.png" id="3_dpnst"]
-[ext_resource type="Texture2D" uid="uid://cfwakcydb8ymn" path="res://assets/img/icons/plus.png" id="3_s1lue"]
+[ext_resource type="Texture2D" uid="uid://bpg5j0vteek7" path="res://assets/img/icons/yes.png" id="4_g5ijc"]
 [ext_resource type="Texture2D" uid="uid://vy3p1b130feg" path="res://assets/img/icons/forward.png" id="4_okr7b"]
-[ext_resource type="Texture2D" uid="uid://d1x31xhwulnt6" path="res://assets/img/icons/rotate-left.png" id="5_s1lue"]
+[ext_resource type="Texture2D" uid="uid://bchj2kl7ksuyf" path="res://assets/img/icons/no.png" id="5_5qun0"]
+[ext_resource type="Texture2D" uid="uid://dc6hnnwa223cd" path="res://assets/img/icons/turn-right.png" id="5_l3exe"]
 [ext_resource type="Texture2D" uid="uid://4gqi1t0etue2" path="res://assets/img/icons/strafe-right.png" id="6_w0xem"]
+[ext_resource type="Texture2D" uid="uid://ergn71cxk02i" path="res://assets/img/icons/turn-left.png" id="7_g5ijc"]
 [ext_resource type="Texture2D" uid="uid://bsee02nrbpijk" path="res://assets/img/icons/backwards.png" id="7_w4cu3"]
 [ext_resource type="Texture2D" uid="uid://ddmtfhjeqc58j" path="res://assets/img/icons/strafe-left.png" id="8_l3exe"]
 [ext_resource type="PackedScene" uid="uid://cy2xfaroim1vl" path="res://components/dialogs/npc-dialog.tscn" id="10_dpnst"]
@@ -119,21 +120,21 @@ expand_icon = true
 visible = false
 
 [node name="Yes" type="Button" parent="ConfirmButtons"]
-offset_left = 576.0
-offset_top = 224.0
+offset_left = 592.0
+offset_top = 228.0
 offset_right = 640.0
-offset_bottom = 288.0
+offset_bottom = 276.0
 theme_type_variation = &"Z_ButtonAction"
-icon = ExtResource("3_s1lue")
+icon = ExtResource("4_g5ijc")
 expand_icon = true
 
 [node name="No" type="Button" parent="ConfirmButtons"]
-offset_left = 648.0
-offset_top = 224.0
-offset_right = 712.0
-offset_bottom = 288.0
+offset_left = 656.0
+offset_top = 228.0
+offset_right = 704.0
+offset_bottom = 276.0
 theme_type_variation = &"Z_ButtonAction"
-icon = ExtResource("2_3ciuf")
+icon = ExtResource("5_5qun0")
 expand_icon = true
 
 [node name="MovementButtons" type="Node" parent="."]
@@ -144,7 +145,7 @@ offset_top = 448.0
 offset_right = 768.0
 offset_bottom = 496.0
 theme_type_variation = &"Z_ButtonAction"
-icon = ExtResource("3_dpnst")
+icon = ExtResource("5_l3exe")
 expand_icon = true
 
 [node name="Forward" type="Button" parent="MovementButtons"]
@@ -162,7 +163,7 @@ offset_top = 448.0
 offset_right = 640.0
 offset_bottom = 496.0
 theme_type_variation = &"Z_ButtonAction"
-icon = ExtResource("5_s1lue")
+icon = ExtResource("7_g5ijc")
 expand_icon = true
 
 [node name="StrafeRight" type="Button" parent="MovementButtons"]

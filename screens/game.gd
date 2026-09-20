@@ -163,9 +163,9 @@ func update_quest(id: String, status: Quest.Status) -> void:
     var state = self.app_root.state
     state.update_quest(id, status)
 
-func add_quest_item(id: String, desc: String) -> void:
+func add_quest_item(id: String, desc: String, icon: int) -> void:
     var state = self.app_root.state
-    state.add_quest_item(id, desc)
+    state.add_quest_item(id, desc, icon)
 
 func has_quest_item(id: String, yes: int, no: int) -> void:
     var state = self.app_root.state

@@ -18,6 +18,8 @@ func _init() -> void:
     var q4 = Quest.new("id4", "Quest debug 4")
     q3.status = Quest.Status.Completed
     self.quests = [q1,q2,q3,q4]
+    for i in range(24):
+        self.add_quest_item("debug_item_%s" % i, "Debug item %s" % (i + 1), i % 8)
 
 func add_quest(id: String, desc: String) -> void:
     if self.has_quest(id):
@@ -37,13 +39,13 @@ func update_quest(id: String, status: Quest.Status) -> void:
         if quest.id == id:
             quest.status = status
 
-func add_quest_item(id: String, desc: String) -> void:
+func add_quest_item(id: String, desc: String, icon: int) -> void:
     if self.has_quest_item(id):
         for quest_item in self.quest_items:
             if quest_item.id == id:
                 quest_item.count += 1
         return
-    var quest_item = QuestItem.new(id, desc)
+    var quest_item = QuestItem.new(id, desc, icon)
     self.quest_items.push_back(quest_item)
 
 func has_quest_item(id: String) -> bool:

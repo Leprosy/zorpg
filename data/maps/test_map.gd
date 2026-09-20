@@ -17,7 +17,7 @@ func _ready() -> void:
             { "cmd": "exit_script" },
             { "cmd": "show_wide_dialog", "args": { "content": "This is confirmed!" } },
             { "cmd": "add_quest", "args": { "id": "taldo1", "desc": "Find Super Taldo" } },
-            { "cmd": "add_quest_item", "args": { "id": "taldo_key", "desc": "Taldo Key" } },
+            { "cmd": "add_quest_item", "args": { "id": "taldo_key", "desc": "Taldo Key", "icon": 0 } },
             { "cmd": "hide_wide_dialog" },
         ],
         "3x-3": [
